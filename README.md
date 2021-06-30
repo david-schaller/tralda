@@ -26,29 +26,34 @@ The package has several dependencies (which are installed automatically when usi
 
 ### Tree data structures
 
-The class `Tree` in the module `datastructures.Tree` implements the basic tree data structures which are essential for most of the modules in the package.
+The following classes can be imported from the subpackage `tralda.datastructures`.
+The class `Tree` implements the basic tree data structures which are essential for most of the modules in the package.
 It provides methods for tree traversals and manipulation, output in Newick format, as well as the efficient computation of last common ancestors (class `LCA` which is initialized with an instance of type `Tree`).
 
 The classes `TreeSet` and `TreeDict` implement data structures (AVL trees) for sorted sets and dictionaries, respectively.
 
 ### Supertree computation
 
-The subpackage `supertree` implements a number of algorithms for the computation of supertrees:
-* BUILD (Aho et al. 1981), class `Build` or function `BUILD_supertree` (import via `supertree`),
-* BuildST (Deng & Fernández-Baca 2016), class `BuildST` or function `Build_st` (import via `supertree`),
-* LinCR (Schaller et al. 2021), class `LinCR` or function `linear_common_refinement` (import via `supertree`).
+The subpackage `tralda.supertree` implements a number of algorithms for the computation of supertrees:
+* BUILD (Aho et al. 1981), class `Build` or function `BUILD_supertree`
+* BuildST (Deng & Fernández-Baca 2016), class `BuildST` or function `Build_st`
+* LinCR (Schaller et al. 2021), class `LinCR` or function `linear_common_refinement`
 
 The LinCR algorithm computes a supertree for a sequence of trees on the same set of leaves, i.e., a common refinement.
 
 ### Cograph editing
 
-The subpackage `cograph` contains an efficient algorithm for cograph recognition and heuristics for cograph editing.
+The subpackage `tralda.cograph` contains an efficient algorithm for cograph recognition and heuristics for cograph editing:
+* class `Cotree` inherits from `Tree`
+* function `linear_cograph_detection` recognizes cographs and returns a `Cotree` representation in the positive case (Corneil et al. 1985)
+* function `edit_to_cograph` edits an arbitrary graph to a cograph (algorithm from Crespelle 2019)
 
 ### Other data structures
 
-* linked list: class `LinkedList` (import via `datastructures`)
-* doubly-linked list: class `DoublyLinkedList` (import via `datastructures`)
-* HDT dynamic graph data structure (Holm, de Lichtenberg & Thorup in 2001): `HDTGraph` (import via `datastructures`)
+The following data structures can be imported from the subpackage `tralda.datastructures`:
+* linked list: class `LinkedList`
+* doubly-linked list: class `DoublyLinkedList`
+* HDT dynamic graph data structure (Holm, de Lichtenberg & Thorup in 2001): class `HDTGraph`
 
 ## Citation and references
 
