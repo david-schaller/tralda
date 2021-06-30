@@ -16,7 +16,7 @@ The `tralda` package is available on [PyPI](https://pypi.org/project/tralda/):
     pip install tralda
 
 For details about how to install Python packages see [here](https://packaging.python.org/tutorials/installing-packages/).
-    
+
 #### Dependencies
 
 The package has several dependencies (which are installed automatically when using `pip`):
@@ -42,7 +42,7 @@ The subpackage `tralda.supertree` implements a number of algorithms for the comp
 
 The LinCR algorithm computes a supertree for a sequence of trees on the same set of leaves, i.e., a common refinement.
 
-### Cograph editing
+### Cographs and cotrees
 
 The subpackage `tralda.cograph` contains an efficient algorithm for cograph recognition and heuristics for cograph editing:
 * class `Cotree` inherits from `Tree`
