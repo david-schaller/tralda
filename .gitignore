@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+.idea/
+.spyproject/
+*~
+tralda.egg-info/
+build/
+dist/
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+bin/
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# LaTeX
+*.log
+*.aux
+*.bbl
+*.out
+*.gz
+*.blg
+*.lof
+*.toc
+_minted*/
+*.pyg
+
+# others
+examples/results/*
+testfile*
+*.DS_Store
