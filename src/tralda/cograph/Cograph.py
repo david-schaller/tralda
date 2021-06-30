@@ -16,7 +16,7 @@ from collections import deque
 
 import networkx as nx
 
-from tralda.Tree import Tree, TreeNode, LCA
+from tralda.datastructures.Tree import Tree, TreeNode, LCA
 
 
 __author__ = 'David Schaller'

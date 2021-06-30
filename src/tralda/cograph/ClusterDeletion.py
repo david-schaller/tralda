@@ -8,10 +8,9 @@ cographs, and the complete multipartite graph completion problem.
 
 __author__ = 'David Schaller'
 
-import itertools
-import networkx as nx
 
 from tralda.cograph.Cograph import Cotree
+from tralda.tools.GraphTools import complete_multipartite_graph_from_sets
 
 
 def cluster_deletion(cograph):
@@ -76,21 +75,6 @@ def cluster_deletion(cograph):
             raise RuntimeError('invalid cotree')
     
     return P[cotree.root]
-
-
-def complete_multipartite_graph_from_sets(partition):
-    """Construct the complete multipartite graphs from the independent sets."""
-    
-    G = nx.Graph()
-    
-    for i in range(len(partition)):
-        G.add_nodes_from(partition[i])
-        
-        for j in range(i+1, len(partition)):
-            for x, y in itertools.product(partition[i], partition[j]):
-                G.add_edge(x, y)
-    
-    return G
 
 
 def complete_multipartite_completion(cograph, supply_graph=False):

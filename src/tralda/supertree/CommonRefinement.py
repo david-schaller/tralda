@@ -10,7 +10,7 @@ from tralda.datastructures.Tree import Tree, TreeNode
 __author__ = 'David Schaller'
 
 
-def common_refinement(trees):
+def linear_common_refinement(trees):
     """Minimal common refinement for a set of trees with the same leaf set.
     
     All input trees must be phylogenetic and have the same set of leaf IDs.
@@ -34,11 +34,11 @@ def common_refinement(trees):
         set of leaves.
     """
     
-    cr = _RefinementConstructor(trees)
+    cr = LinCR(trees)
     return cr.run()
 
 
-class _RefinementConstructor:
+class LinCR:
     
     def __init__(self, trees):
         
@@ -217,45 +217,3 @@ class _RefinementConstructor:
                     return False
         
         return True
-                
-
-if __name__ == '__main__':
-    
-    # ----- TESTING THIS MODULE -----
-    
-    import random
-    
-    N = 20
-    contraction_prob = 0.9
-    tree = Tree.random_tree(N, binary=True)
-    print(tree.to_newick())
-    print('----------')
-    
-    partial_trees = []
-    for i in range(10):
-        
-        T_i = tree.copy()
-        
-        edges = []
-        
-        for u, v in T_i.inner_edges():
-            if random.random() < contraction_prob:
-                edges.append((u,v))
-        
-        T_i.contract(edges)
-        print(T_i.to_newick())
-
-        partial_trees.append(T_i)
-    
-    cr_tree = common_refinement(partial_trees)
-    
-    print('----------')
-    if cr_tree:
-        
-        for T_i in partial_trees:
-            print(cr_tree.is_refinement(T_i))
-        print(tree.is_refinement(cr_tree))
-        print(cr_tree.to_newick())
-        
-    else:
-        print('could not build tree')
