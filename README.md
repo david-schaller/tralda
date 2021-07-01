@@ -1,13 +1,13 @@
 # tralda
 
 [![license: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![pypi version](https://img.shields.io/badge/pypi-v0.0.1-blue.svg)](https://pypi.org/project/tralda/)
+[![pypi version](https://img.shields.io/badge/pypi-v0.0.2-blue.svg)](https://pypi.org/project/tralda/)
 
 A Python library for **tr**ee **al**gorithms and **da**ta structures.
 
 ## Installation
 
-The package requires Python 3.5 or higher.
+The package requires Python 3.7 or higher.
 
 #### Easy installation with pip
 
