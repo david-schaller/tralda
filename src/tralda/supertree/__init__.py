@@ -2,7 +2,9 @@
 
 from tralda.supertree.Build import (Build,
                                     BUILD_supertree,
-                                    tree_profile_to_triples)
+                                    tree_profile_to_triples,
+                                    greedy_BUILD,
+                                    best_pair_merge_first)
 from tralda.supertree.BuildST import (BuildST,
                                       build_st)
 from tralda.supertree.CommonRefinement import (LinCR,
