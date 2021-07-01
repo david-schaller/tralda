@@ -14,7 +14,6 @@ References:
       Pattern Matching (CPM 2016). DOI: 10.4230/LIPIcs.CPM.2016.12
 """
 
-from collections import deque
 
 from tralda.datastructures.Tree import Tree, TreeNode
 from tralda.datastructures.DoublyLinkedList import DLList
@@ -45,9 +44,7 @@ class BuildST:
     
     Parameters
     ----------
-    hdt : bool
-        If True, the dynamic graph data structure is used as described in the
-        references paper.
+    trees : sequence of Tree instances
     
     References
     ----------
@@ -56,7 +53,7 @@ class BuildST:
       Pattern Matching (CPM 2016). DOI: 10.4230/LIPIcs.CPM.2016.12
     """
     
-    def __init__(self, trees, hdt=True):
+    def __init__(self, trees):
         """Constructor for BuildST algorithm."""
         
         self.trees = trees
@@ -65,15 +62,9 @@ class BuildST:
         self.node_to_tree_index = {}
         self.list_pointer = {}                          # node --> DLL element
         self.singleton_pointer = {}                     # node --> DLL element
+        self.hdt_graph = HDTGraph()
         
         self.fail_message = ''
-        
-        if hdt:
-            self.ConnectedComp = ConnectedComp_HDT      # use 'ConnectedComp_HDT'
-            self.hdt_graph = HDTGraph()
-        else:
-            self.ConnectedComp = ConnectedComp_simple   # use 'ConnectedComp_simple'
-            self.hdt_graph = False
         
     
     def run(self):
@@ -106,7 +97,7 @@ class BuildST:
     
     def _initialize(self):
         
-        Y = self.ConnectedComp(len(self.trees), self, count=len(self.Xp))
+        Y = _ConnectedComp(len(self.trees), self, count=len(self.Xp))
         
         for i, tree in enumerate(self.trees):
             
@@ -215,7 +206,7 @@ class BuildST:
                         else:
                             Y_current.set_component(component=conn_comp[0],
                                                     representative=v_i)
-                            Y_new = self.ConnectedComp(Y_current.k, self)
+                            Y_new = _ConnectedComp(Y_current.k, self)
                             Y_new.set_component(component=conn_comp[1], 
                                                 representative=u)
                             current_smaller = True \
@@ -235,7 +226,7 @@ class BuildST:
                         else:
                             Y_current.set_component(component=conn_comp[1],
                                                     representative=v_i)
-                            Y_new = self.ConnectedComp(Y_current.k, self)
+                            Y_new = _ConnectedComp(Y_current.k, self)
                             Y_new.set_component(component=conn_comp[0],
                                                 representative=u)
                             current_smaller = True \
@@ -336,8 +327,8 @@ class XpNode:
         return str(self.ID)
         
     
-class ConnectedComp_HDT:
-    """Connected components class for D.-F.-B. algorithm (HDT datastructure)."""
+class _ConnectedComp:
+    """Connected component for D. & F.-B. algorithm (HDT data structure)."""
     
     def __init__(self, k, buildst, count=0, singleton=None, List=None):
         
@@ -413,100 +404,3 @@ class ConnectedComp_HDT:
                 result.append(node)
                 
         return result
-
-
-class ConnectedComp_simple:
-    """Connected components class for D.-F.-B. algorithm (simple datastructure)."""
-    
-    def __init__(self, k, buildst, count=0, singleton=None, List=None):
-        
-        self.k = k
-        self.buildst = buildst
-        self.count = count
-        self.singleton = singleton if singleton else DLList()
-        self.List = List if List else [DLList() for i in range(k)]
-        
-        self.component = {}
-    
-    
-    def keys(self):
-        """Generator for the elements in the component."""
-        
-        yield from self.component.keys()
-    
-    
-    def contains_key(self, key):
-        """Check if a given key is element of the component."""
-        
-        return key in self.component
-        
-    
-    def initialize_tree_edges(self, tree):
-        """Add all edges of a tree to the graph datastructure."""
-        
-        for u, v in tree.edges():
-            if u not in self.component:
-                self.component[u] = set()
-            if v not in self.component:
-                self.component[v] = set()
-            self.component[u].add(v)         # add all tree edges
-            self.component[v].add(u)         # as undirected edges
-    
-    
-    def add_edge(self, u, v):
-        """Add an edge to the graph datastructure."""
-        
-        if u not in self.component:
-            self.component[u] = set()
-        if v not in self.component:
-            self.component[v] = set()
-        self.component[u].add(v)             # add all tree edges
-        self.component[v].add(u)             # as undirected edges
-    
-    
-    def delete_edge(self, u, v):
-        """Delete an edge and return the 1 or 2 conn. components of u and v."""
-        
-        self.component[u].remove(v)
-        self.component[v].remove(u)
-        return self.breadth_first_search()     
-    
-    
-    def breadth_first_search(self):
-        """Determines connected components by breadth-first search."""
-        
-        result = []                                 # a list of dictionaries
-        visited = set()                             # already visited nodes
-        Q = deque()                                 # initialize queue
-        
-        for start_node in self.component.keys():
-            if start_node in visited:
-                continue
-            conn_comp = {}                          # dictionary that represents
-                                                    # one conn. comp.
-            conn_comp[start_node] = self.component[start_node]
-            visited.add(start_node)
-            Q.append(start_node)
-            while Q:
-                v = Q[0]
-                for u in self.component[v]:
-                    if u not in visited:
-                        visited.add(u)
-                        Q.append(u)
-                        conn_comp[u] = self.component[u]
-                Q.popleft()
-            result.append(conn_comp)
-            
-        return result
-    
-    
-    def set_component(self, component=None, representative=None):
-        """Set the component (self.component)."""
-        
-        self.component = component
-    
-    
-    def get_labelnodes(self):
-        """Return the labelnodes in the connected component."""
-        
-        return [v for v in self.component.keys() if isinstance(v, XpNode)]
