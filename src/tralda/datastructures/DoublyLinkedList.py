@@ -212,8 +212,8 @@ class DLList:
             
         else:
             new_node = DLListNode(value,
-                                     prev_node=node,
-                                     next_node=node._next)
+                                  prev_node=node,
+                                  next_node=node._next)
             new_node._next._prev = new_node
             node._next = new_node
             self._count += 1
@@ -276,6 +276,40 @@ class DLList:
         self._first = None
         self._last = None
         self._count = 0
+        
+    
+    def sublist(self, left_node, right_node):
+        """Sublist of items in the subsequence between two nodes of the list.
+        
+        Parameters
+        ----------
+        left_node : DLListNode
+            The left bound of the subsequence.
+        right_node : DLListNode
+            The right bound of the subsequence.
+        
+        Returns
+        -------
+        list
+            The values in the subsequence.
+        
+        Raises
+        ------
+        KeyError
+            If 'right_node' is not a successor of 'left_node' in the list.
+        """
+        
+        l = []
+        current = left_node
+        
+        while current:
+            l.append(current._value)
+            if current is right_node:
+                return l
+            current = current._next
+            
+        raise KeyError('{} is not contained in the subsequence'\
+                       'starting with {}'.format(right_node, left_node))
         
     
     def _count_actual(self):

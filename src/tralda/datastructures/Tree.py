@@ -88,7 +88,34 @@ class TreeNode:
         elif child_node.parent is not self:
             child_node.parent.remove_child(child_node)
             child_node.parent = self
-            child_node._par_dll_node = self.children.append(child_node)  
+            child_node._par_dll_node = self.children.append(child_node)
+    
+    
+    def add_child_right_of(self, child_node, right_of):
+        """Add a node as a child of this node as a right sibling of one of
+        its children.
+        
+        Can also be used to change the position of a child node, i.e., to
+        detach it and reinsert it to the right of the specified node.
+        
+        Parameters
+        ----------
+        child_node : TreeNode
+            The node to add as a new child to this node.
+        right_of : TreeNode
+            The child of this node right of which 'child_node' gets inserted.
+        """
+        
+        if right_of.parent is not self:
+            return KeyError('{} is not a child of node {}'.format(right_of,
+                                                                  self))
+        
+        if child_node.parent is not None:
+            child_node.parent.remove_child(child_node)
+            
+        child_node.parent = self
+        child_node._par_dll_node = \
+            self.children.insert_right_of(right_of._par_dll_node, child_node)
     
     
     def remove_child(self, child_node):
@@ -137,6 +164,38 @@ class TreeNode:
         """
         
         return not self.children
+    
+    
+    def child_subsequence(self, left_node, right_node):
+        """Consecutive subsequence of children within a left and right bound.
+        
+        Parameters
+        ----------
+        left_node : TreeNode
+            The left bound of the subsequence.
+        right_node : TreeNode
+            The right bound of the subsequence.
+        
+        Returns
+        -------
+        list
+            The children in the subsequence.
+        
+        Raises
+        ------
+        KeyError
+            If 'right_node' or 'left_node' is not a child of this node.
+        """
+        
+        if left_node.parent is not self:
+            return KeyError('{} is not a child of node {}'.format(left_node,
+                                                                  self))
+        if right_node.parent is not self:
+            return KeyError('{} is not a child of node {}'.format(right_node,
+                                                                  self))
+        
+        return self.children.sublist(left_node._par_dll_node,
+                                     right_node._par_dll_node)
         
 
 class Tree:

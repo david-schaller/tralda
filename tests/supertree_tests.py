@@ -12,14 +12,14 @@ __author__ = 'David Schaller'
 class TestSupertrees(unittest.TestCase):
     
     
-    def get_partial_trees(self, tree):
+    def get_partial_trees(self, tree, contraction_prob=0.9):
         
         partial_trees = []
         for i in range(10):
             T_i = tree.copy()
             edges = []
             for u, v in T_i.inner_edges():
-                if random.random() < 0.9:
+                if random.random() < contraction_prob:
                     edges.append((u,v))
             T_i.contract(edges)
             partial_trees.append(T_i)
@@ -29,7 +29,7 @@ class TestSupertrees(unittest.TestCase):
     def test_LinCR(self):
     
         tree = Tree.random_tree(50, binary=True)
-        partial_trees = self.get_partial_trees(tree)
+        partial_trees = self.get_partial_trees(tree, contraction_prob=0.9)
         
         cr_tree = linear_common_refinement(partial_trees)
         
@@ -45,7 +45,7 @@ class TestSupertrees(unittest.TestCase):
     def test_supertree_equal(self):
     
         tree = Tree.random_tree(50, binary=True)
-        partial_trees = self.get_partial_trees(tree)
+        partial_trees = self.get_partial_trees(tree, contraction_prob=0.9)
         
         cr_tree = linear_common_refinement(partial_trees)
         b_tree = BUILD_supertree(partial_trees)
