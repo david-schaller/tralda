@@ -311,15 +311,19 @@ def one_way_compatible(T1, T2, return_no_of_contractions=False):
         
         if ((d_u.parent is not r_u) or (e_u.parent is not r_u) or
             (size[u] != stop[u] - start[u] + 1)):
+            
+            # this should never appear
+            if not u.parent:
+                raise RuntimeError('vertex {} has no parent'.format(u.parent))
+                
             bad_edges.append((u.parent, u))
     
-    T = T1.copy()
-    T.contract(bad_edges)
+    T1 = T1.contract(bad_edges, inplace=False)
     
     if return_no_of_contractions:
-        return T, len(bad_edges)
+        return T1, len(bad_edges)
     else:
-        return T
+        return T1
 
             
 if __name__ == '__main__':

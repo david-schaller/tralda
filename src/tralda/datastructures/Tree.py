@@ -188,11 +188,11 @@ class TreeNode:
         """
         
         if left_node.parent is not self:
-            return KeyError('{} is not a child of node {}'.format(left_node,
-                                                                  self))
+            raise KeyError('{} is not a child of node {}'.format(left_node,
+                                                                 self))
         if right_node.parent is not self:
-            return KeyError('{} is not a child of node {}'.format(right_node,
-                                                                  self))
+            raise KeyError('{} is not a child of node {}'.format(right_node,
+                                                                 self))
         
         return self.children.sublist(left_node._par_dll_node,
                                      right_node._par_dll_node)
@@ -469,24 +469,36 @@ class Tree:
             return []
         
     
-    def contract(self, edges):
+    def contract(self, edges, inplace=True):
         """Contract edges in the tree.
         
         Parameters
         ----------
         edges : iterable object of tuples of two TreeNode objects
             The edges to be contracted in the tree.
+        inplace : bool
+            If True, the edges are contracted in this tree instance, otherwise
+            a copy is returned and the original tree is not affected.
+            The default is True.
         """
         
         contracted = set()
+        
+        if not inplace:
+            T_copy, mapping = self.copy(mapping=True)
         
         for u, v in edges:
             
             # avoid trying to contract the same edge multiple times
             if v not in contracted:
-                self.delete_and_reconnect(v)
+                if inplace:
+                    self.delete_and_reconnect(v)
+                else:
+                    T_copy.delete_and_reconnect(mapping[v])
             
             contracted.add(v)
+        
+        return self if inplace else T_copy
         
         
     def get_triples(self, id_only=False):
