@@ -324,30 +324,3 @@ def one_way_compatible(T1, T2, return_no_of_contractions=False):
         return T1, len(bad_edges)
     else:
         return T1
-
-            
-if __name__ == '__main__':
-    
-    import random
-    
-    tree = Tree.random_tree(10, binary=True)
-    partial_trees = []
-    for i in range(10):
-        T_i = tree.copy()
-        edges = []
-        for u, v in T_i.inner_edges():
-            if random.random() < 0.8:
-                edges.append((u,v))
-        T_i.contract(edges)
-        partial_trees.append(T_i)
-    
-    T1 = partial_trees[0]
-    T2 = partial_trees[1]
-    # T = merge_trees(T1, T2)
-    # T = loose_consensus_tree([T1, T2])
-    T = loose_consensus_tree(partial_trees)
-    print(T1.to_newick())
-    print(T2.to_newick())
-    print(T.to_newick())
-    print(T.is_refinement(T1))
-    print(T.is_refinement(T2))
