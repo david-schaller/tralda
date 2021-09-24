@@ -21,7 +21,7 @@ class TreeNode:
     See Also
     --------
     Tree
-    """    
+    """
     
     def __init__(self, **attr):
         """Constructor for TreeNode class.

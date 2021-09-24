@@ -3,10 +3,11 @@
 """
 Heuristic for cograph editing.
 
-Implementation the O(n^2) algorithm in:
-    Christophe Crespelle.
-    Linear-Time Minimal Cograph Editing.
-    Preprint published 2019.
+References
+----------
+.. [1] Christophe Crespelle.
+   Linear-Time Minimal Cograph Editing.
+   Preprint published 2019.
 """
 
 import random
@@ -19,6 +20,29 @@ __author__ = 'David Schaller'
 
 
 def edit_to_cograph(G, run_number=10):
+    """Heuristic algorithm for optimal cograph editing.
+    
+    Time complexity O(|V|^2).
+    
+    Parameters
+    ----------
+    G : nexworkx.Graph
+        A graph.
+    run_number : Number of editing runs from which the best editing result is
+        returned.
+    
+    Returns
+    -------
+    Tree
+        The cotree, i.e., a Tree instance with inner vertex labels 'series'
+        and 'parallel', that corresponds to the best editing result.
+    
+    References
+    ----------
+    .. [1] Christophe Crespelle.
+       Linear-Time Minimal Cograph Editing.
+       Preprint published 2019.
+    """
     
     ce = CographEditor(G)
     best_cotree = ce.cograph_edit()
@@ -27,8 +51,23 @@ def edit_to_cograph(G, run_number=10):
 
 
 class CographEditor:
+    """Heuristic for cograph editing running in O(|V|^2)..
+    
+    References
+    ----------
+    .. [1] Christophe Crespelle.
+       Linear-Time Minimal Cograph Editing.
+       Preprint published 2019.
+    """
     
     def __init__(self, G):
+        """Constructor of CographEditor class.
+        
+        Parameters
+        ----------
+        G : networkx.Graph
+            A graph.
+        """
         
         if not isinstance(G, nx.Graph):
             raise TypeError('not a NetworkX Graph')
@@ -44,6 +83,19 @@ class CographEditor:
         
     
     def cograph_edit(self, run_number=10):
+        """Run the cograph editing.
+        
+        Parameters
+        ----------
+        run_number : Number of editing runs from which the best editing result is
+            returned.
+        
+        Returns
+        -------
+        Tree
+            The cotree, i.e., a Tree instance with inner vertex labels 'series'
+            and 'parallel', that corresponds to the best editing result.
+        """
         
         for i in range(run_number):
             
