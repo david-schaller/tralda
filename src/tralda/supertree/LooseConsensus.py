@@ -148,9 +148,8 @@ def _preprocess(T1, T2):
         orig_to_new[orig] = new
         if orig.parent:
             orig_to_new[orig.parent].add_child(new)
-        for key, value in orig.__dict__.items():
-            if key not in ('parent', 'children', '_par_dll_node'):
-                setattr(new, key, value)
+        for key, value in orig.attributes():
+            setattr(new, key, value)
     T2 = Tree(orig_to_new[T2.root])
     
     # dict storing for each vertex the number edges from the root

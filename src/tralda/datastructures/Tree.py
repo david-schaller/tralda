@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import itertools, random
+import itertools, json, os, pickle, random
+
+import networkx as nx
 
 import tralda.datastructures.DoublyLinkedList as dll
 
@@ -51,7 +53,20 @@ class TreeNode:
         return '<TN: {}>'.format(self.label if hasattr(self, 'label') 
                                             else id(self))
     
-                                            
+    
+    def attributes(self):
+        """A generator for the node attributes.
+        
+        Yields
+        ------
+        pairs of str and the type of the corresponding value
+        """
+        
+        for key, value in self.__dict__.items():
+            if key not in ('parent', 'children', '_par_dll_node'):
+                yield key, value
+    
+    
     def add_child(self, child_node):
         """Add a node as a child of this node.
         
@@ -787,15 +802,211 @@ class Tree:
                 orig_to_new[orig.parent].add_child(new)
             
             # shallow copy of the node attributes
-            for key, value in orig.__dict__.items():
-                if key not in ('parent', 'children', '_par_dll_node'):
-                    setattr(new, key, value)
+            for key, value in orig.attributes():
+                setattr(new, key, value)
         
         if mapping:
             return Tree(orig_to_new[self.root]), orig_to_new
         else:
             return Tree(orig_to_new[self.root])
     
+    
+# --------------------------------------------------------------------------
+#                         TREE  <--->  NETWORKX
+# --------------------------------------------------------------------------
+            
+    def to_nx(self):
+        """Convert a Tree into a NetworkX Graph.
+        
+        The attributes correspond to the node attributes in the resulting graph.
+        The nodes of the resulting graph correspond to the object ids of the
+        TreeNode instances belonging to the Tree.
+        
+        Returns
+        -------
+        networkx.DiGraph
+            A graph representation of the tree.
+        int
+            The object id of the root (and thus the corresponding node in the
+            graph) in order to be able to completely reconstruct the tree.
+        """
+        
+        self._assert_integrity()
+        G = nx.DiGraph()
+        
+        if not self.root:
+            return G, None
+        
+        for v in self.preorder():
+            G.add_node(id(v))
+            for key, value in v.attributes():
+                G.nodes[id(v)][key] = value
+        
+        for u, v, sibling_nr in self.edges_sibling_order():
+            if u is v:
+                raise RuntimeError('loop at {} and {}'.format(u, v))
+            G.add_edge(id(u), id(v))
+            G.nodes[id(v)]['sibling_nr'] = sibling_nr
+            
+        return G, id(self.root)
+    
+    
+    @staticmethod
+    def parse_nx(G, root):
+        """Convert a NetworkX Graph version back into a PhyloTree.
+        
+        Parameters
+        ----------
+        G : networkx.Graph
+            A tree represented as a Networkx Graph.
+        root : int
+            The node in the graph corresponding to the root.
+        
+        Returns
+        -------
+        PhyloTree
+            The reconstructed tree.
+        """
+        
+        number_of_leaves = 0
+        
+        if root is None:
+            return Tree(None)
+    
+        def _build_tree(graphnode, parent=None):
+            
+            nonlocal number_of_leaves
+            
+            treenode = TreeNode()
+            
+            if parent:
+                parent.add_child(treenode)
+            
+            for key, value in G.nodes[graphnode].items():
+                setattr(treenode, key, value)
+            
+            children = sorted(G.neighbors(graphnode),
+                              key=lambda item: G.nodes[item]['sibling_nr'])
+            
+            for c in children:
+                _build_tree(c, parent=treenode)
+            if G.out_degree(graphnode) == 0:
+                number_of_leaves += 1
+            
+            return treenode
+        
+        tree = Tree(_build_tree(root))
+        tree.number_of_species = number_of_leaves
+        
+        return tree
+
+# --------------------------------------------------------------------------
+#                           SERIALIZATION
+# --------------------------------------------------------------------------
+    
+    @staticmethod
+    def _infer_serialization_mode(filename):
+        
+        _, file_ext = os.path.splitext(filename)
+        
+        if file_ext.lower() == '.json':
+            return 'json'
+        elif file_ext.lower() == '.pickle':
+            return 'pickle'
+        else:
+            raise ValueError('serialization format is not supplied and could '\
+                             'not be inferred from file extension')
+            
+            
+    def serialize(self, filename, mode=None):
+        """Serialize the tree using pickle or json.
+        
+        Parameters
+        ----------
+        filename : str
+            The filename (including the path) of the file to be created.
+        mode : str or None, optional
+            The serialization mode. Supported are pickle and json. The default
+            is None in which case the mode is inferred from the file extension.
+        
+        Raises
+        ------
+        ValueError
+            If the serialization mode is unknown or could not be inferred.
+        """
+        
+        if not mode:
+            mode = Tree._infer_serialization_mode(filename)
+        
+        tree_nx, root_id = self.to_nx()
+        
+        if mode == 'json':
+            data = nx.readwrite.json_graph.tree_data(tree_nx, root=root_id)
+            
+            with open(filename, 'w') as f:
+                f.write( json.dumps(data) )
+                
+        elif mode == 'pickle':
+            pickle.dump( (tree_nx, root_id), open(filename, 'wb') )
+            
+        else:
+            raise ValueError("serialization mode '{}' not supported".format(mode))
+    
+    
+    @staticmethod
+    def load(filename, mode=None):
+        """Reload a PhyloTree from a file (pickle or json).
+        
+        Parameters
+        ----------
+        filename : str
+            The filename (including the path) of the file to be loaded.
+        mode : str or None, optional
+            The serialization mode. Supported are pickle and json. The default
+            is None in which case the mode is inferred from the file extension.
+        
+        Returns
+        -------
+        Tree
+            The tree reloaded from file.
+        
+        Raises
+        ------
+        ValueError
+            If the serialization mode is unknown or could not be inferred.
+        """
+        
+        if not mode:
+            mode = Tree._infer_serialization_mode(filename)
+        
+        if mode == 'json':
+            with open(filename, 'r') as f:
+                data = json.loads( f.read() )
+                
+            tree_nx = nx.readwrite.json_graph.tree_graph(data)
+            
+            root_id = None
+            for v in tree_nx:
+                if tree_nx.in_degree(v) == 0:
+                    root_id = v
+                    break
+                
+            if root_id is None:
+                raise RuntimeError('could not identify root')
+                
+        elif mode == 'pickle':
+            tree_nx, root_id = pickle.load( open(filename, 'rb') )
+            
+        else:
+            raise ValueError("serialization mode '{}' not supported".format(mode))
+        
+        tree = Tree.parse_nx(tree_nx, root_id)
+        
+        return tree
+
+# --------------------------------------------------------------------------
+#                             RANDOM TREE
+# --------------------------------------------------------------------------
     
     @staticmethod
     def random_tree(N, binary=False):
