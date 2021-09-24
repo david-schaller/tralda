@@ -124,12 +124,12 @@ class Build:
         # trivial cases: only one or two leaves left in L
         if len(L) == 1:
             leaf = L.pop()
-            return TreeNode(leaf, label=str(leaf))
+            return TreeNode(label=leaf)
         elif len(L) == 2:
-            node = TreeNode(-1)
+            node = TreeNode()
             for _ in range(2):
                 leaf = L.pop()
-                node.add_child(TreeNode(leaf, label=str(leaf)))
+                node.add_child(TreeNode(label=leaf))
             return node
             
         help_graph = aho_graph(R, L, weighted=self.weighted_mincut,
@@ -142,7 +142,7 @@ class Build:
             return False
         
         # otherwise proceed recursively
-        node = TreeNode(-1)            # place new inner node
+        node = TreeNode()                   # place new inner node
         for cc in conn_comps:
             Li = set(cc)                    # list/dictionary --> set
             Ri = []
@@ -217,13 +217,13 @@ class MTT:
         
         if len(L) == 1:
             leaf = L.pop()
-            return TreeNode(leaf, label=str(leaf))
+            return TreeNode(label=leaf)
         
         elif len(L) == 2:
-            node = TreeNode(-1)
+            node = TreeNode()
             for _ in range(2):
                 leaf = L.pop()
-                node.add_child(TreeNode(leaf, label=str(leaf)))
+                node.add_child(TreeNode(label=leaf))
             return node
     
     
@@ -240,7 +240,7 @@ class MTT:
         if len(partition) < 2:
             return False
         
-        node = TreeNode(-1)            # place new inner node
+        node = TreeNode()                   # place new inner node
         for s in partition:
             Li, Ri = set(s), []
             for t in R:                     # construct triple subset
@@ -267,7 +267,7 @@ class MTT:
         if len(partition) < 2:
             return False
         
-        node = TreeNode(-1)            # place new inner node
+        node = TreeNode()                   # place new inner node
         for s in partition:
             Li, Ri, Fi = set(s), [], []
             for Xi, X in ((Ri, R), (Fi, F)):
@@ -334,11 +334,11 @@ def best_pair_merge_first(R, L, triple_weights=None, return_root=False):
     """
     
     # initialization
-    nodes = {TreeNode(leaf, label=str(leaf)): {leaf} for leaf in L}
+    nodes = {TreeNode(label=leaf): {leaf} for leaf in L}
     leaf_to_node = {}
     
     for node in nodes:
-        leaf_to_node[node.ID] = node
+        leaf_to_node[node.label] = node
     
     # merging
     for i in range(len(L)-1):
@@ -381,7 +381,7 @@ def best_pair_merge_first(R, L, triple_weights=None, return_root=False):
                 S_i, S_j = pair
         
         # create new node S_k connecting S_i and S_j
-        S_k = TreeNode(-1)
+        S_k = TreeNode()
         S_k.add_child(S_i)
         S_k.add_child(S_j)
         
@@ -417,7 +417,7 @@ def minimal_identifying_triple_set(tree):
     repres = {}
     
     for v in tree.postorder():
-        repres[v] = repres[v.children[0]] if v.children else v.ID
+        repres[v] = repres[v.children[0]] if v.children else v.label
     
     for u, v in tree.inner_edges():
         W = [c for c in v.children]
@@ -441,7 +441,7 @@ def tree_profile_to_triples(trees):
         
     for tree in trees:
         
-        L.update(l.ID for l in tree.leaves())
+        L.update(l.label for l in tree.leaves())
         R.update((*sorted(t[:2]), t[2])
                  for t in minimal_identifying_triple_set(tree))
     

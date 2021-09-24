@@ -9,7 +9,8 @@ cographs, and the complete multipartite graph completion problem.
 __author__ = 'David Schaller'
 
 
-from tralda.cograph.Cograph import Cotree
+from tralda.datastructures.Tree import Tree
+from tralda.cograph.Cograph import to_cotree, complement_cograph
 from tralda.tools.GraphTools import complete_multipartite_graph_from_sets
 
 
@@ -21,7 +22,7 @@ def cluster_deletion(cograph):
     
     Parameters
     ----------
-    cograph : networkx.Graph or Cotree
+    cograph : networkx.Graph or Tree
         The cograph for which cluster deletion shall be performed.
     
     Returns
@@ -44,7 +45,7 @@ def cluster_deletion(cograph):
     arXiv:2012.08897
     """
     
-    cotree = cograph if isinstance(cograph, Cotree) else Cotree.cotree(cograph)
+    cotree = cograph if isinstance(cograph, Tree) else to_cotree(cograph)
     
     if not cotree:
         raise RuntimeError('not a valid cograph/cotree')
@@ -55,7 +56,7 @@ def cluster_deletion(cograph):
         
         P[u] = []
         if not u.children:
-            P[u].append([u.ID])
+            P[u].append([u.label])
         
         elif u.label == 'parallel':
             for v in u.children:
@@ -86,7 +87,7 @@ def complete_multipartite_completion(cograph, supply_graph=False):
     
     Parameters
     ----------
-    cograph : networkx.Graph or Cotree
+    cograph : networkx.Graph or Tree
         The cograph for which complete multipartite graph completion shall be
         performed.
     supply_graph : bool, optional
@@ -106,14 +107,14 @@ def complete_multipartite_completion(cograph, supply_graph=False):
         If the input is not a valid cograph or cotree.
     """
     
-    cotree = cograph if isinstance(cograph, Cotree) else Cotree.cotree(cograph)
+    cotree = cograph if isinstance(cograph, Tree) else to_cotree(cograph)
     
     if not cotree:
         raise RuntimeError('not a valid cograph/cotree')
         
     # complete multipartite graph completion is equivalent to 
     # cluster deletion in the complement cograph
-    compl_cotree = cotree.complement(inplace=False)
+    compl_cotree = complement_cograph(cotree, inplace=False)
     
     # clusters are then equivalent to the maximal independent sets
     independent_sets = cluster_deletion(compl_cotree)

@@ -9,13 +9,14 @@ __author__ = 'David Schaller'
 
 
 from tralda.datastructures.Tree import Tree, TreeNode, LCA
+from tralda.tools.TreeTools import assert_leaf_sets_equal
 
 
 def loose_consensus_tree(trees):
     """Compute the loose consensus tree for trees with the same leaf set.
     
-    All input trees must be phylogenetic and have the same set of leaf IDs.
-    In each tree, the leaf IDs must be unique.
+    All input trees must be phylogenetic and have the same set of leaf labels.
+    In each tree, the leaves' label attributes must be set and unique.
     
     Parameters
     ----------
@@ -47,10 +48,20 @@ def loose_consensus_tree(trees):
 
 
 class LooseConsensusTree:
+    """Construction of the loose consensus tree.
+        
+    References
+    ----------
+    .. [1] J. Jansson, C. Shen, W.-K. Sung.
+       Improved Algorithms for Constructing Consensus Trees.
+       In: J. ACM 63, 3, Article 28 (June 2016), 24 pages.
+       doi:10.1145/2925985.
+    """
     
     def __init__(self, trees):
         
-        _assert_leaf_sets_equal(trees)
+        if not assert_leaf_sets_equal(trees):
+            raise RuntimeError('trees must have the same leaf labels')
         self.trees = trees
     
     
@@ -83,8 +94,8 @@ class LooseConsensusTree:
 def merge_all(trees):
     """Common refinement for compatible trees with the same leaf set.
     
-    All input trees must be phylogenetic and have the same set of leaf IDs.
-    In each tree, the leaf IDs must be unique.
+    All input trees must be phylogenetic and have the same set of leaf labels.
+    In each tree, the leaves' label attributes must be set and unique.
     
     Warning: The behavior of the function is undefined if the trees are not
     compatible, i.e., if no common refinement exists.
@@ -99,7 +110,8 @@ def merge_all(trees):
         A common refinement of the input trees; None if 'trees' is empty.
     """
     
-    _assert_leaf_sets_equal(trees)
+    if not assert_leaf_sets_equal(trees):
+        raise RuntimeError('trees must have the same leaf labels')
     
     k = len(trees)
     if k == 0:
@@ -114,34 +126,15 @@ def merge_all(trees):
     return T
 
 
-def _assert_leaf_sets_equal(trees):
-    
-    L = None
-        
-    for T_i in trees:
-        
-        if not isinstance(T_i, Tree):
-            raise TypeError("not a 'Tree' instance")
-            
-        if not L:
-            L = {v.ID for v in T_i.leaves()}
-            if len(L) == 0:
-                raise RuntimeError('empty tree in tree list')
-        else:
-            L2 = {v.ID for v in T_i.leaves()}
-            if L != L2:
-                raise RuntimeError('trees must have the same leaf IDs')
-
-
 def _preprocess(T1, T2):
     
     # bijection such that clusters in T1 form sequences os consecutive integers
-    f = {l.ID: i for i, l in enumerate(T1.leaves())}
+    f = {l.label: i for i, l in enumerate(T1.leaves())}
     
     # dict storing the minimal f(x) for each vertex in T2
     m = {}
     for v in T2.postorder():
-        m[v] = min(m[c] for c in v.children) if v.children else f[v.ID]
+        m[v] = min(m[c] for c in v.children) if v.children else f[v.label]
     
     counting_sort = [[] for i in range(len(f))]
     for v in T2.preorder():
@@ -151,10 +144,13 @@ def _preprocess(T1, T2):
     # copy T2 while ordering all children according to counting_sort
     orig_to_new = {}
     for orig in sorted_vertices:
-        new = TreeNode(orig.ID, label=orig.label)
+        new = TreeNode()
         orig_to_new[orig] = new
         if orig.parent:
             orig_to_new[orig.parent].add_child(new)
+        for key, value in orig.__dict__.items():
+            if key not in ('parent', 'children', '_par_dll_node'):
+                setattr(new, key, value)
     T2 = Tree(orig_to_new[T2.root])
     
     # dict storing for each vertex the number edges from the root
@@ -163,12 +159,12 @@ def _preprocess(T1, T2):
         depth[v] = depth[v.parent] + 1 if v.parent else 0
     
     L_T2 = list(T2.leaves())
-    leaf_rank = {l.ID: i for i, l in enumerate(L_T2)}
+    leaf_rank = {l.label: i for i, l in enumerate(L_T2)}
     start, stop = {}, {}
     for u in T1.postorder():
         if not u.children:
-            start[u] = leaf_rank[u.ID]
-            stop[u] = leaf_rank[u.ID]
+            start[u] = leaf_rank[u.label]
+            stop[u] = leaf_rank[u.label]
         else:
             start[u] = min(start[c] for c in u.children)
             stop[u] = max(stop[c] for c in u.children)
@@ -201,8 +197,8 @@ def _preprocess(T1, T2):
 def merge_trees(T1, T2):
     """Common refinement of two compatible trees with the same leaf set.
     
-    Both input trees must be phylogenetic and have the same set of leaf IDs.
-    In each tree, the leaf IDs must be unique.
+    Both input trees must be phylogenetic and have the same set of leaf labels.
+    In each tree, the leaves' label attributess must be set and unique.
     
     Parameters
     ----------
@@ -243,7 +239,7 @@ def merge_trees(T1, T2):
         if d_u is leftmost_child and e_u is rightmost_child:
             continue
         
-        c = TreeNode(-1)
+        c = TreeNode()
         depth[c] = depth[r_u] + 1
         if d_u is not leftmost_child:
             x_left[a] = c
@@ -261,8 +257,8 @@ def merge_trees(T1, T2):
 def one_way_compatible(T1, T2, return_no_of_contractions=False):
     """Remove all clusters in a tree T1 that are incompatible with T2.
     
-    Both input trees must be phylogenetic and have the same set of leaf IDs.
-    In each tree, the leaf IDs must be unique.
+    Both input trees must be phylogenetic and have the same set of leaf labels.
+    In each tree, the leaves' label attributes must be set and unique.
     
     Parameters
     ----------

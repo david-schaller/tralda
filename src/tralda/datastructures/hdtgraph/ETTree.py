@@ -273,7 +273,7 @@ class ETTree:
         
         ett = ETTree(nodedict=nodedict)
         previous = None
-        for occ in tree.euler_generator(id_only=False):
+        for occ in tree.euler_generator():
             if occ in ett.nodedict:
                 if ett.nodedict[occ].active_occ:
                     ett_node = ETTreeNode(occ, active=False, prev_occ=previous)

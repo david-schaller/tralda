@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from tralda.cograph.Cograph import (Cotree,
-                                    CotreeNode,
-                                    linear_cograph_detection,
+from tralda.cograph.Cograph import (to_cograph,
+                                    to_cotree,
+                                    complement_cograph,
+                                    random_cotree,
                                     LinearCographDetector)
 
 from tralda.cograph.CographEditor import edit_to_cograph, CographEditor

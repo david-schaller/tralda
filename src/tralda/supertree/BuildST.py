@@ -27,8 +27,8 @@ def build_st(trees):
     """Supertree construction based on BuildST algorithm.
     
     Note that the graph connecting to trees in the input set whenever they
-    share at least one leaf ID must be connected. Otherwise, the implementation
-    returns False, even though a supertree may exist.
+    share at least one leaf label must be connected. Otherwise, the
+    implementation returns False, even though a supertree may exist.
     """
     
     st_builder = BuildST(trees)
@@ -39,8 +39,8 @@ class BuildST:
     """BuildST algorithm.
     
     Note that the graph connecting to trees in the input set whenever they
-    share at least one leaf ID must be connected. Otherwise, the implementation
-    returns False, even though a supertree may exist.
+    share at least one leaf label must be connected. Otherwise, the
+    implementation returns False, even though a supertree may exist.
     
     Parameters
     ----------
@@ -57,7 +57,7 @@ class BuildST:
         """Constructor for BuildST algorithm."""
         
         self.trees = trees
-        self.Xp = {}                                    # leaf ID --> XpNode
+        self.Xp = {}                                    # leaf label --> XpNode
         self.marked = set()                             # set of marked nodes
         self.node_to_tree_index = {}
         self.list_pointer = {}                          # node --> DLL element
@@ -90,9 +90,9 @@ class BuildST:
                 # access to tree index i in [k]
                 self.node_to_tree_index[node] = i
                 if not node.children:
-                    if node.ID not in self.Xp:
-                        self.Xp[node.ID] = XpNode(node.ID)
-                    self.Xp[node.ID].leafnodes.append(node)
+                    if node.label not in self.Xp:
+                        self.Xp[node.label] = XpNode(node.label)
+                    self.Xp[node.label].leafnodes.append(node)
     
     
     def _initialize(self):
@@ -138,9 +138,9 @@ class BuildST:
         # --------------------------------------------------
         if U.count == 1:
             labelnode = U.get_labelnodes()[0]
-            return TreeNode(labelnode.ID, label=str(labelnode.ID))
+            return TreeNode(label=labelnode.label)
         
-        r_U = TreeNode(-1)    # create a node r_U
+        r_U = TreeNode()      # create a node r_U
         
         # --------------------------------------------------
         # if |L(U)| = 2 then
@@ -152,8 +152,8 @@ class BuildST:
             if len(labels) != 2:
                 self.failmessage = 'could not find 2 labeled nodes'
                 return
-            node1 = TreeNode(labels[0].ID, label=str(labels[0].ID))
-            node2 = TreeNode(labels[1].ID, label=str(labels[1].ID))
+            node1 = TreeNode(label=labels[0].label)
+            node2 = TreeNode(label=labels[1].label)
             r_U.add_child(node1)
             r_U.add_child(node2)
             return r_U
@@ -311,20 +311,20 @@ class BuildST:
 
 
 class XpNode:
-    """Special type of node for the set Xp (one for each leaf ID).""" 
+    """Special type of node for the set Xp (one for each leaf label).""" 
     
-    def __init__(self, ID):
+    def __init__(self, label):
         
-        self.ID = ID
+        self.label = label
         self.leafnodes = []         # corresponding treenodes of the profile
     
     def __repr__(self):
         
-        return '<XpNodeID:{}, {}>'.format(id(self), self.ID)
+        return '<XpNodeID:{}, {}>'.format(id(self), self.label)
     
     def __str__(self):
         
-        return str(self.ID)
+        return str(self.label)
         
     
 class _ConnectedComp:

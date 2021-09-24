@@ -3,9 +3,12 @@
 import unittest
 import networkx as nx
 
-from tralda.cograph import (Cotree, linear_cograph_detection,
+from tralda.cograph import (random_cotree,
+                            to_cograph,
+                            to_cotree,
                             CographEditor,
-                            complete_multipartite_completion)
+                            complete_multipartite_completion,
+                            )
 import tralda.tools.GraphTools as gt
 
 
@@ -17,10 +20,10 @@ class TestCographPackage(unittest.TestCase):
     
     def test_is_cograph(self):
         
-        cotree = Cotree.random_cotree(100)
-        cograph = cotree.to_cograph()
+        cotree = random_cotree(100)
+        cograph = to_cograph(cotree)
         
-        self.assertTrue( linear_cograph_detection(cograph) )
+        self.assertTrue( to_cotree(cograph) )
         
         ce = CographEditor(cograph)
         ce.cograph_edit(run_number=10)
@@ -34,7 +37,7 @@ class TestCographPackage(unittest.TestCase):
         graph.add_edge('b', 'c')
         graph.add_edge('c', 'd')
         
-        self.assertFalse(linear_cograph_detection(graph))
+        self.assertFalse(to_cotree(graph))
         
         ce = CographEditor(graph)
         ce.cograph_edit(run_number=10)
@@ -46,16 +49,16 @@ class TestCographPackage(unittest.TestCase):
         graph = gt.random_graph(100, p=0.3)
         ce = CographEditor(graph)
         ce.cograph_edit(run_number=10)
-        cograph = ce.best_T.to_cograph()
+        cograph = to_cograph(ce.best_T)
         
-        self.assertTrue( linear_cograph_detection(cograph) )
+        self.assertTrue( to_cotree(cograph) )
     
     
     def test_compl_multipart_completion(self):
         
-        cotree = Cotree.random_cotree(20)
+        cotree = random_cotree(20)
         sets, cmg = complete_multipartite_completion(cotree, supply_graph=True)
-        orig_cograph =  cotree.to_cograph()
+        orig_cograph = to_cograph(cotree)
         
         self.assertTrue(gt.is_subgraph(orig_cograph, cmg))
         

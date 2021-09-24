@@ -13,43 +13,24 @@ class TreeNode:
     
     Attributes
     ----------
-    ID : int
-        Integer identifier of the node, some methods use the convention -1 if
-        an identifier is not needed.
-    label: str
-        Human interpretable label.
     parent: TreeNode
         Parent node of this node.
     children: dll.DLList
         Child nodes of this node in a doubly-linked list.
-    leaves: list of TreeNode.
-        A list of all leaf nodes in the subtree under this node, only available
-        after execution of supply_leaves() function.
     
     See Also
     --------
     Tree
-    CotreeNode
-    """
+    """    
     
-    __slots__ = ('ID', 'label', 'parent', '_par_dll_node',
-                 'children', 'leaves')
-    
-    
-    def __init__(self, ID, label=''):
+    def __init__(self, **attr):
         """Constructor for TreeNode class.
         
         Parameters
         ----------
-        ID : int
-            Integer identifier of the node, some methods use the convention -1
-            if an identifier is not needed.
-        label: str, optional
-            Human interpretable label (the default is '').
+        attr : keyword arguments, optional
+            Set node attributes using key=value.
         """
-        
-        self.ID = ID
-        self.label = label
         
         self.parent = None
         # reference to doubly-linked list element in the parents' children
@@ -57,15 +38,18 @@ class TreeNode:
         
         self.children = dll.DLList()
         
+        self.__dict__.update(attr)
+        
     
     def __str__(self):
         
-        return str(self.label)
+        return str(self.label) if hasattr(self, 'label') else ''
     
     
     def __repr__(self):
         
-        return '<TN: {}>'.format(self.ID)
+        return '<TN: {}>'.format(self.label if hasattr(self, 'label') 
+                                            else id(self))
     
                                             
     def add_child(self, child_node):
@@ -385,14 +369,8 @@ class Tree:
             yield from []
                 
     
-    def euler_generator(self, id_only=False):
+    def euler_generator(self):
         """Generator for an Euler tour of the tree.
-        
-        Parameters
-        ----------
-        id_only : bool
-            If True, the tuples only contain the integer IDs of the nodes
-            (the default is False).
         
         Yields
         ------
@@ -400,18 +378,14 @@ class Tree:
             Nodes in an Euler tour of the tree.
         """
         
-        def _euler_generator(node, id_only):
-            if id_only: yield node.ID
-            else:       yield node
-            
+        def _euler_generator(node):
+            yield node
             for child in node.children:
-                yield from _euler_generator(child, id_only)
-                
-                if id_only: yield node.ID
-                else:       yield node
+                yield from _euler_generator(child)
+                yield node
         
         if self.root:
-            yield from _euler_generator(self.root, id_only)
+            yield from _euler_generator(self.root)
         else:
             yield from []
             
@@ -439,7 +413,7 @@ class Tree:
             yield from []
             
     
-    def supply_leaves(self):
+    def leaf_dict(self):
         """Leaves in the subtree rooted at each node.
         
         Computes the list of leaves for every node in the tree containing the
@@ -447,26 +421,22 @@ class Tree:
         
         Returns
         -------
-        list of TreeNode objects
-            The leaves under the root, i.e. the complete list of leaves.
-            Returns an empty list if the root is None.
+        dict with TreeNode keys and lists of TreeNode objects as values
+            The leaves under each vertex.
         """
         
-        def _supply_leaves(node):
-            node.leaves = []
-            
-            if not node.children:
-                node.leaves.append(node)
-            else:
-                for child in node.children:
-                    node.leaves.extend(_supply_leaves(child))
-                    
-            return node.leaves
+        leaves = {}
         
-        if self.root:
-            return _supply_leaves(self.root)
-        else:
-            return []
+        for v in self.postorder():
+            
+            if not v.children:
+                leaves[v] = [v]
+            else:
+                leaves[v] = []
+                for child in v.children:
+                    leaves[v].extend(leaves[child])
+                    
+        return leaves
         
     
     def contract(self, edges, inplace=True):
@@ -501,7 +471,7 @@ class Tree:
         return self if inplace else T_copy
         
         
-    def get_triples(self, id_only=False):
+    def get_triples(self, label_only=False):
         """Retrieve a list of all triples of the tree.
         
         A tree displays a triple ab|c on the leaf nodes a, b and c if the last
@@ -510,8 +480,9 @@ class Tree:
         
         Parameters
         ----------
-        id_only : bool
-            If True, the triples are represented by the IDs of the nodes.
+        label_only : bool
+            If True, the triples are represented by the label attribute of the
+            nodes.
             
         Returns
         -------
@@ -520,21 +491,22 @@ class Tree:
             first two items are closer related in the tree.
         """
         
-        if id_only:
-            return [(a.ID, b.ID, c.ID) for a, b, c in self._triple_generator()]
+        if label_only:
+            return [(a.label, b.label, c.label)
+                    for a, b, c in self._triple_generator()]
         else:
             return [t for t in self._triple_generator()]
     
     
     def _triple_generator(self):
         
-        self.supply_leaves()
+        leaves = self.leaf_dict()
         
         for u in self.preorder():
             for v1, v2 in itertools.permutations(u.children, 2):
-                if len(v2.leaves) > 1:
-                    for c in v1.leaves:
-                        for a, b in itertools.combinations(v2.leaves, 2):
+                if len(leaves[v2]) > 1:
+                    for c in leaves[v1]:
+                        for a, b in itertools.combinations(leaves[v2], 2):
                             yield a, b, c
     
     
@@ -567,25 +539,6 @@ class Tree:
             node.children.clear()
         
         return parent
-    
-    
-    def get_max_ID(self):
-        """The maximum of all node IDs.
-        
-        Returns
-        -------
-        int
-            The maximum of all node IDs in the tree, or -1 if all IDs are None
-            or if there are no nodes.
-        """
-        
-        max_ID = -1
-        
-        for v in self.preorder():
-            if v.ID is not None:
-                max_ID = max(v.ID, max_ID)
-                
-        return max_ID
         
     
     def to_newick(self, node=None):
@@ -687,26 +640,27 @@ class Tree:
     
     
     def get_hierarchy(self):
-        """Hierarchy set on the leaf IDs defined by the tree.
+        """Hierarchy set on the leaf labels defined by the tree.
         
         Every (phylogenetic) tree can be represented by a hierarchy on the set
         of its leaves.
-        The IDs of the leaf nodes must be unique.
+        The label attributes of the leaf nodes must be set and unique for each
+        leaf.
         
         Returns
         -------
         set of lists of str objects
             Representing the hierarchy where the leaves are represented by
-            their IDs.
+            their labels.
         """
         
-        self.supply_leaves()
+        leaves = self.leaf_dict()
         
         hierarchy = set()
         
         for v in self.preorder():
             
-            A = [leaf.ID for leaf in v.leaves]
+            A = [leaf.label for leaf in leaves[v]]
             A.sort()
             A = tuple(A)
             hierarchy.add(A)
@@ -715,9 +669,9 @@ class Tree:
     
     
     def equal_topology(self, other):
-        """Compare the tree topology based on the leaf IDs.
+        """Compare the tree topology based on the leaf labelss.
         
-        Only works for phylogenetic trees with unique leaf IDs.
+        Only works for phylogenetic trees with unique leaf labels.
         
         Parameters
         ----------
@@ -750,9 +704,9 @@ class Tree:
     
     def is_refinement(self, other):
         """Checks whether the tree is a refinement of 'other' based on the
-        leaf IDs.
+        leaf labels.
         
-        Only works for phylogenetic trees with unique leaf IDs.
+        Only works for phylogenetic trees with unique leaf labels.
         
         Parameters
         ----------
@@ -802,9 +756,10 @@ class Tree:
     def copy(self, mapping=False):
         """Return a copy of the tree.
         
-        Constructs a deep copy of the tree, i.e. to the level of nodes.
-        By default, the node attributes are all immutable data types.
-        Hence, the original tree is not affected by operations on the copy.
+        Constructs a copy of the tree to the level of nodes, i.e., the
+        attributes are only copied as references.
+        If the node attributes are all immutable data types, the original
+        tree is not affected by operations on the copy.
         
         Parameters
         ----------
@@ -825,10 +780,16 @@ class Tree:
         orig_to_new = {}
         
         for orig in self.preorder():
-            new = TreeNode(orig.ID, label=orig.label)
+            
+            new = TreeNode()
             orig_to_new[orig] = new
             if orig.parent:
                 orig_to_new[orig.parent].add_child(new)
+            
+            # shallow copy of the node attributes
+            for key, value in orig.__dict__.items():
+                if key not in ('parent', 'children', '_par_dll_node'):
+                    setattr(new, key, value)
         
         if mapping:
             return Tree(orig_to_new[self.root]), orig_to_new
@@ -864,7 +825,7 @@ class Tree:
         
         if not (isinstance(N, int)) or N < 1:
             raise TypeError("N must be an 'int' > 0")
-        root = TreeNode(0, label='0')
+        root = TreeNode(label=0)
         tree = Tree(root)
         node_list = [root]
         nr, leaf_count = 1, 1
@@ -874,8 +835,8 @@ class Tree:
             
             if not node.children: 
                 # to be phylogenetic at least two children must be added
-                new_child1 = TreeNode(nr, label=str(nr))
-                new_child2 = TreeNode(nr+1, label=str(nr+1))
+                new_child1 = TreeNode(label=nr)
+                new_child2 = TreeNode(label=nr+1)
                 node.add_child(new_child1)
                 node.add_child(new_child2)
                 node_list.extend(node.children)
@@ -883,7 +844,7 @@ class Tree:
                 leaf_count += 1
             elif node.children and not binary:
                 # add only one child if there are already children
-                new_child = TreeNode(nr, label=str(nr))
+                new_child = TreeNode(label=nr)
                 node.add_child(new_child)
                 node_list.append(new_child)
                 nr += 1
@@ -938,8 +899,8 @@ class LCA:
         self._V = [v for v in self._tree.preorder()]
         self._index = {v: i for i, v in enumerate(self._V)}
         
-        # store IDs for queries via ID
-        self._id_dict = {v.ID: v for v in self._V}
+        # store labels for queries via label
+        self._label_dict = {v.label: v for v in self._V if hasattr(v, 'label')}
         
         self._euler_tour = []
         # levels of the vertices in the Euler tour
@@ -972,9 +933,9 @@ class LCA:
         Parameters
         ----------
         a : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         b : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         
         Returns
         -------
@@ -982,8 +943,8 @@ class LCA:
             The last common ancestor of `a` and `b`.
         """
         
-        return self._get_lca(self._id_to_treenode(a),
-                             self._id_to_treenode(b))
+        return self._get_lca(self._label_to_treenode(a),
+                             self._label_to_treenode(b))
         
         
     
@@ -993,9 +954,9 @@ class LCA:
         Parameters
         ----------
         a : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         b : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         
         Returns
         -------
@@ -1003,8 +964,8 @@ class LCA:
             The last common ancestor of `a` and `b`.
         """
         
-        return self._get_lca(self._id_to_treenode(a),
-                             self._id_to_treenode(b))
+        return self._get_lca(self._label_to_treenode(a),
+                             self._label_to_treenode(b))
     
     
     def displays_triple(self, a, b, c):
@@ -1013,11 +974,11 @@ class LCA:
         Parameters
         ----------
         a : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         b : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         c : TreeNode or int
-            A node or its ID in the tree corresponding to this LCA instance.
+            A node or its label in the tree corresponding to this LCA instance.
         
         Returns
         -------
@@ -1026,9 +987,9 @@ class LCA:
         """
         
         try:
-            return self._has_triple(self._id_to_treenode(a),
-                                    self._id_to_treenode(b),
-                                    self._id_to_treenode(c))
+            return self._has_triple(self._label_to_treenode(a),
+                                    self._label_to_treenode(b),
+                                    self._label_to_treenode(c))
         except KeyError:
             return False
         
@@ -1052,8 +1013,8 @@ class LCA:
             True if `u` and `v` are comparable in the tree, else False.
         """
         
-        return self._are_comparable(self._id_to_treenode(u),
-                                    self._id_to_treenode(v))
+        return self._are_comparable(self._label_to_treenode(u),
+                                    self._label_to_treenode(v))
     
     
     def ancestor_or_equal(self, u, v):
@@ -1072,8 +1033,8 @@ class LCA:
             True if `u` is equal or an ancestor of `v`, else False.
         """
         
-        return self._ancestor_or_equal(self._id_to_treenode(u),
-                                       self._id_to_treenode(v))
+        return self._ancestor_or_equal(self._label_to_treenode(u),
+                                       self._label_to_treenode(v))
     
     
     def ancestor_not_equal(self, u, v):
@@ -1092,8 +1053,8 @@ class LCA:
             True if `u` is a strict ancestor of `v`, else False.
         """
         
-        u = self._id_to_treenode(u)
-        v = self._id_to_treenode(v)
+        u = self._label_to_treenode(u)
+        v = self._label_to_treenode(v)
         
         return u != v and self._ancestor_or_equal(u, v)
     
@@ -1305,15 +1266,15 @@ class LCA:
         return self._sparse_table_query(self._L, self._st, i, j)
         
     
-    def _id_to_treenode(self, v):
+    def _label_to_treenode(self, v):
         
         if isinstance(v, TreeNode):
             return v
         elif isinstance(v, (tuple, list)) and len(v) == 2:
-            return (self._id_to_treenode(v[0]),
-                    self._id_to_treenode(v[1]))
+            return (self._label_to_treenode(v[0]),
+                    self._label_to_treenode(v[1]))
         else:
-            return self._id_dict[v]
+            return self._label_dict[v]
         
         
     def _get_lca(self, v1, v2):
@@ -1359,32 +1320,3 @@ class LCA:
         # both are edges
         elif isinstance(u, tuple) and isinstance(v, tuple):
             return u[1] is v[1] or u[1] is self._get_lca(u[1], v[0])
-        
-
-def lcas_naive(tree):
-    """Naive computation of the last common ancestor for all leaf pairs.
-    
-    .. deprecated:: 1.0.0
-        `lcas_naive` may be removed in future version of AsymmeTree.
-        
-    Parameters
-    ----------
-    tree : Tree
-        The tree for which the last common ancestors are computed.
-    
-    Returns
-    -------
-    dict
-        Keys are all pairs of TreeNode objects that are leaves, and the values
-        correspond to the TreeNode that is their last common ancestor.
-    """
-    
-    lcas = {}
-    tree.supply_leaves()
-    
-    for u in tree.preorder():
-        for v1, v2 in itertools.permutations(u.children, 2):
-            for x, y in itertools.product(v1.leaves, v2.leaves):
-                lcas[x, y] = u
-    
-    return lcas

@@ -5,6 +5,7 @@
 from collections import deque
 
 from tralda.datastructures.Tree import Tree, TreeNode
+from tralda.tools.TreeTools import assert_leaf_sets_equal
 
 
 __author__ = 'David Schaller'
@@ -13,8 +14,8 @@ __author__ = 'David Schaller'
 def linear_common_refinement(trees):
     """Minimal common refinement for a set of trees with the same leaf set.
     
-    All input trees must be phylogenetic and have the same set of leaf IDs.
-    In each tree, the leaf IDs must be unique.
+    All input trees must be phylogenetic and have the same set of leaf labels.
+    In each tree, the leaves' label attributes must be set and unique.
     
     Parameters
     ----------
@@ -42,21 +43,10 @@ class LinCR:
     
     def __init__(self, trees):
         
-        self.L = None
+        self.L = assert_leaf_sets_equal(trees)
         
-        for T_i in trees:
-            
-            if not isinstance(T_i, Tree):
-                raise TypeError("not a 'Tree' instance")
-                
-            if not self.L:
-                self.L = {v.ID for v in T_i.leaves()}
-                if len(self.L) == 0:
-                    raise RuntimeError('empty tree in tree list')
-            else:
-                L2 = {v.ID for v in T_i.leaves()}
-                if self.L != L2:
-                    raise RuntimeError('trees must have the same leaf IDs')
+        if not self.L:
+            raise RuntimeError('trees must have the same leaf labels')
         
         self.trees = trees
         
@@ -94,19 +84,19 @@ class LinCR:
         self.Q = deque()        # queue
         self.V = set()          # vertices in resulting tree
         
-        self.ID_dict = {}
+        self.label_dict = {}
         
-        for ID in self.L:
-            v = TreeNode(ID, label=str(ID))
+        for label in self.L:
+            v = TreeNode(label=label)
             self.Q.append(v)
             self.V.add(v)
-            self.ID_dict[ID] = v
+            self.label_dict[label] = v
             self.J[v] = {i: None for i in range(len(self.trees))}
             self.l[v] = 1 
         
         for i, T_i in enumerate(self.trees):
             for v_i in T_i.leaves():
-                v = self.ID_dict[v_i.ID]
+                v = self.label_dict[v_i.label]
                 self.p[i][v] = v_i
                 self.J[v][i] = v_i
                 self.vi_to_v[v_i] = v
@@ -156,7 +146,7 @@ class LinCR:
                 if u in self.vi_to_v:
                     u = self.vi_to_v[u]
                 else:
-                    u = TreeNode(-1)
+                    u = TreeNode()
                     self.J[u] = J_u
                     for i, u_i in J_u.items():
                         self.vi_to_v[u_i] = u
