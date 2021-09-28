@@ -3,8 +3,8 @@
 """
 Doubly-linked list.
 
-Implementation of a doubly-linked list in Python 3. The list enables access
-to single list elements in order to modify/delete values in constant time.
+The list enables access to single list elements in order to modify/delete
+values in constant time.
 """
 
 import collections
@@ -49,16 +49,37 @@ class DLList:
         
     
     def __len__(self):
+        """Number of items in the list.
+        
+        Returns
+        -------
+        int
+            The number of items in the list.
+        """
         
         return self._count
     
     
     def __nonzero__(self):
+        """Returns whether the list is non-empty.
+        
+        Returns
+        -------
+        bool
+            Return True if the list is non-empty.
+        """
         
         return True if self._count > 0 else False
     
     
     def __iter__(self):
+        """Returns an iterator object for the list.
+        
+        Returns
+        -------
+        DLListIterator
+            An iterator for this list.
+        """
         
         return DLListIterator(self)
 
@@ -69,26 +90,56 @@ class DLList:
     
     
     def __getitem__(self, index):
+        """Access value at a specified index.
+        
+        Returns
+        -------
+        object
+            The value at the specified index.
+        
+        Raises
+        ------
+        TypeError
+            If index is not of type int.
+        IndexError
+            If index is out of bounds.
+        """
         
         return self.node_at(index)._value
     
     
     def first(self):
+        """Return the first item in the list.
+        """
         
         return self._first._value
     
     
     def last(self):
+        """Return the last item in the list.
+        """
         
         return self._last._value
     
     
     def first_node(self):
+        """Return the first list node.
+        
+        Returns
+        -------
+        DLListNode
+        """
         
         return self._first
     
     
     def node_at(self, index):
+        """Return the first list node.
+        
+        Returns
+        -------
+        DLListNode
+        """
         
         if not isinstance(index, int):
             raise TypeError("index must be of type 'int'")
@@ -115,6 +166,18 @@ class DLList:
     
     
     def append(self, value):
+        """Append an item to the list.
+        
+        Parameters
+        ----------
+        value
+            The value to be inserted at the end of the list.
+        
+        Returns
+        -------
+        DLListNode
+            The new end node of the list.
+        """
         
         new_end = DLListNode(value, prev_node=self._last)
         if self._last:
@@ -127,12 +190,31 @@ class DLList:
     
     
     def extend(self, iterable):
+        """Append multiple items to the list.
+        
+        Parameters
+        ----------
+        collection
+            The values to be inserted at the end of the list.
+        """
         
         for value in iterable:
             self.append(value)
     
     
     def append_left(self, value):
+        """Append an item to left side of the list.
+        
+        Parameters
+        ----------
+        value
+            The value to be inserted at the end of the list.
+        
+        Returns
+        -------
+        DLListNode
+            The new start node of the list.
+        """
         
         new_start = DLListNode(value, next_node=self._first)
         if self._first:
@@ -145,7 +227,15 @@ class DLList:
     
     
     def remove_node(self, node):
-        """Remove an item by reference to the 'DLListNode' instance in O(1)."""
+        """Remove an item by reference to the 'DLListNode' instance.
+        
+        Runs in constant time.
+        
+        Parameters
+        ----------
+        node : DLListNode
+            The node to be removed.
+        """
         
         if node._prev:
             node._prev._next = node._next
@@ -160,7 +250,20 @@ class DLList:
     
     
     def remove(self, value):
-        """Remove an item by value in O(n)."""
+        """Remove an item by value.
+        
+        Runs in  O(n).
+        
+        Parameters
+        ----------
+        value : arbitrary type
+            The value to be removed.
+        
+        Raises
+        ------
+        KeyError
+            If the value was not found in the list.
+        """
         
         node = self._first
         while node:
@@ -177,6 +280,13 @@ class DLList:
         
         Removes the range [index, index+length) from the sequence. If no length
         is specified or index+length is out of bounds, the list gets truncated.
+        
+        Parameters
+        ----------
+        index : int
+            The start of the range to be removed.
+        length : int, optional
+            The start of the range to be removed.
         """
         
         if not isinstance(index, int):
@@ -205,7 +315,20 @@ class DLList:
     
     
     def insert_right_of(self, node, value):
-        """Insert a new item right of a node of the list in O(1)."""
+        """Insert a new item right of a node of the list in O(1).
+        
+        Parameters
+        ----------
+        node : DLListNode
+            The list node next to which the item shall be inserted.
+        value : arbitrary type
+            The value to be inserted.
+        
+        Return
+        ------
+        DLListNode
+            The list node for the inserted value.
+        """
         
         if node is self._last:
             new_node = self.append(value)
@@ -222,7 +345,13 @@ class DLList:
             
     
     def truncate(self, index):
-        """Truncate all nodes starting from the specified index."""
+        """Truncate all nodes starting from the specified index.
+        
+        Parameters
+        ----------
+        index : int
+            The index from which on the list is truncated.
+        """
         
         if index <= 0:
             self.clear()
@@ -236,7 +365,13 @@ class DLList:
             
     
     def truncate_left(self, n):
-        """Truncate n nodes on the left side."""
+        """Truncate n nodes on the left side.
+        
+        Parameters
+        ----------
+        n : int
+            The number of items to be truncated.
+        """
         
         if n >= self._count:
             self.clear()
@@ -272,6 +407,7 @@ class DLList:
     
     
     def clear(self):
+        """Clear the list."""
         
         self._first = None
         self._last = None

@@ -18,6 +18,25 @@ def aho_graph(R, L, weighted=False, triple_weights=None):
         
     Edges {a,b} are optionally weighted by the number of occurrences, resp.,
     sum of weights of triples of the form ab|x or ba|x.
+    
+    Parameters
+    ----------
+    R : collection of tuples
+        A collection of triples.
+    L : collection
+        A collection of leaf labels.
+    weighted : bool, optional
+        If True, weight the edges in the resulting graph accordingto the
+        number of corresponding triples (and their weights).
+        The default is False.
+    triple_weights : dict with tuples as keys and float values, optional
+        The weights of the triples. The default is None, in which case every
+        triple has weight one.
+    
+    Returns
+    -------
+    networkx.Graph
+        The undirected Aho graph.
     """
     
     G = nx.Graph()
@@ -44,6 +63,24 @@ def _triple_connect(G, t):
     
 
 def mtt_partition(L, R, F):
+    """Construct the auxiliary partition for the MTT algorithm.
+    
+    Parameters
+    ----------
+    L : collection
+        A collection of leaf labels.
+    R : collection of tuples
+        A collection of required triples.
+    F : collection of tuples
+        A collection of forbidden triples.
+        
+    Returns
+    -------
+    Partition
+        The auxiliary partition for the MTT algorithm.
+    networkx.Graph
+        A graph representation of the auxiliary partition.
+    """
     
     # auxiliary graph initialized as Aho graph
     G = aho_graph(R, L, weighted=False)
@@ -83,7 +120,16 @@ def mtt_partition(L, R, F):
 
 
 class Build:
-    """BUILD algorithm (Aho et al. 1981)."""
+    """BUILD algorithm.
+    
+    References
+    ----------
+    .. [1] A. V. Aho, Y. Sagiv, T. G. Szymanski, and J. D. Ullman.
+       Inferring a tree from lowest common ancestors with an application to
+       the optimization of relational expressions.
+       SIAM Journal on Computing, 10:405–421, 1981.
+       doi: 10.1137/0210030.
+    """
     
     def __init__(self, R, L, mincut=False, 
                  weighted_mincut=False, triple_weights=None):
@@ -104,6 +150,12 @@ class Build:
             If True, return 'TreeNode' instead of 'Tree' instance.
         print_info : bool
             Print information about inconsistencies.
+        
+        Returns
+        -------
+        Tree or None
+            The BUILD tree on leaf set L displaying all triples in R if the
+            triple set R is consistent.
         """
         
         self.cut_value = 0
@@ -183,9 +235,28 @@ class Build:
         
 
 class MTT:
-    """MTT algorithm."""
+    """MTT algorithm.
+    
+    References
+    ----------
+    .. [1] Y.-J. He, T. N. D. Huynh, J. Jansson, andW.-K. Sung.
+       Inferring phylogenetic relationships avoiding forbidden rooted triplets.
+       Journal of Bioinformatics and Computational Biology, 4: 59–74, 2006.
+       doi: 10.1142/S0219720006001709.
+    """
     
     def __init__(self, R, L, F=None):
+        """Constructor for class MTT.
+        
+        Parameters
+        ----------
+        L : collection
+            A collection of leaf labels.
+        R : collection of tuples
+            A collection of required triples.
+        F : collection of tuples, optional
+            A collection of forbidden triples.
+        """
         
         self.R = R
         self.L = L
@@ -201,6 +272,12 @@ class MTT:
         ----------
         return_root : bool
             If True, return 'TreeNode' instead of 'Tree' instance.
+        
+        Returns
+        -------
+        Tree or bool
+            A tree on leaf set L displaying all triples in R and none in F,
+            if such a tree exists; False otherwise.
         """
         
         self.total_cost = 0
@@ -290,11 +367,20 @@ def greedy_BUILD(R, L, triple_weights=None, return_root=False):
     
     Parameters
     ----------
+    R : collection of tuples
+        A collection of triples.
+    L : collection
+        A collection of leaf labels.
     triple_weights : dict, optional
         Weights for the triples; default is None in which case all triples are
         uniformly weighted.
-    return_root : bool
+    return_root : bool, optional
         If True, return 'TreeNode' instead of 'Tree' instance.
+        The default is False.
+    
+    Returns
+    -------
+    Tree or TreeNode
     """
         
     if triple_weights:
@@ -326,11 +412,20 @@ def best_pair_merge_first(R, L, triple_weights=None, return_root=False):
     
     Parameters
     ----------
+    R : collection of tuples
+        A collection of triples.
+    L : collection
+        A collection of leaf labels.
     triple_weights : dict, optional
         Weights for the triples; default is None in which case all triples are
         uniformly weighted.
-    return_root : bool
+    return_root : bool, optional
         If True, return 'TreeNode' instead of 'Tree' instance.
+        The default is False.
+    
+    Returns
+    -------
+    Tree or TreeNode
     """
     
     # initialization
@@ -406,6 +501,10 @@ def minimal_identifying_triple_set(tree):
     ----------
     tree : Tree
     
+    Yields
+    -------
+    tuple of three ThreeNode instances
+    
     References
     ----------
     - Stefan Grünewald, Mike Steel and M. Shel Swenson. Closure operations in
@@ -434,6 +533,12 @@ def tree_profile_to_triples(trees):
     Parameters
     ----------
     trees : sequence of Tree instances
+    
+    Returns
+    -------
+    tuple of two sets
+        The first set contains all leaf labels that appear in the tree profile.
+        The second set contains a representive set of triples.
     """
     
     L = set()

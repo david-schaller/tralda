@@ -33,6 +33,13 @@ def linear_common_refinement(trees):
     RuntimeError
         If the sequence contains empty trees or the tree do not share the same
         set of leaves.
+        
+    References
+    ----------
+    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021)
+    A Simple Linear-Time Algorithm for the Common Refinement of Rooted
+    Phylogenetic Trees on a Common Leaf Set.
+    arXiv:2107.00072 [cs.DS]
     """
     
     cr = LinCR(trees)
@@ -40,6 +47,15 @@ def linear_common_refinement(trees):
 
 
 class LinCR:
+    """Minimal common refinement for a set of trees with the same leaf set.
+    
+    References
+    ----------
+    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021)
+    A Simple Linear-Time Algorithm for the Common Refinement of Rooted
+    Phylogenetic Trees on a Common Leaf Set.
+    arXiv:2107.00072 [cs.DS]
+    """
     
     def __init__(self, trees):
         
