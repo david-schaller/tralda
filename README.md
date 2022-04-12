@@ -1,7 +1,7 @@
 # tralda
 
 [![license: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![pypi version](https://img.shields.io/badge/pypi-v1.0.0-blue.svg)](https://pypi.org/project/tralda/)
+[![pypi version](https://img.shields.io/badge/pypi-v1.0.1-blue.svg)](https://pypi.org/project/tralda/)
 
 A Python library for **tr**ee **al**gorithms and **da**ta structures.
 

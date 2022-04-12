@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='tralda',
-    version='1.0.0',
+    version='1.0.1',
     author='David Schaller',
     author_email='sdavid@bioinf.uni-leipzig.de',
     description='A library for tree data structures and algorithms.',
