@@ -528,6 +528,9 @@ class Tree:
     def delete_and_reconnect(self, node):
         """Delete a node from the tree and reconnect its parent and children.
         
+        This function preserves the 'sibling order' of the remaining nodes
+        of the tree.
+        
         Parameters
         ----------
         node : TreeNode
@@ -544,13 +547,13 @@ class Tree:
         if not parent:
             return False
         else:
-            parent.remove_child(node)
-            
             # copy list of children to edit edges
             children = [child for child in node.children]
+            
             for child in children:
-                parent.add_child(child)
-                    
+                parent.add_child_right_of(child, node)
+            
+            parent.remove_child(node)
             node.children.clear()
         
         return parent
