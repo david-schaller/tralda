@@ -856,7 +856,7 @@ class Tree:
     
     @staticmethod
     def parse_nx(G, root):
-        """Convert a NetworkX Graph version back into a PhyloTree.
+        """Convert a NetworkX Graph version back into a Tree.
         
         Parameters
         ----------
@@ -867,7 +867,7 @@ class Tree:
         
         Returns
         -------
-        PhyloTree
+        Tree
             The reconstructed tree.
         """
         
@@ -906,6 +906,66 @@ class Tree:
 # --------------------------------------------------------------------------
 #                           SERIALIZATION
 # --------------------------------------------------------------------------
+
+    def to_dict(self):
+        """Convert the tree into a nested dictionary.
+        
+        Raises
+        ------
+        RuntimeError
+            If the tree is empty.
+        """
+        
+        def _to_dict(node):
+            
+            node_dict = {k: v for k, v in node.attributes()}
+            
+            for i, child in enumerate(node.children):
+                node_dict[f'_child{i}'] = _to_dict(child)
+            
+            return node_dict
+        
+        if self.root:
+            return _to_dict(self.root)
+        else:
+            raise RuntimeError('cannot convert empty tree to dict')
+    
+    
+    @staticmethod
+    def parse_dict(tree_dict):
+        """Convert a dictionary representation back into a Tree.
+        
+        Parameters
+        ----------
+        tree_dict : dict
+            A dictionary representation of the tree.
+        
+        Returns
+        -------
+        Tree
+            The reconstructed tree.
+        """
+        
+        def _parse_dict(node_dict):
+            
+            node = TreeNode()
+            children = {}
+            
+            for k, v in node_dict.items():
+                
+                if k.startswith('_child'):
+                    children[int(k[6:])] = _parse_dict(v)
+                else:
+                    setattr(node, k, v)
+            
+            for i in sorted(children):
+                node.add_child(children[i])
+            
+            return node
+        
+        return Tree(_parse_dict(tree_dict))
+        
+    
     
     @staticmethod
     def _infer_serialization_mode(filename):
@@ -940,25 +1000,22 @@ class Tree:
         
         if not mode:
             mode = Tree._infer_serialization_mode(filename)
-        
-        tree_nx, root_id = self.to_nx()
-        
-        if mode == 'json':
-            data = nx.readwrite.json_graph.tree_data(tree_nx, root=root_id)
             
+        if mode == 'json':
             with open(filename, 'w') as f:
-                f.write( json.dumps(data) )
+                json.dump(self.to_dict(), f)
                 
         elif mode == 'pickle':
+            tree_nx, root_id = self.to_nx()
             pickle.dump( (tree_nx, root_id), open(filename, 'wb') )
             
         else:
-            raise ValueError("serialization mode '{}' not supported".format(mode))
+            raise ValueError(f"serialization mode '{mode}' not supported")
     
     
     @staticmethod
     def load(filename, mode=None):
-        """Reload a PhyloTree from a file (pickle or json).
+        """Reload a Tree from a file (pickle or json).
         
         Parameters
         ----------
@@ -984,28 +1041,15 @@ class Tree:
         
         if mode == 'json':
             with open(filename, 'r') as f:
-                data = json.loads( f.read() )
-                
-            tree_nx = nx.readwrite.json_graph.tree_graph(data)
-            
-            root_id = None
-            for v in tree_nx:
-                if tree_nx.in_degree(v) == 0:
-                    root_id = v
-                    break
-                
-            if root_id is None:
-                raise RuntimeError('could not identify root')
+                tree_dict = json.load(f)
+            return Tree.parse_dict(tree_dict)
                 
         elif mode == 'pickle':
-            tree_nx, root_id = pickle.load( open(filename, 'rb') )
+            return Tree.parse_nx( *pickle.load(open(filename, 'rb')) )
             
         else:
-            raise ValueError("serialization mode '{}' not supported".format(mode))
-        
-        tree = Tree.parse_nx(tree_nx, root_id)
-        
-        return tree
+            raise ValueError(f"serialization mode '{mode}' not supported")
+
 
 # --------------------------------------------------------------------------
 #                             RANDOM TREE
