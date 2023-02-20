@@ -856,7 +856,7 @@ class Tree:
             
             for child in children:
                 
-                node = TreeNode(event='')
+                node = TreeNode()
                 subroot.add_child(node)
                 end = -1
                 
