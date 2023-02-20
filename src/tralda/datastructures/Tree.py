@@ -212,7 +212,7 @@ class Tree:
             of a tree.
         """
         
-        if isinstance(arg, TreeNode):
+        if isinstance(arg, TreeNode) or arg is None:
             self.root = arg
         elif isinstance(arg, str):
             self.root = Tree._parse_newick_and_return_root(arg)
