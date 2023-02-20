@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import unittest, os
+import unittest, os, random
 
 from tralda.datastructures import Tree
 
@@ -25,6 +25,24 @@ class TestTrees(unittest.TestCase):
         post = {v for v in tree.postorder()}
         
         self.assertTrue( pre == post )
+    
+    
+    def test_newick(self):
+        
+        tree = Tree.random_tree(20)
+        
+        for v in tree.preorder():
+            v.dist = random.random()
+        
+        newick = tree.to_newick()
+        
+        tree2 = Tree.parse_newick(newick)
+        
+        self.assertTrue(tree.equal_topology(tree2))
+        
+        for v, v2 in zip(tree.preorder(), tree2.preorder()):
+            self.assertEqual(v.label, v2.label)
+            self.assertTrue(v.dist - v2.dist <= 1e-6)
     
     
     def test_serialization(self):

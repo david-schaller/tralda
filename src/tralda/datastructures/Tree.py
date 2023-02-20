@@ -50,8 +50,7 @@ class TreeNode:
     
     def __repr__(self):
         
-        return '<TN: {}>'.format(self.label if hasattr(self, 'label') 
-                                            else id(self))
+        return f'<TN: {self.label if hasattr(self, "label") else id(self)}>'
     
     
     def attributes(self):
@@ -106,8 +105,7 @@ class TreeNode:
         """
         
         if right_of.parent is not self:
-            return KeyError('{} is not a child of node {}'.format(right_of,
-                                                                  self))
+            return KeyError(f'{right_of} is not a child of node {self}')
         
         if child_node.parent is not None:
             child_node.parent.remove_child(child_node)
@@ -136,8 +134,7 @@ class TreeNode:
             child_node.parent = None
             child_node._par_dll_node = None
         else:
-            raise KeyError('{} is not a child of node {}'.format(child_node,
-                                                                 self))
+            raise KeyError(f'{child_node} is not a child of node {self}')
             
             
     def detach(self):
@@ -187,18 +184,16 @@ class TreeNode:
         """
         
         if left_node.parent is not self:
-            raise KeyError('{} is not a child of node {}'.format(left_node,
-                                                                 self))
+            raise KeyError(f'{left_node} is not a child of node {self}')
         if right_node.parent is not self:
-            raise KeyError('{} is not a child of node {}'.format(right_node,
-                                                                 self))
+            raise KeyError(f'{right_node} is not a child of node {self}')
         
         return self.children.sublist(left_node._par_dll_node,
                                      right_node._par_dll_node)
         
 
 class Tree:
-    """Basic class for trees.
+    """Rooted tree whose nodes may have an arbitrary number of children.
     
     Attributes
     ----------
@@ -206,20 +201,24 @@ class Tree:
         The root node of the tree.
     """
     
-    # corresponding node type
-    node_type = TreeNode
     
-    
-    def __init__(self, root):
+    def __init__(self, arg):
         """Constructor for the class tree.
         
         Parameters
         ----------
-        root : TreeNode
-            The root node for the newly created tree.
+        arg : TreeNode or str
+            The root node for the newly created tree or a Newick representation
+            of a tree.
         """
         
-        self.root = root
+        if isinstance(arg, TreeNode):
+            self.root = arg
+        elif isinstance(arg, str):
+            self.root = Tree._parse_newick_and_return_root(arg)
+        else:
+            raise TypeError(f'Tree cannot be initialized with argument of type '
+                            f'{type(arg)}')
         
     
     def leaves(self):
@@ -559,37 +558,6 @@ class Tree:
         return parent
         
     
-    def to_newick(self, node=None):
-        """Newick representation of the tree.
-        
-        Parameters
-        ----------
-        node : TreeNode, optional
-            The node whose subtree shall be returned as a Newick string, the
-            default is None, in which case the whole tree is returned in Newick
-            format.
-        
-        Returns
-        -------
-        str
-            A newick representation of the (sub)tree.
-        """
-        
-        def _to_newick(node):
-            if not node.children:
-                return str(node)
-            else:
-                s = ''
-                for child in node.children:
-                    s += _to_newick(child) + ','
-                return "({}){}".format(s[:-1], node)
-        
-        if self.root:
-            return _to_newick(self.root) + ';'
-        else:
-            return ';'
-        
-    
     def random_leaves(self, proportion):
         """A random sample of the leaves.
         
@@ -763,10 +731,9 @@ class Tree:
         for v in self.preorder():
             for child in v.children:
                 if child is v:
-                    raise RuntimeError('loop at {}'.format(v))
+                    raise RuntimeError(f'loop at {v}')
                 if child.parent is not v:
-                    raise RuntimeError('Tree invalid for '\
-                                       '{} and {}'.format(v, child))
+                    raise RuntimeError(f'Tree invalid for {v} and {child}')
         
         return True
     
@@ -812,6 +779,190 @@ class Tree:
             return Tree(orig_to_new[self.root]), orig_to_new
         else:
             return Tree(orig_to_new[self.root])
+
+
+# --------------------------------------------------------------------------
+#                         TREE  <--->  NEWICK
+# --------------------------------------------------------------------------
+
+    def to_newick(self, node=None):
+        """Newick representation of the tree.
+        
+        Parameters
+        ----------
+        node : TreeNode, optional
+            The node whose subtree shall be returned as a Newick string, the
+            default is None, in which case the whole tree is returned in Newick
+            format.
+        
+        Returns
+        -------
+        str
+            A newick representation of the (sub)tree.
+        """
+        
+        def _to_newick(node):
+            
+            node_str = str(node)
+            
+            # add colon and distance if available
+            if hasattr(node, 'dist'):
+                node_str += f':{node.dist}'
+            
+            if not node.children:
+                return node_str
+            else:
+                s = ''
+                for child in node.children:
+                    s += _to_newick(child) + ','
+                return f'({s[:-1]}){node_str}'
+        
+        if self.root:
+            return _to_newick(self.root) + ';'
+        else:
+            return ';'
+    
+    
+    @staticmethod
+    def _parse_newick_and_return_root(newick):
+        """Parses trees in Newick format and returns the root.
+        
+        If available (after colons in the Newick strings), the distance is 
+        stored in the 'dist' attribute of the nodes. Moreover, labels are
+        converted to integers if possible.
+        
+        Parameters
+        ----------
+        newick : str
+            A tree in Newick format.
+        
+        Returns
+        -------
+        TreeNode
+            The root of the parsed tree.
+        
+        Raises
+        ------
+        TypeError
+            If the input is not a string.
+        ValueError
+            If the input is not a valid Newick string.
+        """
+        
+        def _parse_subtree(subroot, subtree_string):
+            """Recursive function to parse the subtrees."""
+            
+            children = _split_children(subtree_string)
+            
+            for child in children:
+                
+                node = TreeNode(event='')
+                subroot.add_child(node)
+                end = -1
+                
+                # the child has subtrees
+                if child[0] == '(':
+                    end = child.rfind(')')
+                    if end == -1:
+                        raise ValueError('invalid Newick string')
+                    # recursive call
+                    _parse_subtree(node, child[1:end])               
+                    
+                child = child[end+1:].strip()
+                
+                label = child
+                
+                if child.find(':') != -1:
+                    label, dist = child.rsplit(':', 1)
+                    
+                    try:
+                        node.dist = float(dist)
+                    except ValueError:
+                        raise ValueError('invalid distance in Newick string: ' \
+                                         f'{dist}')
+                
+                # convert label to integer if possible
+                node.label = int(label) if label.isdigit() else label
+                    
+                        
+        def _split_children(child_string):
+            """Splits a given string by all ',' that are not enclosed by 
+            parentheses.
+            """
+            
+            stack = 0
+            children = []
+            current = ''
+            
+            for c in child_string:
+                if (stack == 0) and c == ',':
+                    children.append(current)
+                    current = ''
+                elif c == '(':
+                    stack += 1
+                    current += c
+                elif c == ')':
+                    if stack <= 0:
+                        raise ValueError('invalid Newick string')
+                    stack -= 1
+                    current += c
+                else:
+                    current += c
+                    
+            children.append(current.strip())
+            return children
+        
+        if not isinstance(newick, str):
+            raise TypeError("Newick parser needs a 'str' as input")
+            
+        end = newick.find(';')
+        if end != -1:
+            newick = newick[:end]
+        
+        temp_root = TreeNode()
+        _parse_subtree(temp_root, newick)
+        
+        if temp_root.children:
+            root = temp_root.children[0]
+            # remove the parent temp_root
+            root.detach()
+            return root
+        else:
+            raise ValueError('invalid Newick string')
+    
+    
+    @staticmethod
+    def parse_newick(newick):
+        """Parses trees in Newick format into object of type 'Tree'.
+        
+        If available (after colons in the Newick strings), the distance is 
+        stored in the 'dist' attribute of the nodes. Moreover, labels are
+        converted to integers if possible.
+        
+        Parameters
+        ----------
+        newick : str
+            A tree in Newick format.
+        
+        Returns
+        -------
+        Tree
+            The parsed tree.
+        
+        Raises
+        ------
+        TypeError
+            If the input is not a string.
+        ValueError
+            If the input is not a valid Newick string.
+        
+        Notes
+        -----
+        Do not use this function for serialization and reloading Tree
+        objects. Use the `serialize()` function instead.
+        """
+        
+        return Tree(Tree._parse_newick_and_return_root(newick))
     
     
 # --------------------------------------------------------------------------
@@ -847,7 +998,7 @@ class Tree:
         
         for u, v, sibling_nr in self.edges_sibling_order():
             if u is v:
-                raise RuntimeError('loop at {} and {}'.format(u, v))
+                raise RuntimeError(f'loop at {u} and {v}')
             G.add_edge(id(u), id(v))
             G.nodes[id(v)]['sibling_nr'] = sibling_nr
             
