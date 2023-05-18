@@ -7,8 +7,19 @@ from tralda.datastructures import Tree
 
 __author__ = 'David Schaller'
 
+example_tree = '((((14,15,(27,(29,30)28)18)10,(19,20)11,16)7,8,9,17)1,'\
+               '(4,5)2,3,((23,24)12,13,22)6,(25,26)21)0;'
+
 
 class TestTrees(unittest.TestCase):
+    
+    
+    def test_basic_properties(self):
+        
+        tree = Tree.parse_newick(example_tree)
+        
+        self.assertEqual(len(tree), 31)
+        self.assertEqual(tree.height(), 6)
     
     
     def test_integrity(self):
@@ -64,6 +75,47 @@ class TestTrees(unittest.TestCase):
         
         self.assertTrue( tree.equal_topology(tree_p) and
                          tree.equal_topology(tree_j) )
+    
+    def test_print_tree(self):
+        
+        # indentation was set to 4
+        reference = [
+            '0',
+            '├───1',
+            '│   ├───7',
+            '│   │   ├───10',
+            '│   │   │   ├───14',
+            '│   │   │   ├───15',
+            '│   │   │   └───18',
+            '│   │   │       ├───27',
+            '│   │   │       └───28',
+            '│   │   │           ├───29',
+            '│   │   │           └───30',
+            '│   │   ├───11',
+            '│   │   │   ├───19',
+            '│   │   │   └───20',
+            '│   │   └───16',
+            '│   ├───8',
+            '│   ├───9',
+            '│   └───17',
+            '├───2',
+            '│   ├───4',
+            '│   └───5',
+            '├───3',
+            '├───6',
+            '│   ├───12',
+            '│   │   ├───23',
+            '│   │   └───24',
+            '│   ├───13',
+            '│   └───22',
+            '└───21',
+            '    ├───25',
+            '    └───26'
+        ]
+        
+        tree = Tree.parse_newick(example_tree)
+        
+        self.assertEqual(tree._lines_for_print_tree(4), reference)
             
 
 if __name__ == '__main__':
