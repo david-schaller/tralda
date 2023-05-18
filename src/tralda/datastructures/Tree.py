@@ -219,6 +219,34 @@ class Tree:
         else:
             raise TypeError(f'Tree cannot be initialized with argument of type '
                             f'{type(arg)}')
+    
+    
+    def __len__(self):
+        """Size of the tree.
+        
+        Runs in O(n) where n is the size of the tree.
+        
+        Returns
+        -------
+        int
+            The size of the tree.
+        """
+        
+        return sum(1 for _ in self.preorder())
+    
+    
+    def height(self):
+        """Height of the tree.
+        
+        Runs in O(n) where n is the size of the tree.
+        
+        Returns
+        -------
+        int
+            The height of the tree.
+        """
+        
+        return max(level for _, level in self.preorder_and_level())
         
     
     def leaves(self):
@@ -244,7 +272,7 @@ class Tree:
     
     
     def preorder(self):
-        """Generator for preorder traversal of the tree.
+        """Generator for a pre-order traversal of the tree.
         
         Yields
         ------
@@ -261,10 +289,30 @@ class Tree:
             yield from _preorder(self.root)
         else:
             yield from []
+    
+    
+    def preorder_and_level(self):
+        """Generator for a pre-order traversal with node levels.
+        
+        Yields
+        ------
+        tuple of a TreeNode and an int
+            Nodes and their level (distance from the root) in pre-order.
+        """
+        
+        def _preorder_level(node, level):
+            yield (node, level)
+            for child in node.children:
+                yield from _preorder_level(child, level+1)
+        
+        if self.root:
+            yield from _preorder_level(self.root, 0)
+        else:
+            yield from []
             
     
     def traverse_subtree(self, u):
-        """Generator for pre-order traversal of the subtree rooted at u.
+        """Generator for a pre-order traversal of the subtree rooted at u.
         
         Yields
         ------
@@ -1200,6 +1248,72 @@ class Tree:
             
         else:
             raise ValueError(f"serialization mode '{mode}' not supported")
+
+
+# --------------------------------------------------------------------------
+#                     Print the tree to the console
+# --------------------------------------------------------------------------
+
+    def _lines_for_print_tree(self, child_indentation):
+        
+        symbols = ('\u2500', '\u2502', '\u2514', '\u251c')
+        
+        nodes = [node for node in self.preorder()]
+        node_index = {node: i for i, node in enumerate(nodes)}
+        n = len(node_index)
+        
+        lines = [[] for i in range(n)]
+        
+        for node, level in self.preorder_and_level():
+            
+            lines[node_index[node]].append(str(node))
+            
+            if not node.children:
+                continue
+            
+            last_child = node.children.last()
+            
+            for i in range(node_index[node] + 1, node_index[last_child] + 1):
+                descendant = nodes[i]
+                if descendant is last_child:
+                    lines[node_index[descendant]].append(
+                        symbols[2] + (child_indentation - 1) * symbols[0]
+                        )
+                elif node is descendant.parent:
+                    lines[node_index[descendant]].append(
+                        symbols[3] + (child_indentation - 1) * symbols[0]
+                        )
+                else:
+                    lines[node_index[descendant]].append(
+                        symbols[1] + (child_indentation - 1) * ' '
+                        )
+            
+            for descendant in self.traverse_subtree(last_child):
+                if descendant is not last_child:
+                    lines[node_index[descendant]].append(
+                        child_indentation * ' '
+                        )
+        
+        lines = [''.join(line) for line in lines]
+        
+        return lines
+        
+        
+    def print_tree(self, child_indentation=3):
+        """Print a representation of the tree to the console.
+        
+        Parameters
+        ----------
+        child_indentation : int, optional
+            The indentation added per level of the nodes. Must be >= 1. The
+            default is 3.
+        """
+        
+        if not isinstance(child_indentation, int) or child_indentation < 1:
+            raise ValueError('child indentation must be an integer >= 1')
+        
+        for line in self._lines_for_print_tree(child_indentation):
+            print(line)
 
 
 # --------------------------------------------------------------------------
