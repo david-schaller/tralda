@@ -1206,7 +1206,8 @@ class Tree:
                 
         elif mode == 'pickle':
             tree_nx, root_id = self.to_nx()
-            pickle.dump( (tree_nx, root_id), open(filename, 'wb') )
+            with open(filename, 'wb') as f:
+                pickle.dump((tree_nx, root_id), f)
             
         else:
             raise ValueError(f"serialization mode '{mode}' not supported")
@@ -1244,7 +1245,8 @@ class Tree:
             return Tree.parse_dict(tree_dict)
                 
         elif mode == 'pickle':
-            return Tree.parse_nx( *pickle.load(open(filename, 'rb')) )
+            with open(filename, 'rb') as f:
+                return Tree.parse_nx(*pickle.load(f))
             
         else:
             raise ValueError(f"serialization mode '{mode}' not supported")
