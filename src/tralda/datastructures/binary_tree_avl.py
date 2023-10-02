@@ -164,18 +164,12 @@ class TreeSet(BaseBinarySearchTree):
         node.parent, node.left, node.right = None, None, None
     
     
-    def check_integrity(self, node: Optional[BinaryNode] = None) -> bool:
-        """Recursive integrity check of the tree.
+    def check_integrity(self) -> bool:
+        """Integrity check of the tree.
             
         Checks whether all children have a correct parent reference and the size
-        and heigth is correct in all subtrees. 
-        Additionally, the AVL property is checked.
-        Intended for testing purpose.
-        
-        Parameters
-        ----------
-        node : BinaryNode, optional
-            The node at which to start the recursive integrity check.
+        and heigth is correct in all subtrees. Additionally, the AVL property is 
+        checked. Intended for testing purpose.
         
         Returns
         -------
@@ -229,13 +223,13 @@ class TreeDictIterator(BinaryTreeIterator):
     
     __slots__ = ('_mode',)
     
-    def __init__(self, tree, mode=1):
+    def __init__(self, tree: 'TreeDict', mode: int = 1):
         """Initilize the TreeDict iterator.
 
         Parameters
         ----------
-        tree : BaseBinarySearchTree
-            The binary search tree.
+        tree : TreeDict
+            The TreeDict instance.
         mode : int
             What shall be iterated through (1 = keys, 2 = values, 3 = key-value
             pairs).
@@ -487,6 +481,10 @@ class TreeDict(TreeSet):
                 node.right = self.node_class(key, value)
                 node.right.parent = node
                 self.root = self._rebalance(node)
+    
+    
+    def _insert_key(self, key: Any) -> None:
+        raise NotImplementedError('cannot insert key without value')
         
 
 if __name__ == '__main__':
@@ -502,6 +500,7 @@ if __name__ == '__main__':
     # print(t.to_newick())
     
     t = t.copy()
+    t.check_integrity()
     print(len(t))
     print(t.pop_at(-10000))
     print(len(t))
@@ -530,3 +529,5 @@ if __name__ == '__main__':
     end_time2 = time.time()
     
     print(end_time1 - start_time1, end_time2 - start_time2)
+    
+    t.check_integrity()
