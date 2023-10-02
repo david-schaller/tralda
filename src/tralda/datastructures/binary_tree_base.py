@@ -3,6 +3,7 @@
 """Base classes for binary search trees.
 """
 
+from enum import Enum
 from typing import Optional, Any, Iterator, Iterable
 
 __author__ = 'David Schaller'
@@ -166,6 +167,14 @@ class BinaryTreeIterator:
     
     __slots__ = ('tree', '_current', '_from')
     
+    class ComingFrom(Enum):
+        """Keep track what subtrees of a node have already been iterated 
+        through.
+        """
+        above = 1
+        left = 2
+        right = 3
+    
     def __init__(self, tree: 'BaseBinarySearchTree'):
         """Initilize the tree iterator.
 
@@ -176,12 +185,7 @@ class BinaryTreeIterator:
         """
         self.tree = tree
         self._current = self.tree.root
-        
-        # Where do I come from?
-        # 1 -- up
-        # 2 -- left
-        # 3 -- right
-        self._from = 1
+        self._from = self.ComingFrom.above
         
         
     def __iter__(self) -> 'BaseBinarySearchTree':
@@ -216,33 +220,30 @@ class BinaryTreeIterator:
             The next node.
         """
         while self._current:
-            # coming from above
-            if self._from == 1:
+            if self._from == self.ComingFrom.above:
                 if self._current.left:
                     self._current = self._current.left
                 else:
-                    self._from = 2
-            # coming from left child --> return this node
-            elif self._from == 2:
+                    self._from = self.ComingFrom.left
+            elif self._from == self.ComingFrom.left:
                 x = self._current
                 if self._current.right:
                     self._current = self._current.right
-                    self._from = 1
+                    self._from = self.ComingFrom.above
                 else:
                     self._current = self._current.parent
                     if self._current and self._current.left is x:
-                        self._from = 2
+                        self._from = self.ComingFrom.left
                     elif self._current:
-                        self._from = 3
+                        self._from = self.ComingFrom.right
                 return x
-            # coming from right child
             else:
                 x = self._current
                 self._current = self._current.parent
                 if self._current and self._current.left is x:
-                    self._from = 2
+                    self._from = self.ComingFrom.left
                 elif self._current:
-                    self._from = 3
+                    self._from = self.ComingFrom.right
  
 
 class BaseBinarySearchTree:
@@ -649,7 +650,10 @@ class BaseBinarySearchTree:
             A copy of the tree.
         """
         
-        def _copy_subtree(node: BinaryNode, parent: Optional[BinaryNode] = None):
+        def _copy_subtree(
+            node: BinaryNode, 
+            parent: Optional[BinaryNode] = None
+        ):
             node_copy = node.copy()
             node_copy.parent = parent
             if node.left:
@@ -711,46 +715,29 @@ class BaseBinarySearchTree:
             yield from []
     
     
-    def check_integrity(self, node: Optional[BinaryNode] = None) -> bool:
+    def check_integrity(self) -> bool:
         """Recursive integrity check of the tree.
             
         Checks whether all children have a correct parent reference and the size
         and heigth is correct in all subtrees. Intended for testing purpose.
-        
-        Parameters
-        ----------
-        node : BinaryNode, optional
-            The node at which to start the recursive integrity check.
         
         Returns
         -------
         bool
             Whether all integrity checks have been passed.
         """
-        if not node:
-            if not self.root:
-                print('tree has no root')
-                return False
-            else:
-                return self.check_integrity(self.root)
-        else:
+        for node in self._inorder_traversal():
             height_left, height_right, size = 0, 0, 1
             
             if node.left:
-                if (
-                    node is not node.left.parent or 
-                    not self.check_integrity(node.left)
-                ):
+                if node is not node.left.parent:
                     print(f'check node (left): {node}')
                     return False
                 height_left = node.left.height
                 size += node.left.size
                 
             if node.right:
-                if (
-                    node is not node.right.parent or
-                    not self.check_integrity(node.right)
-                ):
+                if node is not node.right.parent:
                     print(f'check node (right):{node}')
                     return False
                 height_right = node.right.height
