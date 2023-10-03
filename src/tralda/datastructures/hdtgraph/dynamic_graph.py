@@ -23,10 +23,8 @@ References:
       July 1999. 502–536.
 """
 
-from tralda.datastructures.hdtgraph.ETTree import (ETTree,
-                                                   ETTreeNode,
-                                                   DGNode)
-from tralda.datastructures.Tree import Tree
+from tralda.datastructures.hdtgraph.et_tree import ETTree, ETTreeNode, DGNode
+from tralda.datastructures.tree import Tree
 
 
 __author__ = 'David Schaller'

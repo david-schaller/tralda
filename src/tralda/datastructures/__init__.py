@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from tralda.datastructures.Tree import Tree, TreeNode, LCA
+from tralda.datastructures.tree import Tree, TreeNode, LCA
 
-from tralda.datastructures.LinkedList import LinkedList, LinkedListNode
-from tralda.datastructures.DoublyLinkedList import DLList, DLListNode
+from tralda.datastructures.linked import LinkedList, LinkedListNode
+from tralda.datastructures.doubly_linked import DLList, DLListNode
 
-from tralda.datastructures.binary_tree_avl import TreeSet, TreeDict
+from tralda.datastructures.bst.avl import TreeSet, TreeDict
 
-from tralda.datastructures.hdtgraph.DynamicGraph import HDTGraph
+from tralda.datastructures.hdtgraph.dynamic_graph import HDTGraph
