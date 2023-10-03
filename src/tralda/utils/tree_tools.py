@@ -4,7 +4,7 @@
 Tree Tools.
 """
 
-from tralda.datastructures.Tree import Tree
+from tralda.datastructures.tree import Tree
 
 
 __author__ = 'David Schaller'

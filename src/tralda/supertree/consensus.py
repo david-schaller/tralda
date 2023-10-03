@@ -8,8 +8,8 @@ Construction of a loose consensus tree.
 __author__ = 'David Schaller'
 
 
-from tralda.datastructures.Tree import Tree, TreeNode, LCA
-from tralda.tools.TreeTools import assert_leaf_sets_equal
+from tralda.datastructures.tree import Tree, TreeNode, LCA
+from tralda.utils.tree_tools import assert_leaf_sets_equal
 
 
 def loose_consensus_tree(trees):

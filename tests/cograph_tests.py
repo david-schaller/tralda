@@ -9,7 +9,7 @@ from tralda.cograph import (random_cotree,
                             CographEditor,
                             complete_multipartite_completion,
                             )
-import tralda.tools.GraphTools as gt
+import tralda.utils.graph_tools as gt
 
 
 __author__ = 'David Schaller'

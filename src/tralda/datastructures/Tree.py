@@ -4,7 +4,7 @@ import itertools, json, os, pickle, random
 
 import networkx as nx
 
-import tralda.datastructures.DoublyLinkedList as dll
+import tralda.datastructures.doubly_linked as dll
 
 
 __author__ = 'David Schaller'

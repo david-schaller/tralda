@@ -12,7 +12,7 @@ References:
       July 1999. 502–536.
 """
 
-from tralda.datastructures.DoublyLinkedList import DLList
+from tralda.datastructures.doubly_linked import DLList
 
 
 __author__ = 'David Schaller'

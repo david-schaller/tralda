@@ -4,8 +4,8 @@ import unittest, os, random
 
 import numpy as np
 
-from tralda.datastructures.binary_tree_simple import BinarySearchTree
-from tralda.datastructures.binary_tree_avl import TreeSet, TreeDict
+from tralda.datastructures.bst.simple import BinarySearchTree
+from tralda.datastructures.bst.avl import TreeSet, TreeDict
 
 
 __author__ = 'David Schaller'

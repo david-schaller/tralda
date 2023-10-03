@@ -15,9 +15,9 @@ References:
 """
 
 
-from tralda.datastructures.Tree import Tree, TreeNode
-from tralda.datastructures.DoublyLinkedList import DLList
-from tralda.datastructures.hdtgraph.DynamicGraph import HDTGraph
+from tralda.datastructures.tree import Tree, TreeNode
+from tralda.datastructures.doubly_linked import DLList
+from tralda.datastructures.hdtgraph.dynamic_graph import HDTGraph
 
 
 __author__ = 'David Schaller'

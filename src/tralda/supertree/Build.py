@@ -6,8 +6,8 @@
 import itertools
 import networkx as nx
 
-from tralda.datastructures.Tree import Tree, TreeNode
-from tralda.datastructures.Partition import Partition
+from tralda.datastructures.tree import Tree, TreeNode
+from tralda.datastructures.partition import Partition
 
 
 __author__ = 'David Schaller'
