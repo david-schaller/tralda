@@ -4,8 +4,8 @@
 
 from collections import deque
 
-from tralda.datastructures.Tree import Tree, TreeNode
-from tralda.tools.TreeTools import assert_leaf_sets_equal
+from tralda.datastructures.tree import Tree, TreeNode
+from tralda.utils.tree_tools import assert_leaf_sets_equal
 
 
 __author__ = 'David Schaller'

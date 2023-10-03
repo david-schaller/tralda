@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from typing import Any, Iterator
 
-from tralda.datastructures.binary_tree_base import BinaryNode
-from tralda.datastructures.binary_tree_base import BaseBinarySearchTree
-from tralda.datastructures.binary_tree_base import BinaryTreeIterator
+from tralda.datastructures.bst.base import BinaryNode
+from tralda.datastructures.bst.base import BaseBinarySearchTree
+from tralda.datastructures.bst.base import BinaryTreeIterator
 
 
 __author__ = 'David Schaller'

@@ -1,164 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Cographs and cotrees.  
+Linear-time cograph detection.  
 """
 
 
-import itertools, random
 from collections import deque
 
 import networkx as nx
 
-from tralda.datastructures.Tree import Tree, TreeNode, LCA
+from tralda.datastructures.tree import Tree, TreeNode, LCA
 
 
 __author__ = 'David Schaller'
-    
-
-def to_cograph(cotree):
-    """Returns the cograph corresponding to the cotree.
-    
-    Parameters
-    ----------
-    cotree : Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
-    
-    Returns
-    -------
-    nexworkx.Graph
-        The corresponding cograph with the leaf labels as vertices.
-    """
-    
-    leaves = cotree.leaf_dict()
-    G = nx.Graph()
-    
-    for v in leaves[cotree.root]:
-        G.add_node(v.label)
-    
-    for u in cotree.preorder():
-        if u.label == 'series':
-            for v1, v2 in itertools.combinations(u.children, 2):
-                for l1, l2 in itertools.product(leaves[v1], leaves[v2]):
-                    G.add_edge(l1.label, l2.label)
-    
-    return G  
-    
-
-def to_cotree(G):
-    """Checks if a graph is a cograph and returns its cotree.
-    
-    Linear O(|V| + |E|) implementation.
-    
-    Parameters
-    ----------
-    G : nexworkx.Graph
-        A graph.
-    
-    Returns
-    -------
-    Tree or bool
-        The cotree representation of the graph, or False if it is not a cograph.
-    
-    References
-    ----------
-    .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart.
-       A Linear Recognition Algorithm for Cographs.
-       In: SIAM J. Comput., 14(4), 926–934 (1985).
-       doi: 10.1137/0214065
-    """
-    
-    lcd = LinearCographDetector(G)
-    return lcd.recognition()
-        
-    
-def complement_cograph(cotree, inplace=False):
-    """Returns the cotree of the complement cograph.
-    
-    Parameters
-    ----------
-    cotree : Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
-    
-    Returns
-    -------
-    Tree
-        The cotree of the complement cograph.
-    """
-    
-    tree = cotree if inplace else cotree.copy()
-    
-    for v in tree.inner_nodes():
-        v.label = 'series' if v.label == 'parallel' else 'parallel'
-    
-    return tree
-    
-    
-def paths_of_length_2(cotree):
-    """Generator for all paths of length 2 (edges) in the cograph.
-    
-    Parameters
-    ----------
-    cotree : Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
-    
-    Yields
-    ------
-    tuple of three TreeNode instance
-        All paths of length 2 in the corresponding cograph.
-    """
-    
-    leaves = cotree.leaf_dict()
-    lca = LCA(cotree)
-    
-    for u in cotree.inner_nodes():
-        
-        if u.label == 'parallel':
-            continue
-        
-        for v1, v2 in itertools.permutations(u.children, 2):
-            for t1, t2 in itertools.combinations(leaves[v1], 2):
-                if lca(t1, t2).label == 'parallel':
-                    for t3 in leaves[v2]:
-                        yield t1, t3, t2
-    
-
-def random_cotree(N, force_series_root=False):
-    """Creates a random cotree.
-    
-    Parameters
-    ----------
-    N : int
-        The number of leaves in the resulting tree.
-    force_series_root : bool
-        If True, the cograph of the resulting cotree will be connected,
-        otherwise it may be disconnected; the default is False.
-    
-    Returns
-    -------
-    Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
-    """
-    
-    cotree = Tree.random_tree(N)
-    
-    # assign labels ('series', 'parallel')
-    for v in cotree.preorder():
-        if v.is_leaf():
-            continue
-        elif v.parent is None:
-            if force_series_root:
-                v.label = 'series'
-            else:
-                v.label = 'series' if random.random() < 0.5 else 'parallel'
-        else:
-            v.label = 'series' if v.parent.label == 'parallel' else 'parallel'
-            
-    return cotree
 
 
 class LinearCographDetector:

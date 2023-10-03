@@ -13,7 +13,7 @@ References
 import random
 import networkx as nx
 
-from tralda.datastructures.Tree import Tree, TreeNode
+from tralda.datastructures.tree import Tree, TreeNode
 
 
 __author__ = 'David Schaller'

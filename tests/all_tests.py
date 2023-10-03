@@ -10,5 +10,4 @@ __author__ = 'David Schaller'
 
 
 if __name__ == '__main__':
-    
     unittest.main()
