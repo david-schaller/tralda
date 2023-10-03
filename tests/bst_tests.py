@@ -29,7 +29,7 @@ class TestTrees(unittest.TestCase):
         
         for x in self.to_remove:
             tree.remove(x)
-            
+        
         self.assertEqual(len(tree), len(self.reference_after_removal))
         
         self.assertEqual(
@@ -42,7 +42,7 @@ class TestTrees(unittest.TestCase):
         self._insertion_and_removal(BinarySearchTree)
     
     
-    def test_simple_search_tree(self):
+    def test_avl_tree(self):
         self._insertion_and_removal(TreeSet)
             
 
