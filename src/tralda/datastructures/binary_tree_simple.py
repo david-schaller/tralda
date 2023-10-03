@@ -22,7 +22,6 @@ class BinarySearchTree(BaseBinarySearchTree):
     node_class = BinaryNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
     
-    
     def _insert_key(self, key: Any) -> None:
         """Insert a key into the tree if not already present.
         
@@ -30,85 +29,98 @@ class BinarySearchTree(BaseBinarySearchTree):
         ----------
         key : Any
             The key to be inserted.
+        
+        Raises
+        ------
+        ValueError
+            If the key already exists.
         """
-        if not self.root:
-            self.root = self.node_class(key)
+        self.root = self._recursive_insert(key, self.root)
+        
+    
+    def _recursive_insert(self, key: Any, node: BinaryNode) -> BinaryNode:
+        """Recursive insertion and rebalancing.
+        """
+        if node is None:
+            return self.node_class(key)
+        elif key < node.key:
+            node.left = self._recursive_insert(key, node.left)
+        elif key > node.key:
+            node.right = self._recursive_insert(key, node.right)
         else:
-            node = self._find_insert(key)
-            
-            if key < node.key:
-                node.left = self.node_class(key)
-                node.left.parent = node
-            elif key > node.key:
-                node.right = self.node_class(key)
-                node.right.parent = node
+            raise ValueError(f'key {key} already exists')
+        
+        node.update()
+        
+        return node
+
     
-    
-    def _delete_node(self, node: BinaryNode) -> None:
-        """Delete a node.
+    def _delete_key(self, key: Any) -> None:
+        """Delete a key if present.
         
         Parameters
         ----------
-        node : BinaryNode
-            The node to be deleted.
+        key : Any
+            The key to be deleted.
         """
-        if node.left and node.right:
-            # replace by smallest in right subtree
-            subst = self._smallest_in_subtree(node.right)
-            subst_par = subst.parent
-            
-            if subst_par is not node:
-                subst_par.left = subst.right
-                if subst.right:
-                    subst.right.parent = subst_par
-                subst.right = node.right
-                node.right.parent = subst
-                
-            subst.left = node.left
-            node.left.parent = subst
-            par = node.parent
-            subst.parent = par
-            
-            if par:
-                if node is par.left:
-                    par.left = subst
-                elif node is par.right:
-                    par.right = subst
-            else:
-                self.root = subst
-            
-        elif node.left:
-            par = node.parent
-            node.left.parent = par
-            
-            if par:
-                if node is par.left:
-                    par.left = node.left
-                elif node is par.right:
-                    par.right = node.left
-            else:
-                self.root = node.left
-                
-        elif node.right:
-            par = node.parent
-            node.right.parent = par
-            
-            if par:
-                if node is par.left:
-                    par.left = node.right
-                elif node is par.right:
-                    par.right = node.right
-            else:
-                self.root = node.right
-                
-        else:
-            par = node.parent
-            if par:
-                if node is par.left:
-                    par.left = None
-                elif node is par.right:
-                    par.right = None
-            else:
-                self.root = None
+        self.root = self._recursive_delete(key, self.root)
         
-        node.parent, node.left, node.right = None, None, None
+    
+    def _recursive_delete(self, key: Any, node: BinaryNode) -> BinaryNode:
+        """Recursive deletion.
+        """
+        if node is None:
+            raise ValueError(f'key {key} not found')
+        elif key < node.key:
+            node.left = self._recursive_delete(key, node.left)
+        elif key > node.key:
+            node.right = self._recursive_delete(key, node.right)
+        else:
+            if node.left is None:
+                node = node.right
+            elif node.right is None:
+                node = node.left
+            else:
+                subst_node = self._smallest_in_subtree(node.right)
+                node.set_attributes(subst_node.get_attributes())
+                # now find and delete subst_node
+                node.right = self._recursive_delete(node.key, node.right)
+        
+        if node is not None:
+            node.update()
+        
+        return node
+
+
+    def _pop_at_index(self, idx: int) -> None:
+        """Remove item at the index and return it.
+        
+        Parameters
+        ----------
+        idx : int
+            The index of the element to be removed.
+        """
+        self.root = self._recursive_pop_at_index(idx, self.root)
+    
+    
+    def _recusive_pop_at_index(self,idx: int, node: BinaryNode) -> BinaryNode:
+        """Recursive deletion of a node at the index.
+        """
+        if node is None:
+            raise ValueError(f'could not find node with index {idx}')
+        
+        node_idx = node.left_size()
+        
+        if idx == node_idx:
+            self._temp_attributes = node.get_attributes()
+            return self._recursive_delete(node.key, node)
+        elif idx < node_idx:
+            node.left = self._recusive_pop_at_index(idx, node.left)
+        else:
+            node.right = self._recusive_pop_at_index(idx - node_idx - 1, 
+                                                     node.right)
+        
+        if node is not None:
+            node.update()
+        
+        return node

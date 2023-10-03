@@ -9,7 +9,7 @@ dictionary (TreeDict).
 
 from __future__ import annotations
 
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from tralda.datastructures.binary_tree_base import BinaryNode
 from tralda.datastructures.binary_tree_base import BaseBinarySearchTree
@@ -26,42 +26,88 @@ class TreeSet(BaseBinarySearchTree):
     iterator_class: Iterator[Any] = BinaryTreeIterator
     
     
+    def rotate_right(self, node: BinaryNode) -> BinaryNode:
+        """Perform a right rotation on the node.
+        
+        Parameters
+        ----------
+        node: BinaryNode
+            The node on which to perform a right rotation.
+        
+        Returns
+        -------
+        BinaryNode
+            The former left child of the node which is its parent after the
+            rotation.
+        """
+        left_child = node.left
+        node.left = left_child.right
+        left_child.right = node
+        
+        node.update()
+        left_child.update()
+        
+        return left_child
+        
+        
+    def rotate_left(self, node: BinaryNode) -> BinaryNode:
+        """Perform a left rotation on the node.
+        
+        Parameters
+        ----------
+        node: BinaryNode
+            The node on which to perform a left rotation.
+        
+        Returns
+        -------
+        BinaryNode
+            The former right child of the node which is its parent after the
+            rotation.
+        """
+        right_child = node.right
+        node.right = right_child.left
+        right_child.left = node
+        
+        node.update()
+        right_child.update()
+        
+        return right_child
+    
+    
     def _rebalance(self, node: BinaryNode) -> BinaryNode:
-        """Rebalance the tree starting from the specified node.
+        """Rebalance the node.
 
         Parameters
         ----------
         node : BinaryNode
-            The node at which to start rebalancing.
+            The node to be rebalanced.
 
         Returns
         -------
         BinaryNode
             The root of the tree after rebalancing.
-        """        
-        while node:
-            node.update()
-            while abs(node.balance()) > 1:
-                if node.balance() > 1:
-                    if node.left.balance() >= 0:
-                        # single rotation needed
-                        node.rightrotate()
-                    else:      
-                        # double rotation needed
-                        node.left.leftrotate()
-                        node.rightrotate()
-                else:
-                    if node.right.balance() <= 0:
-                        # single rotation needed
-                        node.leftrotate()
-                    else:
-                        # double rotation needed
-                        node.right.rightrotate()
-                        node.leftrotate()
-                        
-            if not node.parent:
-                return node
-            node = node.parent
+        """
+        node.update()
+        balance = node.balance()
+        
+        if balance > 1:
+            if node.left.balance() >= 0:
+                # single rotation needed
+                node = self.rotate_right(node)
+            else:      
+                # double rotation needed
+                node.left = self.rotate_left(node.left)
+                node = self.rotate_right(node)
+        elif balance < -1:
+            if node.right.balance() <= 0:
+                # single rotation needed
+                node = self.rotate_left(node)
+            else:
+                # double rotation needed
+                node.right = self.rotate_right(node.right)
+                node = self.rotate_left(node)
+        
+        return node
     
     
     def _insert_key(self, key: Any) -> None:
@@ -71,97 +117,103 @@ class TreeSet(BaseBinarySearchTree):
         ----------
         key : Any
             The key to be inserted.
+        
+        Raises
+        ------
+        ValueError
+            If the key already exists.
         """
-        if not self.root:
-            self.root = self.node_class(key)
+        self.root = self._insert_and_rebalance(key, self.root)
+        
+    
+    def _insert_and_rebalance(self, key: Any, node: BinaryNode) -> BinaryNode:
+        """Recursive insertion and rebalancing.
+        """
+        if node is None:
+            return self.node_class(*self._temp_attributes)
+        elif key < node.key:
+            node.left = self._insert_and_rebalance(key, node.left)
+        elif key > node.key:
+            node.right = self._insert_and_rebalance(key, node.right)
         else:
-            node = self._find_insert(key)
-            
-            if key < node.key:
-                node.left = self.node_class(key)
-                node.left.parent = node
-                self.root = self._rebalance(node)
-            elif key > node.key:
-                node.right = self.node_class(key)
-                node.right.parent = node
-                self.root = self._rebalance(node)
+            raise ValueError(f'key {key} already exists')
+        
+        return self._rebalance(node)
     
     
-    def _delete_node(self, node: BinaryNode) -> None:
-        """Delete a node.
+    def _delete_key(self, key: Any) -> None:
+        """Delete a key if present.
         
         Parameters
         ----------
-        node : BinaryNode
-            The node to be deleted.
+        key : Any
+            The key to be deleted.
         """
-        if node.left and node.right:
-            # replace by smallest in right subtree
-            subst = self._smallest_in_subtree(node.right)
-            to_rebalance = subst.parent
-            
-            if to_rebalance is node:
-                to_rebalance = subst
-            else:
-                to_rebalance.left = subst.right
-                if subst.right:
-                    subst.right.parent = to_rebalance
-                subst.right = node.right
-                node.right.parent = subst
-                
-            subst.left = node.left
-            node.left.parent = subst
-            par = node.parent
-            subst.parent = par
-            
-            if par:
-                if node is par.left:
-                    par.left = subst
-                elif node is par.right:
-                    par.right = subst
-            else:
-                self.root = subst
-                
-            self.root = self._rebalance(to_rebalance)
-            
-        elif node.left:
-            par = node.parent
-            node.left.parent = par
-            
-            if par:
-                if node is par.left:
-                    par.left = node.left
-                elif node is par.right:
-                    par.right = node.left
-                self.root = self._rebalance(par)
-            else:
-                self.root = node.left
-                
-        elif node.right:
-            par = node.parent
-            node.right.parent = par
-            
-            if par:
-                if node is par.left:
-                    par.left = node.right
-                elif node is par.right:
-                    par.right = node.right
-                self.root = self._rebalance(par)
-            else:
-                self.root = node.right
-                
-        else:
-            par = node.parent
-            if par:
-                if node is par.left:
-                    par.left = None
-                elif node is par.right:
-                    par.right = None
-                self.root = self._rebalance(par)
-            else:
-                self.root = None
+        self.root = self._delete_and_rebalance(key, self.root)
         
-        node.parent, node.left, node.right = None, None, None
+    
+    def _delete_and_rebalance(self, key: Any, node: BinaryNode) -> BinaryNode:
+        """Recursive deletion and rebalancing.
+        """
+        if node is None:
+            raise ValueError(f'key {key} not found')
+        elif key < node.key:
+            node.left = self._delete_and_rebalance(key, node.left)
+        elif key > node.key:
+            node.right = self._delete_and_rebalance(key, node.right)
+        else:
+            if node.left is None:
+                node = node.right
+            elif node.right is None:
+                node = node.left
+            else:
+                subst_node = self._smallest_in_subtree(node.right)
+                node.set_attributes(subst_node.get_attributes())
+                # now find and delete subst_node
+                node.right = self._delete_and_rebalance(node.key, node.right)
+        
+        if node is not None:
+            node = self._rebalance(node)
+        
+        return node
+    
+    
+    def _pop_at_index(self, idx: int) -> None:
+        """Remove item at the index.
+        
+        Parameters
+        ----------
+        idx : int
+            The index of the element to be removed.
+        """
+        self.root = self._pop_at_index_and_rebalance(idx, self.root)
+    
+    
+    def _pop_at_index_and_rebalance(
+        self,
+        idx: int,
+        node: BinaryNode
+    ) -> BinaryNode:
+        """Recursive deletion of a node at the index.
+        """
+        if node is None:
+            raise ValueError(f'could not find node with index {idx}')
+        
+        node_idx = node.left_size()
+        
+        if idx == node_idx:
+            self._temp_attributes = node.get_attributes()
+            return self._delete_and_rebalance(node.key, node)
+        elif idx < node_idx:
+            node.left = self._pop_at_index_and_rebalance(idx, node.left)
+        else:
+            node.right = self._pop_at_index_and_rebalance(idx - node_idx - 1, 
+                                                          node.right)
+        
+        if node is not None:
+            node = self._rebalance(node)
+        
+        return node
     
     
     def check_integrity(self) -> bool:
@@ -201,21 +253,8 @@ class TreeDictNode(BinaryNode):
         value : Any
             The value associated with the key.
         """
-        
         super().__init__(key)
         self.value = value
-        
-    
-    def copy(self) -> 'TreeDictNode':
-        """A copy of this node.
-
-        Returns:
-            TreeDictNode: A copy of this node.
-        """ 
-        copy= super().copy()
-        copy.value = self.value
-        
-        return copy
 
 
 class TreeDictIterator(BinaryTreeIterator):
@@ -259,15 +298,15 @@ class TreeDictIterator(BinaryTreeIterator):
         StopIteration
             When no items are left.
         """
-        node = self._find_next()
-        if node:
+        try:
+            node = next(self._inorder_generator)
             if self._mode == 1:
                 return node.key
             elif self._mode == 2:
                 return node.value
             else:
                 return (node.key, node.value)
-        else:
+        except StopIteration:
             raise StopIteration
 
 
@@ -364,35 +403,7 @@ class TreeDict(TreeSet):
         return self.iterator_class(self, mode=3)
     
     
-    def pop(self, key: Any) -> Any:
-        """Remove a key from the tree and return its value.
-        
-        Parameters
-        ----------
-        key: Any
-            The key to be removed.
-        
-        Returns
-        -------
-        Any
-            The value associated with the key.
-        
-        Raises
-        ------
-        KeyError
-            If key is not in the tree.
-        """
-        node = self._find(key)
-        
-        if not node:
-            raise KeyError(str(key))
-            
-        self._delete_node(node)
-        
-        return node.value
-    
-    
-    def value_at(self, idx) -> Any:
+    def value_at_index(self, idx) -> Any:
         """Return the value at the index.
         
         Parameters
@@ -405,10 +416,10 @@ class TreeDict(TreeSet):
         Any
             The value of the node at the index.
         """
-        return self._node_at(idx).value
+        return self._node_at_index(idx).value
     
     
-    def key_and_value_at(self, index) -> tuple[Any, Any]:
+    def key_and_value_at_index(self, idx) -> tuple[Any, Any]:
         """Return the key-value pair at the index.
         
         Parameters
@@ -421,26 +432,7 @@ class TreeDict(TreeSet):
         tuple[Any, Any]
             The key-value pair of the node at the index.
         """
-        node = self._node_at(index)
-        
-        return (node.key, node.value)
-    
-    
-    def pop_at(self, idx: int) -> tuple[Any, Any]:
-        """Remove node at the index and return its key value pair.
-        
-        Parameters
-        ----------
-        idx : int
-            The index.
-        
-        Returns
-        -------
-        tuple[Any, Any]
-            The key-value pair of the node at the index.
-        """
-        node = self._node_at(idx)
-        self._delete_node(node)
+        node = self._node_at_index(idx)
         
         return (node.key, node.value)
     
@@ -467,24 +459,15 @@ class TreeDict(TreeSet):
             The key to be added.
         value: Any
             The associated value.
+        
+        Raises
+        ------
+        ValueError
+            If the key already exists.
         """
-        if not self.root:
-            self.root = self.node_class(key, value)
-        else:
-            node = self._find_insert(key)
-            
-            if key < node.key:
-                node.left = self.node_class(key, value)
-                node.left.parent = node
-                self.root = self._rebalance(node)
-            elif key > node.key:
-                node.right = self.node_class(key, value)
-                node.right.parent = node
-                self.root = self._rebalance(node)
-    
-    
-    def _insert_key(self, key: Any) -> None:
-        raise NotImplementedError('cannot insert key without value')
+        self._temp_attributes = (key, value)
+        self._insert_key(key)
+        self._temp_attributes = None
         
 
 if __name__ == '__main__':
@@ -502,9 +485,9 @@ if __name__ == '__main__':
     t = t.copy()
     t.check_integrity()
     print(len(t))
-    print(t.pop_at(-10000))
+    print(t.pop_at_index(-10000))
     print(len(t))
-    print(t.key_and_value_at(980))
+    print(t.key_and_value_at_index(980))
     
     l = [key for key in t.items()]
     print(l[-5:])
@@ -514,11 +497,11 @@ if __name__ == '__main__':
         s.add(key)
     
     # choosing a random element from a TreeSet/TreeDict can be done very fast
-    # using a random integer and the pop_at() function
+    # using a random integer and the pop_at_index() function
     start_time1 = time.time()
     for i in range(500):
         x = random.randint(0, len(t)-1)
-        t.pop_at(x)
+        t.pop_at_index(x)
     end_time1 = time.time()
     print(len(t))
     
