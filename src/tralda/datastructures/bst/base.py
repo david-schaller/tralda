@@ -700,4 +700,4 @@ class BaseBinarySearchTree:
                 print(f'size of node {node} is incorrect')
                 return False
             
-            return True
+        return True
