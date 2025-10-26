@@ -468,7 +468,10 @@ class DLListIterator:
         
         self.dllist = dllist
         self._current = dllist._first
-        
+
+    def __iter__(self):
+
+        return self
     
     def __next__(self):
         
