@@ -74,8 +74,11 @@ class PartitionIterator:
         
         self.partition = partition
         self._current = self.partition.P._first
-        
-    
+
+    def __iter__(self):
+
+        return self
+
     def __next__(self):
         
         if self._current:

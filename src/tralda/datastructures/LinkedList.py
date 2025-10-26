@@ -267,7 +267,10 @@ class LinkedListIterator:
         
         self.llist = llist
         self._current = llist._first
+
+    def __iter__(self):
         
+        return self
     
     def __next__(self):
         

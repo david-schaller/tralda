@@ -521,7 +521,7 @@ class TreeSetIterator:
         
         
     def __iter__(self):
-        
+
         return self
         
     
@@ -713,7 +713,10 @@ class TreeDictIterator(TreeSetIterator):
         # 2 -- value
         # 3 -- (key, value)
         self._mode = mode
-        
+    
+    def __iter__(self):
+
+        return self
     
     def __next__(self):
         
