@@ -168,7 +168,7 @@ class TreeSet(BaseBinarySearchTree):
                 node = node.left
             else:
                 subst_node = self._smallest_in_subtree(node.right)
-                node.set_attributes(subst_node.get_attributes())
+                subst_node.copy_attributes_to_node(node)
                 # now find and delete subst_node
                 node.right = self._delete_and_rebalance(node.key, node.right)
         

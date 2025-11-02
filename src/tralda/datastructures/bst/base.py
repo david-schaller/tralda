@@ -3,6 +3,8 @@
 """Base classes for binary search trees.
 """
 
+from __future__ import annotations
+
 from typing import Optional, Any, Iterator, Iterable
 
 __author__ = 'David Schaller'
@@ -66,8 +68,23 @@ class BinaryNode:
         """
         for val, a in zip(attributes, self._attributes):
             setattr(self, a, val)
-    
-    
+
+
+    def copy_attributes_to_node(self, other: BinaryNode) -> None:
+        """Copy attributes of this node to another node.
+
+        Parameters
+        ----------
+        other : BinaryNode
+            The node into which to copy the attributes.
+        """
+        if not isinstance(other, type(self)):
+            TypeError(
+                f'nodes must have the same type (self if {type(self)}, other is {type(other)})'
+            )
+
+        other.set_attributes(self.get_attributes())
+
     def update(self) -> None:
         """Update height and size of (the subtree under) the node.
         """
@@ -363,8 +380,8 @@ class BaseBinarySearchTree:
     def insert(self, key: Any) -> None:
         """Insert an item.
         
-        This function will throw a ValueError if the keyis already present.
-        If you do not want this behavior, use the function add() instead.
+        This function will throw a ValueError if the key is already present. If you do not want
+        this behavior, use the function add() instead.
         
         Parameters
         ----------
@@ -620,7 +637,7 @@ class BaseBinarySearchTree:
             yield from []
     
     
-    def copy(self) -> 'BaseBinarySearchTree':
+    def copy(self) -> BaseBinarySearchTree:
         """Copy the tree.
         
         Returns
@@ -628,19 +645,21 @@ class BaseBinarySearchTree:
         BaseBinarySearchTree
             A copy of the tree.
         """
-        
-        def _copy_subtree(node: BinaryNode):
-            node_copy = node.copy()
-            if node.left:
-                node_copy.left = _copy_subtree(node.left)
-            if node.right:
-                node_copy.right = _copy_subtree(node.right)
-            return node_copy
-        
         tree_copy = self.__class__()
         if self.root:
-            tree_copy.root = _copy_subtree(self.root)
+            tree_copy.root = self._copy_subtree(self.root)
+
         return tree_copy
+    
+    
+    def _copy_subtree(self, node: BinaryNode) -> BinaryNode:
+        node_copy = node.copy()
+        if node.left:
+            node_copy.left = self._copy_subtree(node.left)
+        if node.right:
+            node_copy.right = self._copy_subtree(node.right)
+
+        return node_copy
                 
     
     def to_newick(self) -> str:
