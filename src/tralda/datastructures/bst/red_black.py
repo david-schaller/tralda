@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
-
-"""
-Red-black tree implementation.
+"""Red-black tree implementation.
     
-Balanced binary search tree implementation of a set (TreeSet) and
-dictionary (TreeDict).
+Balanced binary search tree implementation of a set (TreeSet) and dictionary (TreeDict).
+
+References:
+    [1] https://www.happycoders.eu/de/algorithmen/rot-schwarz-baum-java/
 """
 
 from __future__ import annotations
 
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from tralda.datastructures.bst.base import BinaryNode
 from tralda.datastructures.bst.base import BaseBinarySearchTree
@@ -24,10 +23,43 @@ class RedBlackTreeNode(BinaryNode):
     __slots__ = ('parent', 'is_red',)
     
     def __init__(self, key: Any) -> None:
+        """Initialize the red-black tree node.
+
+        Args:
+            key: The key/label of the node. Keys must be unique within a binary search tree.
+        """
         super().__init__(key)
 
-        self.parent: Optional[RedBlackTreeNode] = None
+        self.parent: RedBlackTreeNode | None = None
         self.is_red: bool = False
+    
+    def copy(self) -> RedBlackTreeNode:
+        """A copy of this node.
+
+        Returns:
+            BinaryNode: A copy of this node.
+        """        
+        copy = super().copy()
+        copy.is_red = self.is_red
+        
+        return copy
+
+
+class TemporyNilNode(RedBlackTreeNode):
+    
+    def __init__(self):
+        """Initialize the temporary NIL node for red-black trees."""
+        super().__init__(0)  # dummy key
+
+        # as the tempory NIL nodes will be deleting after the reparing function is called, it
+        # must not contribute to the height and size
+        self.size: int = 0
+        self.height: int = 0
+    
+    def update(self) -> None:
+        """Update height and size of (the subtree under) the node."""
+        # does nothing for tempory NIL nodes
+        return
  
 
 class TreeSet(BaseBinarySearchTree):
@@ -38,14 +70,31 @@ class TreeSet(BaseBinarySearchTree):
     
     def __init__(self) -> None:
         super().__init__()
+
+    def _copy_subtree(self, node: RedBlackTreeNode) -> RedBlackTreeNode:
+        """Recursive auxiliary function to copy a subtree under the provided node.
+
+        Args:
+            node: Node whose subtree to copy.
+
+        Returns:
+            The root node of the copied subtree.
+        """
+        node_copy = node.copy()
+        if node.left:
+            node_copy.left = self._copy_subtree(node.left)
+            node_copy.left.parent = node_copy
+        if node.right:
+            node_copy.right = self._copy_subtree(node.right)
+            node_copy.right.parent = node_copy
+
+        return node_copy
     
     def _traverse_to_root_and_update(self, node: RedBlackTreeNode) -> None:
         """Update all nodes on the path to the root.
 
-        Parameters
-        ----------
-        node : RedBlackTreeNode
-            Node for starting the traversal to the root.
+        Args:
+            node: Node for starting the traversal to the root.
         """
         node.update()
 
@@ -53,21 +102,17 @@ class TreeSet(BaseBinarySearchTree):
             self._traverse_to_root_and_update(node.parent)
 
     def _replace_child(
-        self, 
-        parent: Optional[RedBlackTreeNode], 
-        old_child: RedBlackTreeNode, 
-        new_child: RedBlackTreeNode
+        self,
+        parent: RedBlackTreeNode | None, 
+        old_child: RedBlackTreeNode,
+        new_child: RedBlackTreeNode | None,
     ) -> None:
         """Replace the child of a parent node.
 
-        Parameters
-        ----------
-        parent: RedBlackTreeNode or None
-            The parent node.
-        old_child: RedBlackTreeNode
-            The current child node to be replaced.
-        new_child: RedBlackTreeNode
-            The replacement node.
+        Args:
+            parent: The parent node.
+            old_child: The current child node to be replaced.
+            new_child: The replacement node.
         """        
         if not parent:
             self.root = new_child
@@ -81,19 +126,25 @@ class TreeSet(BaseBinarySearchTree):
         if new_child:
             new_child.parent = parent
     
+    def _is_black(self, node: RedBlackTreeNode | None) -> bool:
+        """Check if the node is black or None (= a black NIL node).
+
+        Args:
+            node: Node to check.
+
+        Returns:
+            Whether the node is black.
+        """
+        return node is None or not node.is_red
+    
     def _rotate_right(self, node: RedBlackTreeNode) -> RedBlackTreeNode:
         """Perform a right rotation on the node.
         
-        Parameters
-        ----------
-        node: RedBlackTreeNode
-            The node on which to perform a right rotation.
+        Args:
+            node: The node on which to perform a right rotation.
         
-        Returns
-        -------
-        RedBlackTreeNode
-            The former left child of the node which is its parent after the
-            rotation.
+        Returns:
+            The former left child of the node which is its parent after the rotation.
         """
         parent = node.parent
         left_child = node.left
@@ -116,16 +167,11 @@ class TreeSet(BaseBinarySearchTree):
     def _rotate_left(self, node: RedBlackTreeNode) -> RedBlackTreeNode:
         """Perform a left rotation on the node.
         
-        Parameters
-        ----------
-        node: RedBlackTreeNode
-            The node on which to perform a left rotation.
+        Args:
+            node: The node on which to perform a left rotation.
         
-        Returns
-        -------
-        RedBlackTreeNode
-            The former right child of the node which is its parent after the
-            rotation.
+        Returns:
+            The former right child of the node which is its parent after the rotation.
         """
         parent = node.parent
         right_child = node.right
@@ -148,10 +194,8 @@ class TreeSet(BaseBinarySearchTree):
     def _insert_key(self, key: Any) -> None:
         """Insert a key into the tree if not already present.
         
-        Parameters
-        ----------
-        key : Any
-            The key to be inserted.
+        Args:
+            key: The key to be inserted.
         """
         node = self.root
         parent = None
@@ -180,20 +224,31 @@ class TreeSet(BaseBinarySearchTree):
         self._fix_after_insert(new_node)
         self._traverse_to_root_and_update(new_node)
     
-    def _get_uncle(
-        self, 
-        parent: RedBlackTreeNode
-    ) -> Optional[RedBlackTreeNode]:
+    def _get_sibling(self, node: RedBlackTreeNode) -> RedBlackTreeNode | None:
+        """Find the sibling of a node.
+
+        Args:
+            node: The node for which to find the sibling.
+
+        Returns:
+            The sibling node.
+        """
+        parent = node.parent
+        
+        if node is parent.left:
+            return parent.right
+        elif node is parent.right:
+            return parent.left
+        else:
+            raise RuntimeError(f'node is not a child of its parent')
+
+    def _get_uncle(self, parent: RedBlackTreeNode) -> RedBlackTreeNode | None:
         """Find the uncle starting from the parent node.
 
-        Parameters
-        ----------
-        parent : RedBlackTreeNode
-            The parent of the node for which to
+        Args:
+            parent: The parent of the node for which to
 
-        Returns
-        -------
-        RedBlackTreeNode or None
+        Returns:
             The uncle node.
         """
         grandparent = parent.parent
@@ -208,10 +263,8 @@ class TreeSet(BaseBinarySearchTree):
     def _fix_after_insert(self, node: RedBlackTreeNode) -> None:
         """Fix the red-black properties after insertion.
 
-        Parameters
-        ----------
-        node : RedBlackTreeNode
-            The node at which to start fixing the properties.
+        Args:
+            node: The node at which to start fixing the properties.
         """        
         parent = node.parent
         
@@ -269,60 +322,178 @@ class TreeSet(BaseBinarySearchTree):
     def _delete_key(self, key: Any) -> None:
         """Delete a key.
         
-        Parameters
-        ----------
-        key : Any
-            The key to be deleted.
+        Args:
+            key: The key to be deleted.
         """
-        raise NotImplementedError
+        node = self._find(key)
+
+        if not node:
+            raise ValueError(f'key {key} not found')
+
+        self._delete_node(node)
     
     def _pop_at_index(self, idx: int) -> None:
         """Remove item at the index and return it.
         
-        Parameters
-        ----------
-        idx : int
-            The index of the element to be removed.
+        Args:
+            idx: The index of the element to be removed.
         """
-        raise NotImplementedError('not implemented for base class')
+        node = self._node_at_index(idx)
+        self._temp_attributes = node.get_attributes()
+        self._delete_node(node)
+
+    def _delete_node(self, node: RedBlackTreeNode) -> None:
+        """Delete a node from the tree.
+
+        Args:
+            node: The node to delete from the tree.
+        """
+        # node has zero or one child
+        if not node.left or not node.right:
+            # store the node at which to start to fix the red-black properties after deleting a node
+            deleted_node_parent = node.parent
+            moved_up_node = self._delete_node_with_zero_or_one_child(node)
+            deleted_node_is_red = node.is_red
+        
+        # node has two children
+        else:
+            # find smallest node of right subtree ("inorder successor" of current node)
+            inorder_successor = self._smallest_in_subtree(node.right)
+
+            # copy inorder successor's data to current node (keep its color)
+            inorder_successor.copy_attributes_to_node(node)
+
+            # delete inorder successor instead (has at most one child)
+            deleted_node_parent = inorder_successor.parent
+            moved_up_node = self._delete_node_with_zero_or_one_child(inorder_successor)
+            deleted_node_is_red = inorder_successor.is_red
+
+        # we have to repair the red-black properties if the deleted node is red
+        if not deleted_node_is_red:
+            self._fix_after_delete(moved_up_node)
+            
+        if moved_up_node:
+            self._traverse_to_root_and_update(moved_up_node)
+        else:
+            self._traverse_to_root_and_update(deleted_node_parent)
+            
+        # remove the temporary NIL node
+        if isinstance(moved_up_node, TemporyNilNode):
+            self._replace_child(moved_up_node.parent, moved_up_node, None)
+
+    def _delete_node_with_zero_or_one_child(
+        self,
+        node: RedBlackTreeNode,
+    ) -> RedBlackTreeNode | None:
+        """Delete with zero or one child from the tree.
+
+        Args:
+            node: The node to delete from the tree.
+
+        Returns:
+            The node that was moved up or None if no node was moved up.
+        """
+        if node.left:
+            self._replace_child(node.parent, node, node.left)
+            return node.left
+
+        if node.right:
+            self._replace_child(node.parent, node, node.right)
+            return node.right
+        
+        # node has no children
+        new_child = None if node.is_red else TemporyNilNode()
+        self._replace_child(node.parent, node, new_child)
+
+        return new_child
     
-    def check_integrity(self) -> bool:
-        """Integrity check of the tree.
-            
-        Checks whether all children have a correct parent reference and the size
-        and heigth is correct in all subtrees. Intended for testing purpose.
-        
-        Returns
-        -------
-        bool
-            Whether all integrity checks have been passed.
+    def _fix_after_delete(self, node: RedBlackTreeNode) -> None:
+        """Fix the red-black properties after deletion of a node.
+
+        Args:
+            node: The node at which to fix the red-black properties.
         """
-        print("TODO: remove overriding check_integrity function")
+        # case 1: node is the root, end of recursion
+        if node is self.root:
+            return
         
-        for node in self._inorder_traversal():
-            print(node)
-            height_left, height_right, size = 0, 0, 1
+        sibling = self._get_sibling(node)
+        
+        # case 2: red sibling
+        if sibling.is_red:
+            self._handle_red_sibling(node, sibling)
+            # get new sibling for fall-through to cases 3-6
+            sibling = self._get_sibling(node)
+        
+        # cases 3 and 4: black sibling with two black children
+        if self._is_black(sibling.left) and self._is_black(sibling.right):
+            sibling.is_red = True
             
-            if node.left:
-                height_left = node.left.height
-                size += node.left.size
-                
-            if node.right:
-                height_right = node.right.height
-                size += node.right.size
-            
-            if node.height != 1 + max(height_left, height_right):
-                print(
-                    f'height of node {node} is {node.height}, expected '
-                    f'{1 + max(height_left, height_right)}'
-                )
-                return False
-            
-            if node.size != size:
-                print(f'size of node {node} is {node.size}, expected {size}')
-                return False
-            
-        return True
+            # case 3: black sibling with two black children and red parent
+            if node.parent.is_red:
+                node.parent.is_red = False
+            # case 4: black sibling with two black children and black parent
+            self._fix_after_delete(node.parent)
+        
+        # cases 5 and 6: black sibling with at least one red child
+        else:
+            self._handle_black_sibling_with_red_child(node, sibling)
+    
+    def _handle_red_sibling(self, node: RedBlackTreeNode, sibling: RedBlackTreeNode) -> None:
+        """Fix the red-black properties after deletion of a node with a red sibling.
+
+        Args:
+            node: The node at which to fix the red-black properties.
+            sibling: Its red sibling.
+        """
+        # recolor
+        sibling.is_red = False
+        node.parent.is_red = True
+        
+        # rotate
+        if node is node.parent.left:
+            self._rotate_left(node.parent)
+        else:
+            self._rotate_right(node.parent)
+    
+    def _handle_black_sibling_with_red_child(
+        self,
+        node: RedBlackTreeNode,
+        sibling: RedBlackTreeNode,
+    ) -> None:
+        """Fix the red-black properties after deletion of a node with black sibling and red nephew.
+
+        Args:
+            node: The node at which to fix the red-black properties.
+            sibling: Its black sibling with at least one red child.
+        """
+        node_is_left_child = node is node.parent.left
+        
+        # case 5: black sibling with at least one red child and outer nephew is black
+        # --> recolor sibling and its child, and rotate around sibling
+        if node_is_left_child and self._is_black(sibling.right):
+            sibling.left.is_red = False
+            sibling.is_red = True
+            self._rotate_right(sibling)
+            sibling = node.parent.right
+        elif not node_is_left_child and self._is_black(sibling.left):
+            sibling.right.is_red = False
+            sibling.is_red = True
+            self._rotate_left(sibling)
+            sibling = node.parent.left
+        
+        # fall-through to case 6
+        
+        # case 6: black sibling with at least one red child and outer nephew is red
+        # --> recolor sibling + parent + sibling's child, and rotate around parent
+        sibling.is_red = node.parent.is_red
+        node.parent.is_red = False
+        if node_is_left_child:
+            sibling.right.is_red = False
+            self._rotate_left(node.parent)
+        else:
+            sibling.left.is_red = False
+            self._rotate_right(node.parent)
 
 
 if __name__ == '__main__':
@@ -337,35 +508,35 @@ if __name__ == '__main__':
         t.insert(key)
     # print(t.to_newick())
     
-    # t = t.copy()
+    t = t.copy()
     t.check_integrity()
     print(len(t))
-    # print(t.pop_at_index(-10000))
-    # print(len(t))
-    # print(t.key_and_value_at_index(980))
+    print(t.pop_at_index(-10000))
+    print(len(t))
+    print(t.key_at_index(980))
     
-    # l = [key for key in t.items()]
-    # print(l[-5:])
+    l = [key for key in t]
+    print(l[-5:])
      
-    # s = set()
-    # for key in keys:
-    #     s.add(key)
+    s = set()
+    for key in keys:
+        s.add(key)
     
-    # # choosing a random element from a TreeSet/TreeDict can be done very fast
-    # # using a random integer and the pop_at_index() function
-    # start_time1 = time.time()
-    # for i in range(500):
-    #     x = random.randint(0, len(t)-1)
-    #     t.pop_at_index(x)
-    # end_time1 = time.time()
-    # print(len(t))
+    # choosing a random element from a TreeSet/TreeDict can be done very fast
+    # using a random integer and the pop_at_index() function
+    start_time1 = time.time()
+    for i in range(500):
+        x = random.randint(0, len(t)-1)
+        t.pop_at_index(x)
+    end_time1 = time.time()
+    print(len(t))
     
-    # start_time2 = time.time()
-    # for i in range(500):
-    #     x = random.choice(tuple(s))
-    #     s.remove(x)
-    # end_time2 = time.time()
+    start_time2 = time.time()
+    for i in range(500):
+        x = random.choice(tuple(s))
+        s.remove(x)
+    end_time2 = time.time()
     
-    # print(end_time1 - start_time1, end_time2 - start_time2)
+    print(end_time1 - start_time1, end_time2 - start_time2)
     
-    # t.check_integrity()
+    t.check_integrity()
