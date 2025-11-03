@@ -1,3 +1,22 @@
+[project]
+name = "tralda"
+version = "2.0.0"
+description = "A library for tree data structures and algorithms"
+readme = "README.md"
+authors = [
+    { name = "David Schaller", email = "38377210+david-schaller@users.noreply.github.com" }
+]
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "networkx>=3.4.2",
+    "numpy>=2.2.6",
+]
+
+[project.urls]
+Repository = "https://github.com/david-schaller/tralda.git"
+Issues = "https://github.com/david-schaller/tralda/issues"
+
 [build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"
