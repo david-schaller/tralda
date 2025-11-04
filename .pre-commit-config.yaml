@@ -7,3 +7,14 @@ repos:
     rev: 0.9.6
     hooks:
       - id: uv-lock
+        description: "Make sure your uv.lock file is up to date."
+  
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.14.3
+    hooks:
+      - id: ruff-check
+        description: "Run Ruff as a linter."
+        args: [ --fix ]
+      - id: ruff-format
+        description: "Run Ruff as a formatter."

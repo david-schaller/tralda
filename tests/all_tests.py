@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import unittest
 
-from tree_tests import *
-from cograph_tests import *
+from tree_tests import *  # noqa: F403
+from cograph_tests import *  # noqa: F403
 
 
-__author__ = 'David Schaller'
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
