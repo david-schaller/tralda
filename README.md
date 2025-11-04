@@ -148,6 +148,24 @@ The following auxiliary data structures can be imported from the subpackage `tra
 * HDT dynamic graph data structure (Holm, de Lichtenberg & Thorup in 2001): class `HDTGraph`
 * AVL trees: classes `TreeSet` and `TreeDict` implement data structures for sorted sets and dictionaries, respectively
 
+## Contributing
+
+If you want to contribute to `tralda`, please use the package and project manager [uv](https://docs.astral.sh/uv/).
+See [this page](https://docs.astral.sh/uv/getting-started/installation/) for installation instructions.
+
+Moreover, please use [pre-commit](https://pre-commit.com) for automated code formatting and linting.
+
+To install it and initialize it for your local `tralda` repository, follow these steps:
+
+- Install `uv`
+- Run the following command (after which you should be able to run `pre-commit` from anywhere)
+    - `uv tool install pre-commit --with pre-commit-uv`
+- Navigate to the root directory of your local `tralda` repository
+    - `cd <MY_PATH_TO>/tralda`
+- Install `pre-commit` as a git hook in the `tralda` repository
+    - `pre-commit install`
+
+
 ## Citation and references
 
 If you use `tralda` in your project or code from it, please consider citing:
