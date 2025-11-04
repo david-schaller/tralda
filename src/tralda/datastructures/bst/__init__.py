@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
+"""Binary search trees subpackage."""
 
-"""
-Binary search trees subpackage.
-"""
+from __future__ import annotations
