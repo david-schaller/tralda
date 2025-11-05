@@ -380,25 +380,3 @@ class HDTGraph:
         else:
             for ett in self.levels[level].forest:
                 print(ett.ET_to_list(), ett.get_size())
-
-
-if __name__ == "__main__":
-    graph = HDTGraph()
-
-    import random
-
-    insert = []
-    for i in range(100):
-        a = random.randint(0, 20)
-        b = random.randint(0, 20)
-        if a != b:
-            insert.append((a, b))
-
-    for e in insert:
-        graph.insert_edge(e[0], e[1])
-
-    for e in random.sample(insert, 30):
-        print("edge", e[0], e[1])
-        graph.delete_edge(e[0], e[1])
-
-    graph.print_ett_forest(level="all")
