@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from tralda.datastructures.tree import Tree, TreeNode, LCA
+from tralda.datastructures.tree import Tree
+from tralda.datastructures.tree import TreeNode
+from tralda.datastructures.last_common_ancestor import LCA
 from tralda.utils.tree_tools import assert_leaf_sets_equal
 
 

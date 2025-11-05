@@ -10,7 +10,7 @@ import random
 import networkx as nx
 
 from tralda.datastructures.tree import Tree
-from tralda.datastructures.tree import LCA
+from tralda.datastructures.last_common_ancestor import LCA
 from tralda.utils.graph_tools import complete_multipartite_graph_from_sets
 from tralda.cograph.detection import LinearCographDetector
 
