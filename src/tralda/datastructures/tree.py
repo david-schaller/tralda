@@ -1,5 +1,10 @@
+"""Module for the main tree datastructure in tralda."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
+from collections.abc import Iterator
+from typing import Any
 import itertools
 import json
 import os
@@ -14,92 +19,85 @@ import tralda.datastructures.doubly_linked as dll
 class TreeNode:
     """Tree nodes for class Tree.
 
-    Attributes
-    ----------
-    parent: TreeNode
-        Parent node of this node.
-    children: dll.DLList
-        Child nodes of this node in a doubly-linked list.
-
-    See Also
-    --------
-    Tree
+    Attributes:
+        parent (TreeNode): Parent node of this node.
+        children (dll.DLList): Child nodes of this node in a doubly-linked list.
     """
 
-    def __init__(self, **attr):
+    def __init__(self, **kwargs) -> None:
         """Constructor for TreeNode class.
 
-        Parameters
-        ----------
-        attr : keyword arguments, optional
-            Set node attributes using key=value.
+        Args:
+            **kwargs: Set arbitrary node attributes using key=value.
         """
-
         self.parent = None
         # reference to doubly-linked list element in the parents' children
         self._par_dll_node = None
 
         self.children = dll.DLList()
 
-        self.__dict__.update(attr)
+        self.__dict__.update(kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return the label of the tree node if available.
+
+        Returns:
+            The label of the tree node if available or an empty string.
+        """
         return str(self.label) if hasattr(self, "label") else ""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Return a string representation of the tree node.
+
+        If available, the `label` attribute will be contained, otherwise the object ID of the
+        TreeNode instance.
+
+        Returns:
+            A string representation of the tree node.
+        """
         return f"<TN: {self.label if hasattr(self, 'label') else id(self)}>"
 
-    def attributes(self):
+    def attributes(self) -> Iterator[tuple[str, Any]]:
         """A generator for the node attributes.
 
-        Yields
-        ------
-        pairs of str and the type of the corresponding value
+        Yields:
+            Pairs of str and the type of the corresponding value.
         """
-
         for key, value in self.__dict__.items():
             if key not in ("parent", "children", "_par_dll_node"):
                 yield key, value
 
-    def add_child(self, child_node):
+    def add_child(self, child_node: TreeNode) -> None:
         """Add a node as a child of this node.
 
         Does nothing if the node is already a child node of this node.
 
-        Parameters
-        ----------
-        child_node : TreeNode
-            The node to add as a new child to this node.
+        Args:
+            child_node: The node to add as a new child to this node.
         """
-
-        # do nothing if child_node is already a child of self
-
         if child_node.parent is None:
             child_node.parent = self
             child_node._par_dll_node = self.children.append(child_node)
-
         elif child_node.parent is not self:
             child_node.parent.remove_child(child_node)
             child_node.parent = self
             child_node._par_dll_node = self.children.append(child_node)
 
-    def add_child_right_of(self, child_node, right_of):
-        """Add a node as a child of this node as a right sibling of one of
-        its children.
+    def add_child_right_of(self, child_node: TreeNode, right_of: TreeNode) -> None:
+        """Add a node as a child of this node as a right sibling of one of its children.
 
-        Can also be used to change the position of a child node, i.e., to
-        detach it and reinsert it to the right of the specified node.
+        Can also be used to change the position of a child node, i.e., to detach it and re-insert
+        it to the right of the specified node.
 
-        Parameters
-        ----------
-        child_node : TreeNode
-            The node to add as a new child to this node.
-        right_of : TreeNode
-            The child of this node right of which 'child_node' gets inserted.
+        Args:
+            child_node: The node to add as a new child to this node.
+            right_of: The child of this node right of which 'child_node' gets inserted.
+
+        Raises:
+            KeyError: If 'right_of' is not a child of this node.
         """
-
         if right_of.parent is not self:
-            return KeyError(f"{right_of} is not a child of node {self}")
+            raise KeyError(f"{right_of} is not a child of node {self}")
 
         if child_node.parent is not None:
             child_node.parent.remove_child(child_node)
@@ -107,20 +105,15 @@ class TreeNode:
         child_node.parent = self
         child_node._par_dll_node = self.children.insert_right_of(right_of._par_dll_node, child_node)
 
-    def remove_child(self, child_node):
+    def remove_child(self, child_node: TreeNode) -> None:
         """Remove a child node of this node.
 
-        Parameters
-        ----------
-        child_node : TreeNode
-            The node to be removed from the list of children.
+        Args:
+            child_node: The node to be removed from the list of children.
 
-        Raises
-        ------
-        KeyError
-            If the supplied node is not a child of this node.
+        Raises:
+            KeyError: If the supplied node is not a child of this node.
         """
-
         if child_node.parent is self:
             self.children.remove_node(child_node._par_dll_node)
             child_node.parent = None
@@ -128,50 +121,38 @@ class TreeNode:
         else:
             raise KeyError(f"{child_node} is not a child of node {self}")
 
-    def detach(self):
+    def detach(self) -> None:
         """Detach this node from its parent.
 
         The node has no parent afterwards.
         """
-
         if self.parent is not None:
             self.parent.remove_child(self)
         else:
             self.parent = None
             self._par_dll_node = None
 
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         """Return True if the node is a leaf, False otherwise.
 
-        Returns
-        -------
-        bool
-            True if the node is a leaf, i.e. it has no children, else False.
+        Returns:
+            True if the node is a leaf, i.e., it has no children, else False.
         """
-
         return not self.children
 
-    def child_subsequence(self, left_node, right_node):
+    def child_subsequence(self, left_node: TreeNode, right_node: TreeNode) -> list[TreeNode]:
         """Consecutive subsequence of children within a left and right bound.
 
-        Parameters
-        ----------
-        left_node : TreeNode
-            The left bound of the subsequence.
-        right_node : TreeNode
-            The right bound of the subsequence.
+        Args:
+            left_node: The left bound of the subsequence.
+            right_node: The right bound of the subsequence.
 
-        Returns
-        -------
-        list
+        Returns:
             The children in the subsequence.
 
-        Raises
-        ------
-        KeyError
-            If 'right_node' or 'left_node' is not a child of this node.
+        Raises:
+            KeyError: If 'right_node' or 'left_node' is not a child of this node.
         """
-
         if left_node.parent is not self:
             raise KeyError(f"{left_node} is not a child of node {self}")
         if right_node.parent is not self:
@@ -183,22 +164,19 @@ class TreeNode:
 class Tree:
     """Rooted tree whose nodes may have an arbitrary number of children.
 
-    Attributes
-    ----------
-    root : TreeNode
-        The root node of the tree.
+    Attributes:
+        root (TreeNode): The root node of the tree.
     """
 
-    def __init__(self, arg):
-        """Constructor for the class tree.
+    def __init__(self, arg: TreeNode | str) -> None:
+        """Constructor for the class Tree.
 
-        Parameters
-        ----------
-        arg : TreeNode or str
-            The root node for the newly created tree or a Newick representation
-            of a tree.
+        Args:
+            arg: The root node for the newly created tree or a Newick representation of a tree.
+
+        Raises:
+            TypeError: If 'arg' is neither a TreeNode instance nor a string.
         """
-
         if isinstance(arg, TreeNode) or arg is None:
             self.root = arg
         elif isinstance(arg, str):
@@ -206,42 +184,37 @@ class Tree:
         else:
             raise TypeError(f"Tree cannot be initialized with argument of type {type(arg)}")
 
-    def __len__(self):
-        """Size of the tree.
+    def __len__(self) -> int:
+        """Size of the tree (number of nodes).
 
         Runs in O(n) where n is the size of the tree.
 
-        Returns
-        -------
-        int
-            The size of the tree.
+        Returns:
+            The number of nodes in the tree.
         """
-
         return sum(1 for _ in self.preorder())
 
-    def height(self):
-        """Height of the tree.
+    def height(self) -> int:
+        """Height of the tree (number of edges in the longest path from the root to a leaf).
 
-        Runs in O(n) where n is the size of the tree.
+        Runs in O(n) where n is the size of the tree. Return -1 if the tree is empty.
 
-        Returns
-        -------
-        int
+        Returns:
             The height of the tree.
         """
+        if not self.root:
+            return -1
 
         return max(level for _, level in self.preorder_and_level())
 
-    def leaves(self):
+    def leaves(self) -> Iterator[TreeNode]:
         """Generator for leaves of the tree.
 
-        Yields
-        ------
-        TreeNode
+        Yields:
             The leaf nodes of the tree.
         """
 
-        def _leaves(node):
+        def _leaves(node: TreeNode) -> Iterator[TreeNode]:
             if not node.children:
                 yield node
             else:
@@ -253,16 +226,14 @@ class Tree:
         else:
             yield from []
 
-    def preorder(self):
+    def preorder(self) -> Iterator[TreeNode]:
         """Generator for a pre-order traversal of the tree.
 
-        Yields
-        ------
-        TreeNode
+        Yields:
             All nodes of the tree in pre-order.
         """
 
-        def _preorder(node):
+        def _preorder(node: TreeNode) -> Iterator[TreeNode]:
             yield node
             for child in node.children:
                 yield from _preorder(child)
@@ -272,16 +243,14 @@ class Tree:
         else:
             yield from []
 
-    def preorder_and_level(self):
+    def preorder_and_level(self) -> Iterator[tuple[TreeNode, int]]:
         """Generator for a pre-order traversal with node levels.
 
-        Yields
-        ------
-        tuple of a TreeNode and an int
+        Yields:
             Nodes and their level (distance from the root) in pre-order.
         """
 
-        def _preorder_level(node, level):
+        def _preorder_level(node: TreeNode, level: int) -> Iterator[tuple[TreeNode, int]]:
             yield (node, level)
             for child in node.children:
                 yield from _preorder_level(child, level + 1)
@@ -291,29 +260,28 @@ class Tree:
         else:
             yield from []
 
-    def traverse_subtree(self, u):
-        """Generator for a pre-order traversal of the subtree rooted at u.
+    def traverse_subtree(self, node: TreeNode) -> Iterator[TreeNode]:
+        """Generator for a pre-order traversal of the subtree rooted at the given node.
 
-        Yields
-        ------
-        TreeNode
-            All nodes in the subtree rooted at node u in pre-order.
+        Args:
+            node: The node whose subtree to traverse.
+
+        Yields:
+            All nodes in the subtree rooted at the given node in pre-order.
         """
+        yield node
 
-        yield u
-        for child in u.children:
+        for child in node.children:
             yield from self.traverse_subtree(child)
 
-    def postorder(self):
+    def postorder(self) -> Iterator[TreeNode]:
         """Generator for post-order traversal of the tree.
 
-        Yields
-        ------
-        TreeNode
-            All nodes in the subtree rooted at node u in post-order.
+        Yields:
+            All nodes of the tree in post-order.
         """
 
-        def _postorder(node):
+        def _postorder(node: TreeNode) -> Iterator[TreeNode]:
             for child in node.children:
                 yield from _postorder(child)
             yield node
@@ -323,16 +291,16 @@ class Tree:
         else:
             yield from []
 
-    def inner_nodes(self):
+    def inner_nodes(self) -> Iterator[TreeNode]:
         """Generator for inner nodes in pre-order.
 
-        Yields
-        ------
-        TreeNode
+        Inner nodes are those nodes that do not have any children.
+
+        Yields:
             All inner nodes of the tree in pre-order.
         """
 
-        def _inner_nodes(node):
+        def _inner_nodes(node: TreeNode) -> Iterator[TreeNode]:
             if node.children:
                 yield node
                 for child in node.children:
@@ -343,16 +311,14 @@ class Tree:
         else:
             yield from []
 
-    def edges(self):
+    def edges(self) -> Iterator[tuple[TreeNode, TreeNode]]:
         """Generator for all edges of the tree.
 
-        Yields
-        ------
-        tuple of two TreeNode objects
-            All edges of the tree.
+        Yields:
+            All edges of the tree as tuples of TreeNode instances.
         """
 
-        def _edges(node):
+        def _edges(node: TreeNode) -> Iterator[tuple[TreeNode, TreeNode]]:
             for child in node.children:
                 yield (node, child)
                 yield from _edges(child)
@@ -362,17 +328,15 @@ class Tree:
         else:
             yield from []
 
-    def edges_sibling_order(self):
+    def edges_sibling_order(self) -> Iterator[tuple[TreeNode, TreeNode, int]]:
         """Generator for all edges of the tree with sibling order.
 
-        Yields
-        ------
-        tuple of two TreeNode objects and one int
-            Edges uv as tuples (u, v, nr) where nr is the index of v in
-            the list of children of node u.
+        Yields:
+            Edges uv as tuples (u, v, nr) where nr is the index of v in the list of children of
+            node u.
         """
 
-        def _edges_sibling_order(node):
+        def _edges_sibling_order(node: TreeNode) -> Iterator[tuple[TreeNode, TreeNode, int]]:
             i = 0
             for child in node.children:
                 yield (node, child, i)
@@ -384,17 +348,14 @@ class Tree:
         else:
             yield from []
 
-    def inner_edges(self):
+    def inner_edges(self) -> Iterator[tuple[TreeNode, TreeNode]]:
         """Generator for all inner edges of the tree.
 
-        Yields
-        ------
-        tuple of two TreeNode objects
-            All inner edges uv of the tree, i.e. edges for which the child v
-            of u is not a leaf.
+        Yields:
+            All inner edges uv of the tree, i.e., edges for which the child v of u is not a leaf.
         """
 
-        def _inner_edges(node):
+        def _inner_edges(node: TreeNode) -> Iterator[tuple[TreeNode, TreeNode]]:
             for child in node.children:
                 if child.children:
                     yield (node, child)
@@ -405,16 +366,14 @@ class Tree:
         else:
             yield from []
 
-    def euler_generator(self):
+    def euler_generator(self) -> Iterator[TreeNode]:
         """Generator for an Euler tour of the tree.
 
-        Yields
-        ------
-        TreeNode or int
+        Yields:
             Nodes in an Euler tour of the tree.
         """
 
-        def _euler_generator(node):
+        def _euler_generator(node: TreeNode) -> Iterator[TreeNode]:
             yield node
             for child in node.children:
                 yield from _euler_generator(child)
@@ -425,19 +384,15 @@ class Tree:
         else:
             yield from []
 
-    def euler_and_level(self):
+    def euler_and_level(self) -> Iterator[tuple[TreeNode, int]]:
         """Generator for an Euler tour with node levels.
 
-        Yields
-        ------
-        tuple of a TreeNode and an int
-            Nodes and their level (distance from the root) in an Euler tour of
-            the tree.
+        Yields:
+            Nodes and their level (distance from the root) in an Euler tour of the tree.
         """
 
-        def _euler_level(node, level):
+        def _euler_level(node: TreeNode, level: int) -> Iterator[tuple[TreeNode, int]]:
             yield (node, level)
-
             for child in node.children:
                 yield from _euler_level(child, level + 1)
                 yield (node, level)
@@ -447,18 +402,16 @@ class Tree:
         else:
             yield from []
 
-    def leaf_dict(self):
+    def leaf_dict(self) -> dict[TreeNode, list[TreeNode]]:
         """Leaves in the subtree rooted at each node.
 
-        Computes the list of leaves for every node in the tree containing the
-        leaf nodes lying in the subtree rooted at the node.
+        Computes the list of leaves for every node in the tree containing the leaf nodes in the
+        subtree rooted at the node.
 
-        Returns
-        -------
-        dict with TreeNode keys and lists of TreeNode objects as values
-            The leaves under each vertex.
+        Returns:
+            The leaves under each vertex (as a dictionary with TreeNode keys and lists of TreeNode
+            objects as values).
         """
-
         leaves = {}
 
         for v in self.postorder():
@@ -471,92 +424,88 @@ class Tree:
 
         return leaves
 
-    def contract(self, edges, inplace=True):
+    def contract(self, edges: Iterable[tuple[TreeNode]], inplace: bool = True) -> Tree:
         """Contract edges in the tree.
 
-        Parameters
-        ----------
-        edges : iterable object of tuples of two TreeNode objects
-            The edges to be contracted in the tree.
-        inplace : bool
-            If True, the edges are contracted in this tree instance, otherwise
-            a copy is returned and the original tree is not affected.
-            The default is True.
-        """
+        Args:
+            edges: The edges to be contracted in the tree.
+            inplace: If True, the edges are contracted in this tree instance, otherwise a copy is
+                returned and the original tree is not affected.
 
+        Returns:
+            The original tree with contracted edges or a copy in which the contractions are
+            performed.
+        """
         contracted = set()
 
         if not inplace:
             T_copy, mapping = self.copy(mapping=True)
 
-        for u, v in edges:
+        for _, v in edges:
             # avoid trying to contract the same edge multiple times
-            if v not in contracted:
-                if inplace:
-                    self.delete_and_reconnect(v)
-                else:
-                    T_copy.delete_and_reconnect(mapping[v])
+            if v in contracted:
+                continue
+
+            if inplace:
+                self.delete_and_reconnect(v)
+            else:
+                T_copy.delete_and_reconnect(mapping[v])
 
             contracted.add(v)
 
         return self if inplace else T_copy
 
-    def get_triples(self, label_only=False):
-        """Retrieve a list of all triples of the tree.
+    def get_triples(self, label_only: bool = False) -> list[tuple[Any, Any, Any]]:
+        """Retrieve a list of all (rooted) triples of the tree.
 
-        A tree displays a triple ab|c on the leaf nodes a, b and c if the last
-        common ancestor of a and b is a (proper) descendant of the last common
-        ancestor of a and c (b and c).
+        A tree displays a triple ab|c on the leaf nodes a, b and c if the last common ancestor of a
+        and b is a (proper) descendant of the last common ancestor of a and c (b and c).
 
-        Parameters
-        ----------
-        label_only : bool
-            If True, the triples are represented by the label attribute of the
-            nodes.
+        Args:
+            label_only: If True, the triples are represented by the label attribute of the nodes.
 
-        Returns
-        -------
-        list of tuples of three TreeNode or int objects
-            Each tuple (a, b, c) represents the triple ab|c (=ba|c), i.e. the
+        Returns:
+            List of tuples where each tuple (a, b, c) represents the triple ab|c (=ba|c), i.e., the
             first two items are closer related in the tree.
         """
-
         if label_only:
             return [(a.label, b.label, c.label) for a, b, c in self._triple_generator()]
         else:
             return [t for t in self._triple_generator()]
 
-    def _triple_generator(self):
+    def _triple_generator(self) -> Iterator[tuple[TreeNode, TreeNode, TreeNode]]:
+        """Iterator for all (rooted) triples displayed by the tree.
+
+        Yields:
+            The triples displayed by the tree.
+        """
         leaves = self.leaf_dict()
 
         for u in self.preorder():
             for v1, v2 in itertools.permutations(u.children, 2):
-                if len(leaves[v2]) > 1:
-                    for c in leaves[v1]:
-                        for a, b in itertools.combinations(leaves[v2], 2):
-                            yield a, b, c
+                if len(leaves[v2]) <= 1:
+                    continue
 
-    def delete_and_reconnect(self, node):
+                for c in leaves[v1]:
+                    for a, b in itertools.combinations(leaves[v2], 2):
+                        yield a, b, c
+
+    def delete_and_reconnect(self, node: TreeNode) -> TreeNode | None:
         """Delete a node from the tree and reconnect its parent and children.
 
-        This function preserves the 'sibling order' of the remaining nodes
-        of the tree.
+        The function preserves the 'sibling order' of the remaining nodes of the tree.
 
-        Parameters
-        ----------
-        node : TreeNode
-            The node to be deleted.
+        Args:
+            node: The node to be deleted.
 
-        Returns
-        -------
-        TreeNode or bool
-            The parent of the node, if it could be deleted, or False, if the
-            node could not be deleted, i.e., it has no parent.
+        Returns:
+            The parent of the node, if it could be deleted, or None, if the node could not be
+            deleted, i.e., it has no parent.
         """
-
         parent = node.parent
+
         if not parent:
-            return False
+            return None
         else:
             # copy list of children to edit edges
             children = [child for child in node.children]
@@ -569,145 +518,113 @@ class Tree:
 
         return parent
 
-    def random_leaves(self, proportion):
+    def random_leaves(self, proportion: int | float) -> list[TreeNode]:
         """A random sample of the leaves.
 
-        Parameters
-        ----------
-        proportion : float
-            The proportion of the sample w.r.t. the full set of leaves.
+        Args:
+            proportion: The proportion of the sample w.r.t. the full set of leaves.
 
-        Returns
-        -------
-        list of TreeNode objects
-            A random sample of the leaves of the tree.
+        Returns:
+            A randomly samples list of the leaves of the tree.
 
-        Raises
-        ------
-        ValueError
-            If `proportion` is not a number between 0 and 1.
+        Raises:
+            If 'proportion' is not a number between 0 and 1.
         """
-
         if not isinstance(proportion, (float, int)) or proportion < 0 or proportion > 1:
-            raise ValueError("needs a number 0 <= p <= 1")
+            raise ValueError("proportion must be a number 0 <= p <= 1")
 
         leaves = [v for v in self.leaves()]
         k = round(proportion * len(leaves))
 
         return random.sample(leaves, k)
 
-    def is_binary(self):
+    def is_binary(self) -> bool:
         """Check whether the tree is a binary tree.
 
-        Nodes in (rooted) binary trees are either leaves or have exactly two
-        children.
+        Nodes in (rooted) binary trees are either leaves or have exactly two children.
 
-        Returns
-        -------
-        bool
+        Returns:
             True if the tree is binary, else False.
         """
-
         for v in self.preorder():
             if len(v.children) == 1 or len(v.children) > 2:
                 return False
 
         return True
 
-    def is_phylogenetic(self):
+    def is_phylogenetic(self) -> bool:
         """Check whether the tree is a phylogetic tree.
 
-        Nodes in (rooted) phylogentic trees are either leaves or have at least
-        two children.
+        Nodes in (rooted) phylogentic trees are either leaves or have at least two children.
 
-        Returns
-        -------
-        bool
+        Returns:
             True if the tree is phylogenetic, else False.
         """
-
         for v in self.preorder():
             if len(v.children) == 1:
                 return False
 
         return True
 
-    def get_hierarchy(self):
+    def get_hierarchy(self) -> set[tuple[Any]]:
         """Hierarchy set on the leaf labels defined by the tree.
 
-        Every (phylogenetic) tree can be represented by a hierarchy on the set
-        of its leaves.
-        The label attributes of the leaf nodes must be set and unique for each
-        leaf.
+        Every (phylogenetic) tree can be represented by a hierarchy on the set of its leaves. The
+        label attributes of the leaf nodes must be set and unique for each leaf.
 
-        Returns
-        -------
-        set of lists of str objects
-            Representing the hierarchy where the leaves are represented by
-            their labels.
+        Returns:
+            A set of tuples representing the hierarchy where the leaves are represented by their
+            labels.
         """
-
         leaves = self.leaf_dict()
-
         hierarchy = set()
 
         for v in self.preorder():
-            A = [leaf.label for leaf in leaves[v]]
-            A.sort()
-            A = tuple(A)
-            hierarchy.add(A)
+            hierarchy.add(tuple(sorted(leaf.label for leaf in leaves[v])))
 
         return hierarchy
 
-    def equal_topology(self, other):
-        """Compare the tree topology based on the leaf labelss.
+    def equal_topology(self, other: Tree, verbose: bool = False) -> bool:
+        """Compare the tree topology based on the leaf labels.
 
         Only works for phylogenetic trees with unique leaf labels.
 
-        Parameters
-        ----------
-        other : Tree
-            The tree which this tree is compared to.
+        Args:
+            other: Another tree which this tree shall be compared to.
+            verbose: If True, print where the equality check failed (the first time).
 
-        Returns
-        -------
-        bool
+        Returns:
             True if the topologies are equal, else False.
         """
-
         hierarchy1 = sorted(self.get_hierarchy())
         hierarchy2 = sorted(other.get_hierarchy())
 
         if len(hierarchy1) != len(hierarchy2):
-            # print('Unequal sizes of the hierarchy sets: '\
-            #       '{} and {}'.format(len(hierarchy1), len(hierarchy2)))
+            if verbose:
+                print(
+                    f"Unequal sizes of the hierarchy sets: {len(hierarchy1)} and {len(hierarchy2)}"
+                )
             return False
 
         for i in range(len(hierarchy1)):
             if hierarchy1[i] != hierarchy2[i]:
-                # print('Hierarchies not equal:'\
-                #       '\n{}\n{}'.format(hierarchy1[i], hierarchy2[i]))
+                if verbose:
+                    print(f"Hierarchies not equal:\n{hierarchy1[i]}\n{hierarchy2[i]}")
                 return False
 
         return True
 
-    def is_refinement(self, other):
-        """Checks whether the tree is a refinement of 'other' based on the
-        leaf labels.
+    def is_refinement(self, other: Tree) -> bool:
+        """Checks whether the tree is a refinement of 'other' based on the leaf labels.
 
         Only works for phylogenetic trees with unique leaf labels.
 
-        Parameters
-        ----------
-        other : Tree
-            The tree which this tree is compared to.
+        Args:
+            other: Another tree which this tree shall be compared to.
 
-        Returns
-        -------
-        bool
+        Returns:
             True if the tree is refinement of 'other', else False.
         """
-
         hierarchy1 = sorted(self.get_hierarchy())
         hierarchy2 = sorted(other.get_hierarchy())
 
@@ -727,7 +644,16 @@ class Tree:
 
         return True
 
-    def _assert_integrity(self):
+    def _assert_integrity(self) -> bool:
+        """Check whether all nodes in the tree are connected properly to their parents.
+
+        Raises:
+            RuntimeError: If the is a loop or a child of a node is not connected to that node via
+                the 'parent' attribute.
+
+        Returns:
+            True if the integrity check has been passed successfully.
+        """
         for v in self.preorder():
             for child in v.children:
                 if child is v:
@@ -737,27 +663,20 @@ class Tree:
 
         return True
 
-    def copy(self, mapping=False):
+    def copy(self, mapping: bool = False) -> Tree | tuple[Tree, dict[TreeNode, TreeNode]]:
         """Return a copy of the tree.
 
-        Constructs a copy of the tree to the level of nodes, i.e., the
-        attributes are only copied as references.
-        If the node attributes are all immutable data types, the original
-        tree is not affected by operations on the copy.
+        Constructs a copy of the tree to the level of nodes, i.e., the attributes are only copied as
+        references. If the node attributes are all immutable data types, the original tree is not
+        affected by operations on the copy.
 
-        Parameters
-        ----------
-        mapping : bool
-            If True, additionally return the mapping from original to copied
-            nodes as dictionary.
+        Args:
+            mapping: If True, additionally return the mapping from original to copied nodes as
+                dictionary.
 
-        Returns
-        -------
-        Tree or tuple of Tree and dict
-            A copy of the tree and optionally the mapping from original to
-            copied nodes.
+        Returns:
+            A copy of the tree and optionally the mapping from original to copied nodes.
         """
-
         if not self.root:
             return Tree(None)
 
@@ -782,23 +701,18 @@ class Tree:
     #                         TREE  <--->  NEWICK
     # --------------------------------------------------------------------------
 
-    def to_newick(self, node=None):
+    def to_newick(self, node: TreeNode | None = None) -> str:
         """Newick representation of the tree.
 
-        Parameters
-        ----------
-        node : TreeNode, optional
-            The node whose subtree shall be returned as a Newick string, the
-            default is None, in which case the whole tree is returned in Newick
-            format.
+        Args:
+            node: The node whose subtree shall be returned as a Newick string, the default is None,
+                in which case the whole tree is returned in Newick format.
 
-        Returns
-        -------
-        str
+        Returns:
             A newick representation of the (sub)tree.
         """
 
-        def _to_newick(node):
+        def _to_newick(node: TreeNode) -> str:
             node_str = str(node)
 
             # add colon and distance if available
@@ -813,40 +727,41 @@ class Tree:
                     s += _to_newick(child) + ","
                 return f"({s[:-1]}){node_str}"
 
-        if self.root:
+        if node:
+            return _to_newick(node) + ";"
+        elif self.root:
             return _to_newick(self.root) + ";"
         else:
             return ";"
 
     @staticmethod
-    def _parse_newick_and_return_root(newick):
+    def _parse_newick_and_return_root(newick: str) -> TreeNode:
         """Parses trees in Newick format and returns the root.
 
-        If available (after colons in the Newick strings), the distance is
-        stored in the 'dist' attribute of the nodes. Moreover, labels are
-        converted to integers if possible.
+        If available (after colons in the Newick strings), the distance is stored in the 'dist'
+        attribute of the nodes. Moreover, labels are converted to integers if possible.
 
-        Parameters
-        ----------
-        newick : str
-            A tree in Newick format.
+        Args:
+            newick: A tree in Newick format.
 
-        Returns
-        -------
-        TreeNode
+        Returns:
             The root of the parsed tree.
 
-        Raises
-        ------
-        TypeError
-            If the input is not a string.
-        ValueError
-            If the input is not a valid Newick string.
+        Raises:
+            TypeError: If the input is not a string.
+            ValueError: If the input is not a valid Newick string.
         """
 
-        def _parse_subtree(subroot, subtree_string):
-            """Recursive function to parse the subtrees."""
+        def _parse_subtree(subroot: TreeNode, subtree_string: str) -> None:
+            """Recursive function to parse the subtrees.
 
+            Args:
+                subroot: The tree node to which parsed children are attached.
+                subtree_string: The string containing the children to parse.
+
+            Raises:
+                ValueError: If the input is not a valid Newick string.
+            """
             children = _split_children(subtree_string)
 
             for child in children:
@@ -877,11 +792,18 @@ class Tree:
                 # convert label to integer if possible
                 node.label = int(label) if label.isdigit() else label
 
-        def _split_children(child_string):
-            """Splits a given string by all ',' that are not enclosed by
-            parentheses.
-            """
+        def _split_children(child_string: str) -> list[str]:
+            """Splits a given string by all ',' that are not enclosed by parentheses.
 
+            Args:
+                child_string: The string to split into the direct children.
+
+            Returns:
+                The splitted string.
+
+            Raises:
+                ValueError: If the input is not a valid Newick string.
+            """
             stack = 0
             children = []
             current = ""
@@ -922,99 +844,77 @@ class Tree:
         else:
             raise ValueError("invalid Newick string")
 
-    @staticmethod
-    def parse_newick(newick):
-        """Parses trees in Newick format into object of type 'Tree'.
+    @classmethod
+    def parse_newick(cls, newick: str) -> Tree:
+        """Parses trees in Newick format into Tree object.
 
-        If available (after colons in the Newick strings), the distance is
-        stored in the 'dist' attribute of the nodes. Moreover, labels are
-        converted to integers if possible.
+        If available (after colons in the Newick strings), the distance is stored in the 'dist'
+        attribute of the nodes. Moreover, labels are converted to integers if possible.
 
-        Parameters
-        ----------
-        newick : str
-            A tree in Newick format.
+        NOTE: Do not use this function for serialization and reloading Tree objects. Use the
+        'serialize()' function instead.
 
-        Returns
-        -------
-        Tree
+        Args:
+            newick: A tree in Newick format.
+
+        Returns:
             The parsed tree.
 
-        Raises
-        ------
-        TypeError
-            If the input is not a string.
-        ValueError
-            If the input is not a valid Newick string.
-
-        Notes
-        -----
-        Do not use this function for serialization and reloading Tree
-        objects. Use the `serialize()` function instead.
+        Raises:
+            TypeError: If the input is not a string.
+            ValueError: If the input is not a valid Newick string.
         """
-
-        return Tree(Tree._parse_newick_and_return_root(newick))
+        return cls(cls._parse_newick_and_return_root(newick))
 
     # --------------------------------------------------------------------------
     #                         TREE  <--->  NETWORKX
     # --------------------------------------------------------------------------
 
-    def to_nx(self):
-        """Convert a Tree into a NetworkX Graph.
+    def to_nx(self) -> tuple[nx.DiGraph, int]:
+        """Convert a Tree into a NetworkX DiGraph.
 
-        The attributes correspond to the node attributes in the resulting graph.
-        The nodes of the resulting graph correspond to the object ids of the
-        TreeNode instances belonging to the Tree.
+        The attributes correspond to the node attributes in the resulting graph. The nodes of the
+        resulting graph correspond to the object ids of the TreeNode instances belonging to the
+        tree.
 
-        Returns
-        -------
-        networkx.DiGraph
-            A graph representation of the tree.
-        int
-            The object id of the root (and thus the corresponding node in the
-            graph) in order to be able to completely reconstruct the tree.
+        Returns:
+            A graph representation of the tree and the object id of the root (and thus the
+            corresponding node in the graph) in order to be able to completely reconstruct the tree.
         """
-
         self._assert_integrity()
-        G = nx.DiGraph()
+        graph = nx.DiGraph()
 
         if not self.root:
-            return G, None
+            return graph, None
 
         for v in self.preorder():
-            G.add_node(id(v))
+            graph.add_node(id(v))
             for key, value in v.attributes():
-                G.nodes[id(v)][key] = value
+                graph.nodes[id(v)][key] = value
 
         for u, v, sibling_nr in self.edges_sibling_order():
             if u is v:
                 raise RuntimeError(f"loop at {u} and {v}")
-            G.add_edge(id(u), id(v))
-            G.nodes[id(v)]["sibling_nr"] = sibling_nr
+            graph.add_edge(id(u), id(v))
+            graph.nodes[id(v)]["sibling_nr"] = sibling_nr
 
-        return G, id(self.root)
+        return graph, id(self.root)
 
-    @staticmethod
-    def parse_nx(G, root):
-        """Convert a NetworkX Graph version back into a Tree.
+    @classmethod
+    def parse_nx(cls, graph: nx.DiGraph, root: int):
+        """Convert a NetworkX DiGraph version back into a Tree.
 
-        Parameters
-        ----------
-        G : networkx.Graph
-            A tree represented as a Networkx Graph.
-        root : int
-            The node in the graph corresponding to the root.
+        Args:
+            graph: A tree represented as a Networkx DiGraph.
+            root: The node in the graph corresponding to the root.
 
-        Returns
-        -------
-        Tree
+        Returns:
             The reconstructed tree.
         """
-
         number_of_leaves = 0
 
         if root is None:
-            return Tree(None)
+            return cls(None)
 
         def _build_tree(graphnode, parent=None):
             nonlocal number_of_leaves
@@ -1024,19 +924,21 @@ class Tree:
             if parent:
                 parent.add_child(treenode)
 
-            for key, value in G.nodes[graphnode].items():
+            for key, value in graph.nodes[graphnode].items():
                 setattr(treenode, key, value)
 
-            children = sorted(G.neighbors(graphnode), key=lambda item: G.nodes[item]["sibling_nr"])
+            children = sorted(
+                graph.neighbors(graphnode), key=lambda item: graph.nodes[item]["sibling_nr"]
+            )
 
             for c in children:
                 _build_tree(c, parent=treenode)
-            if G.out_degree(graphnode) == 0:
+            if graph.out_degree(graphnode) == 0:
                 number_of_leaves += 1
 
             return treenode
 
-        tree = Tree(_build_tree(root))
+        tree = cls(_build_tree(root))
         tree.number_of_species = number_of_leaves
 
         return tree
@@ -1045,16 +947,17 @@ class Tree:
     #                           SERIALIZATION
     # --------------------------------------------------------------------------
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         """Convert the tree into a nested dictionary.
 
-        Raises
-        ------
-        RuntimeError
-            If the tree is empty.
+        Returns:
+            A dict representation of the tree,
+
+        Raises:
+            RuntimeError: If the tree is empty.
         """
 
-        def _to_dict(node):
+        def _to_dict(node: TreeNode) -> dict[str, Any]:
             node_dict = {k: v for k, v in node.attributes()}
 
             for i, child in enumerate(node.children):
@@ -1067,22 +970,26 @@ class Tree:
         else:
             raise RuntimeError("cannot convert empty tree to dict")
 
-    @staticmethod
-    def parse_dict(tree_dict):
+    @classmethod
+    def parse_dict(cls, tree_dict: dict[str, Any]) -> Tree:
         """Convert a dictionary representation back into a Tree.
 
-        Parameters
-        ----------
-        tree_dict : dict
-            A dictionary representation of the tree.
+        Args:
+            tree_dict: A dictionary representation of the tree.
 
-        Returns
-        -------
-        Tree
+        Returns:
             The reconstructed tree.
         """
 
-        def _parse_dict(node_dict):
+        def _parse_dict(node_dict: dict[str, Any]) -> TreeNode:
+            """Recursive function for reconstructing the subtree represented by the dict.
+
+            Args:
+                node_dict: Dict representing a (sub)tree.
+
+            Returns:
+                The root node of reconstructed (sub)tree.
+            """
             node = TreeNode()
             children = {}
 
@@ -1097,10 +1004,21 @@ class Tree:
 
             return node
 
-        return Tree(_parse_dict(tree_dict))
+        return cls(_parse_dict(tree_dict))
 
     @staticmethod
-    def _infer_serialization_mode(filename):
+    def _infer_serialization_mode(filename: str) -> str:
+        """Infer the serialization mode based on the file ending (.json or .pickle).
+
+        Args:
+            filename: The file name.
+
+        Raises:
+            ValueError: If the file extension is not supported.
+
+        Returns:
+            The inferred serialization mode.
+        """
         _, file_ext = os.path.splitext(filename)
 
         if file_ext.lower() == ".json":
@@ -1112,61 +1030,45 @@ class Tree:
                 "serialization format is not supplied and could not be inferred from file extension"
             )
 
-    def serialize(self, filename, mode=None):
+    def serialize(self, filename: str, mode: str = None) -> None:
         """Serialize the tree using pickle or json.
 
-        Parameters
-        ----------
-        filename : str
-            The filename (including the path) of the file to be created.
-        mode : str or None, optional
-            The serialization mode. Supported are pickle and json. The default
-            is None in which case the mode is inferred from the file extension.
+        Args:
+            filename: The filename (including the path) of the file to be created.
+            mode: The serialization mode. Supported are pickle and json. The default is None in
+                which case the mode is inferred from the file extension.
 
-        Raises
-        ------
-        ValueError
+        Raises:
             If the serialization mode is unknown or could not be inferred.
         """
-
         if not mode:
             mode = Tree._infer_serialization_mode(filename)
 
         if mode == "json":
             with open(filename, "w") as f:
                 json.dump(self.to_dict(), f)
-
         elif mode == "pickle":
             tree_nx, root_id = self.to_nx()
             with open(filename, "wb") as f:
                 pickle.dump((tree_nx, root_id), f)
-
         else:
             raise ValueError(f"serialization mode '{mode}' not supported")
 
-    @staticmethod
-    def load(filename, mode=None):
+    @classmethod
+    def load(cls, filename: str, mode: bool = None) -> Tree:
         """Reload a Tree from a file (pickle or json).
 
-        Parameters
-        ----------
-        filename : str
-            The filename (including the path) of the file to be loaded.
-        mode : str or None, optional
-            The serialization mode. Supported are pickle and json. The default
-            is None in which case the mode is inferred from the file extension.
+        Args:
+            filename: The filename (including the path) of the file to be loaded.
+            mode: The serialization mode. Supported are pickle and json. The default is None in
+                which case the mode is inferred from the file extension.
 
-        Returns
-        -------
-        Tree
+        Returns:
             The tree reloaded from file.
 
-        Raises
-        ------
-        ValueError
-            If the serialization mode is unknown or could not be inferred.
+        Raises:
+            ValueError: If the serialization mode is unknown or could not be inferred.
         """
-
         if not mode:
             mode = Tree._infer_serialization_mode(filename)
 
@@ -1174,11 +1076,9 @@ class Tree:
             with open(filename, "r") as f:
                 tree_dict = json.load(f)
             return Tree.parse_dict(tree_dict)
-
         elif mode == "pickle":
             with open(filename, "rb") as f:
                 return Tree.parse_nx(*pickle.load(f))
-
         else:
             raise ValueError(f"serialization mode '{mode}' not supported")
 
@@ -1186,16 +1086,24 @@ class Tree:
     #                     Print the tree to the console
     # --------------------------------------------------------------------------
 
-    def _lines_for_print_tree(self, child_indentation):
+    def _lines_for_print_tree(self, child_indentation: int) -> list[str]:
+        """Auxiliary function for generating the lines to print the tree.
+
+        Args:
+            child_indentation: The additional indentation to be added for each level.
+
+        Returns:
+            The lines to be printed.
+        """
         symbols = ("\u2500", "\u2502", "\u2514", "\u251c")
 
         nodes = [node for node in self.preorder()]
         node_index = {node: i for i, node in enumerate(nodes)}
         n = len(node_index)
 
-        lines = [[] for i in range(n)]
+        lines = [[] for _ in range(n)]
 
-        for node, level in self.preorder_and_level():
+        for node in self.preorder():
             lines[node_index[node]].append(str(node))
 
             if not node.children:
@@ -1224,16 +1132,12 @@ class Tree:
 
         return lines
 
-    def print_tree(self, child_indentation=3):
+    def print_tree(self, child_indentation: int = 3) -> None:
         """Print a representation of the tree to the console.
 
-        Parameters
-        ----------
-        child_indentation : int, optional
-            The indentation added per level of the nodes. Must be >= 1. The
-            default is 3.
+        Args:
+            child_indentation: The indentation added per level of the nodes. Must be >= 1.
         """
-
         if not isinstance(child_indentation, int) or child_indentation < 1:
             raise ValueError("child indentation must be an integer >= 1")
 
@@ -1244,40 +1148,34 @@ class Tree:
     #                             RANDOM TREE
     # --------------------------------------------------------------------------
 
-    @staticmethod
-    def random_tree(N, binary=False):
-        """A random tree.
+    @classmethod
+    def random_tree(cls, number_of_leaves, binary: bool = False) -> Tree:
+        """A simple function to generate a random tree.
 
-        The resulting tree is always phylogenetic, i.e., each inner node has
-        at least two children.
+        The tree is generated by iteratively sampling a random node to which a new leaf is attached
+        (or two leaves if the sampled node was a leaf). Each step increases the number of leaves by
+        one. The procedure ends as soon as the desired number of leaves is reached.
+        The resulting tree is always phylogenetic, i.e., each inner node has at least two children.
 
-        Parameters
-        ----------
-        N : int
-            The desired number of leaves.
-        binary : bool
-            If True, the resulting tree is binary, otherwise it may contain
-            multifurcations.
+        Args:
+            number_of_leaves: The desired number of leaves.
+            binary: If True, the resulting tree is binary, otherwise it may contain multifurcations.
 
-        Returns
-        -------
-        Tree
-            A randomly generated tree with `N` leaves.
+        Returns:
+            A randomly generated tree with the specified number of leaves.
 
-        Raises
-        ------
-        TypeError
-            If `N` is not an integer >= 1.
+        Raises:
+            TypeError: If 'number_of_leaves' is not an integer >= 1.
         """
-
-        if not (isinstance(N, int)) or N < 1:
+        if not (isinstance(number_of_leaves, int)) or number_of_leaves < 1:
             raise TypeError("N must be an 'int' > 0")
+
         root = TreeNode(label=0)
-        tree = Tree(root)
+        tree = cls(root)
         node_list = [root]
         nr, leaf_count = 1, 1
 
-        while leaf_count < N:
+        while leaf_count < number_of_leaves:
             node = random.choice(node_list)
 
             if not node.children:
