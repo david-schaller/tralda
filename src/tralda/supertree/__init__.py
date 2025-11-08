@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from tralda.supertree.build import Build as Build
-from tralda.supertree.build import BUILD_supertree as BUILD_supertree
+from tralda.supertree.build import build_supertree as build_supertree
 from tralda.supertree.build import tree_profile_to_triples as tree_profile_to_triples
-from tralda.supertree.build import greedy_BUILD as greedy_BUILD
+from tralda.supertree.build import greedy_build as greedy_build
 from tralda.supertree.build import best_pair_merge_first as best_pair_merge_first
 from tralda.supertree.build_st import BuildST as BuildST
 from tralda.supertree.build_st import build_st as build_st

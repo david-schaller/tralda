@@ -1,7 +1,14 @@
-"""Fast computation of a common refinement of trees on the same leaf set."""
+"""Fast computation of a common refinement of trees on the same leaf set.
+
+References:
+    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
+           common refinement of rooted phylogenetic trees on a common leaf set.
+           Algorithms Mol Biol. 16(1):23. DOI: 10.1186/s13015-021-00202-8.
+"""
 
 from __future__ import annotations
 
+from collections.abc import Collection
 from collections import deque
 
 from tralda.datastructures.tree import Tree
@@ -9,127 +16,133 @@ from tralda.datastructures.tree import TreeNode
 from tralda.utils.tree_tools import assert_leaf_sets_equal
 
 
-def linear_common_refinement(trees):
+def linear_common_refinement(trees: Collection[Tree]) -> Tree | None:
     """Minimal common refinement for a set of trees with the same leaf set.
 
-    All input trees must be phylogenetic and have the same set of leaf labels.
-    In each tree, the leaves' label attributes must be set and unique.
+    All input trees must be phylogenetic and have the same set of leaf labels. In each tree, the
+    leaves' label attributes must be set and unique.
 
-    Parameters
-    ----------
-    trees : sequence of Tree instances
+    Args:
+        trees: A collection of of Tree instances.
 
-    Returns
-    -------
-    Tree or bool
-        A common refinement of the input trees if existent, False otherwise.
+    Returns:
+        A common refinement of the input trees if existent, None otherwise.
 
-    Raises
-    ------
-    TypeError
-        In case of input instances that are not of type Tree.
-    RuntimeError
-        If the sequence contains empty trees or the tree do not share the same
-        set of leaves.
-
-    References
-    ----------
-    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021)
-    A Simple Linear-Time Algorithm for the Common Refinement of Rooted
-    Phylogenetic Trees on a Common Leaf Set.
-    arXiv:2107.00072 [cs.DS]
+    References:
+    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
+           common refinement of rooted phylogenetic trees on a common leaf set.
+           Algorithms Mol Biol. 16(1):23. DOI: 10.1186/s13015-021-00202-8.
     """
-
     cr = LinCR(trees)
+
     return cr.run()
 
 
 class LinCR:
-    """Minimal common refinement for a set of trees with the same leaf set.
+    """Minimal common refinement for a set of trees with the same leaf set in linear time.
 
-    References
-    ----------
-    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021)
-    A Simple Linear-Time Algorithm for the Common Refinement of Rooted
-    Phylogenetic Trees on a Common Leaf Set.
-    arXiv:2107.00072 [cs.DS]
+    References:
+    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
+           common refinement of rooted phylogenetic trees on a common leaf set.
+           Algorithms Mol Biol. 16(1):23. DOI: 10.1186/s13015-021-00202-8.
     """
 
-    def __init__(self, trees):
+    def __init__(self, trees: Collection[Tree]) -> None:
+        """Constructor of the LinCR class.
+
+        Args:
+            trees: A collection of of Tree instances.
+
+        Raises:
+            ValueError: If the trees do not have the same leaf labels.
+        """
+        self.trees = trees
         self.L = assert_leaf_sets_equal(trees)
 
         if not self.L:
-            raise RuntimeError("trees must have the same leaf labels")
+            raise ValueError("trees must have the same leaf labels")
 
-        self.trees = trees
+        # ensure that the run() method is only called once
+        self.already_run = False
 
-    def run(self):
+        self.T: Tree | None = None  # the common refinement (CR) candidate
+        self.queue = deque[TreeNode]()
+
+        # vertices in the CR
+        self.vertices_in_cr: set[TreeNode] = set()
+
+        # vertex v in an input trees --> number of leaves below v
+        self.vertex2num_leaves: dict[TreeNode, int] = {}
+
+        # list of dict per tree Ti mapping the nodes v in the constructed tree --> lca_Ti (L(Ti(v)))
+        self.p: list[dict[TreeNode, TreeNode]] = [{} for _ in range(len(self.trees))]
+
+        # vertex in the common refinement --> indices of the trees with corresponding vertex
+        self.J: dict[TreeNode, dict[int, TreeNode | None]] = {}
+
+        # inner vertex in input tree --> corresponding vertex in the common refinement
+        self.vi_to_v: dict[TreeNode, TreeNode] = {}
+
+    def run(self) -> Tree | None:
+        """Run the the algorithm for constructing the minimal common refinement.
+
+        Returns:
+            The minimal common refinement if it exits; None otherwise.
+
+        Raises:
+            ValueError: If the method was already called for this instance.
+        """
+        if self.already_run:
+            raise ValueError("the 'run' method can only be run once")
+
+        self.already_run = True
         self._initialize()
         self._build_tree()
 
-        if self.T:
-            if not self.T.is_phylogenetic():
-                return False
-            if not self._check_displayed():
-                return False
+        if self.T and self.T.is_phylogenetic() and self._check_displayed():
             return self.T
-        else:
-            return False
 
-    def _initialize(self):
-        """Initialize the lookup tables."""
+        # otherwise return None
 
-        self.T = None  # resulting tree (candidate)
+    def _initialize(self) -> None:
+        """Initialize the lookups."""
+        # compute the number of leaves below each vertex
+        for T_i in self.trees:
+            for v in T_i.postorder():
+                if v.is_leaf():
+                    self.vertex2num_leaves[v] = 1
+                else:
+                    self.vertex2num_leaves[v] = sum(self.vertex2num_leaves[w] for w in v.children)
 
-        self._leaf_set_cardinalities()
+        # label --> leaf vertex in the common refinement
+        label2vertex_in_cr = {}
 
-        self.p = [{} for _ in range(len(self.trees))]
-        # v --> lca_Ti (L(Ti(v)))
-
-        self.J = {}  # vertex in resulting tree --> indices of
-        # the trees with corresponding vertex
-        self.vi_to_v = {}  # inner vertex in input tree -->
-        # corresponding vertex in resulting tree
-
-        self.Q = deque()  # queue
-        self.V = set()  # vertices in resulting tree
-
-        self.label_dict = {}
-
+        # initialize the other mappings
         for label in self.L:
             v = TreeNode(label=label)
-            self.Q.append(v)
-            self.V.add(v)
-            self.label_dict[label] = v
+            self.queue.append(v)
+            self.vertices_in_cr.add(v)
+            label2vertex_in_cr[label] = v
             self.J[v] = {i: None for i in range(len(self.trees))}
-            self.l[v] = 1
+            self.vertex2num_leaves[v] = 1
 
         for i, T_i in enumerate(self.trees):
             for v_i in T_i.leaves():
-                v = self.label_dict[v_i.label]
+                v = label2vertex_in_cr[v_i.label]
                 self.p[i][v] = v_i
                 self.J[v][i] = v_i
                 self.vi_to_v[v_i] = v
 
-    def _leaf_set_cardinalities(self):
-        """Compute the number of leaves below each vertex."""
+    def _build_tree(self) -> None:
+        """Constructs the candidate for the common refinement tree.
 
-        self.l = {}
-
-        for T_i in self.trees:
-            for v in T_i.postorder():
-                if v.is_leaf():
-                    self.l[v] = 1
-                else:
-                    self.l[v] = sum(self.l[w] for w in v.children)
-
-    def _build_tree(self):
-        """Constructs the candidate for the common refinement tree."""
-
+        Raises:
+            RuntimeError: If the root could not be determined.
+        """
         self.root = None
 
-        while self.Q:
-            v = self.Q.popleft()
+        while self.queue:
+            v = self.queue.popleft()
             u = None
             l_min = len(self.L)
             J_u = {}
@@ -140,15 +153,15 @@ class LinCR:
                 else:
                     u2 = self.p[i][v]
 
-                if u is None or self.l[u2] < l_min:
+                if u is None or self.vertex2num_leaves[u2] < l_min:
                     u = u2
-                    l_min = self.l[u2]
+                    l_min = self.vertex2num_leaves[u2]
                     J_u.clear()
                     J_u[i] = u2
-                elif self.l[u2] == l_min:
+                elif self.vertex2num_leaves[u2] == l_min:
                     J_u[i] = u2
 
-            if self.l[v] < l_min:
+            if self.vertex2num_leaves[v] < l_min:
                 if u in self.vi_to_v:
                     u = self.vi_to_v[u]
                 else:
@@ -157,16 +170,16 @@ class LinCR:
                     for i, u_i in J_u.items():
                         self.vi_to_v[u_i] = u
                         self.J[u][i] = u_i
-                    self.l[u] = l_min
+                    self.vertex2num_leaves[u] = l_min
                 u.add_child(v)
             else:
-                return False
+                return
 
-            if u not in self.V and l_min < len(self.L):
-                self.Q.append(u)
-                self.V.add(u)
-                if len(self.V) > 2 * len(self.L) - 2:
-                    return False
+            if u not in self.vertices_in_cr and l_min < len(self.L):
+                self.queue.append(u)
+                self.vertices_in_cr.add(u)
+                if len(self.vertices_in_cr) > 2 * len(self.L) - 2:
+                    return
 
                 for i in range(len(self.trees)):
                     if i in self.J[u]:
@@ -184,10 +197,12 @@ class LinCR:
 
         self.T = Tree(self.root)
 
-    def _check_displayed(self):
-        """Checks whether all input trees are displayed by the constructed
-        tree."""
+    def _check_displayed(self) -> bool:
+        """Checks whether all input trees are displayed by the constructed tree.
 
+        Returns:
+            True if all trees are displayed by the constructed tree candidate, False otherwise.
+        """
         for i, T_i in enumerate(self.trees):
             T_copy, v_copy = self.T.copy(mapping=True)
 

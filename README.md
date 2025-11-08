@@ -127,7 +127,7 @@ It provides methods for tree traversals and manipulation, output in Newick forma
 ### Supertree computation
 
 The subpackage `tralda.supertree` implements a number of algorithms for the computation of supertrees:
-* BUILD (Aho et al. 1981), class `Build` or function `BUILD_supertree`
+* BUILD (Aho et al. 1981), class `Build` or function `build_supertree`
 * BuildST (Deng & Fernández-Baca 2016), class `BuildST` or function `build_st`
 * Loose_Cons_Tree (Jansson et al. 2016), class `LooseConsensusTree` or function `loose_consensus_tree`
 * LinCR (Schaller et al. 2021), class `LinCR` or function `linear_common_refinement`
