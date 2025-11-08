@@ -5,7 +5,7 @@ import random
 
 from tralda.datastructures import Tree
 from tralda.supertree import linear_common_refinement
-from tralda.supertree import BUILD_supertree
+from tralda.supertree import build_supertree
 from tralda.supertree import build_st
 
 
@@ -41,7 +41,7 @@ class TestSupertrees(unittest.TestCase):
         partial_trees = self.get_partial_trees(tree, contraction_prob=0.9)
 
         cr_tree = linear_common_refinement(partial_trees)
-        b_tree = BUILD_supertree(partial_trees)
+        b_tree = build_supertree(partial_trees)
         bst_tree = build_st(partial_trees)
 
         all_true = True if cr_tree and b_tree and bst_tree else False
