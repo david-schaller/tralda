@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import unittest
+import itertools
 import os
 import random
 
 from tralda.datastructures import Tree
+from tralda.datastructures import LCA
 
 
 example_tree = (
@@ -104,6 +106,21 @@ class TestTrees(unittest.TestCase):
         tree = Tree.parse_newick(example_tree)
 
         self.assertEqual(tree._lines_for_print_tree(4), reference)
+
+    def test_lca(self):
+        tree = Tree.parse_newick(example_tree)
+        leaf_dict = tree.leaf_dict()
+
+        pairs_and_lca = []
+        for node in tree.inner_nodes():
+            for u, v in itertools.combinations(list(node.children), 2):
+                for a, b in itertools.product(leaf_dict[u], leaf_dict[v]):
+                    pairs_and_lca.append((a, b, node))
+
+        lca = LCA(tree)
+
+        for a, b, expected_lca in pairs_and_lca:
+            self.assertIs(lca(a, b), expected_lca)
 
 
 if __name__ == "__main__":
