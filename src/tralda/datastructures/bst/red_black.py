@@ -195,6 +195,9 @@ class TreeSet(BaseBinarySearchTree):
 
         Args:
             key: The key to be inserted.
+
+        Raises:
+            KeyError: If the key already exists.
         """
         node = self.root
         parent = None
@@ -207,7 +210,7 @@ class TreeSet(BaseBinarySearchTree):
             elif key > node.key:
                 node = node.right
             else:
-                raise ValueError(f"key {key} already exists")
+                raise KeyError(f"key {key} already exists")
 
         # insert the new node
         new_node = RedBlackTreeNode(key)
@@ -327,7 +330,7 @@ class TreeSet(BaseBinarySearchTree):
         node = self._find(key)
 
         if not node:
-            raise ValueError(f"key {key} not found")
+            raise KeyError(f"key {key} not found")
 
         self._delete_node(node)
 

@@ -5,6 +5,7 @@ Balanced binary search tree implementation of a set (TreeSet) and dictionary (Tr
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Any
 from typing import Iterator
 
@@ -14,7 +15,7 @@ from tralda.datastructures.bst.base import BinaryTreeIterator
 
 
 class TreeSet(BaseBinarySearchTree):
-    """AVL tree."""
+    """AVL tree implementation of a sorted set."""
 
     node_class = BinaryNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
@@ -22,16 +23,11 @@ class TreeSet(BaseBinarySearchTree):
     def rotate_right(self, node: BinaryNode) -> BinaryNode:
         """Perform a right rotation on the node.
 
-        Parameters
-        ----------
-        node: BinaryNode
-            The node on which to perform a right rotation.
+        Args:
+            node: The node on which to perform a right rotation.
 
-        Returns
-        -------
-        BinaryNode
-            The former left child of the node which is its parent after the
-            rotation.
+        Returns:
+            The former left child of the node which is its parent after the rotation.
         """
         left_child = node.left
         node.left = left_child.right
@@ -45,16 +41,11 @@ class TreeSet(BaseBinarySearchTree):
     def rotate_left(self, node: BinaryNode) -> BinaryNode:
         """Perform a left rotation on the node.
 
-        Parameters
-        ----------
-        node: BinaryNode
-            The node on which to perform a left rotation.
+        Args:
+            node: The node on which to perform a left rotation.
 
-        Returns
-        -------
-        BinaryNode
-            The former right child of the node which is its parent after the
-            rotation.
+        Returns:
+            The former right child of the node which is its parent after the rotation.
         """
         right_child = node.right
         node.right = right_child.left
@@ -68,14 +59,10 @@ class TreeSet(BaseBinarySearchTree):
     def _rebalance(self, node: BinaryNode) -> BinaryNode:
         """Rebalance the node.
 
-        Parameters
-        ----------
-        node : BinaryNode
-            The node to be rebalanced.
+        Args:
+            node: The node to be rebalanced.
 
-        Returns
-        -------
-        BinaryNode
+        Returns:
             The root of the tree after rebalancing.
         """
         node.update()
@@ -103,46 +90,61 @@ class TreeSet(BaseBinarySearchTree):
     def _insert_key(self, key: Any) -> None:
         """Insert a key into the tree if not already present.
 
-        Parameters
-        ----------
-        key : Any
-            The key to be inserted.
-
-        Raises
-        ------
-        ValueError
-            If the key already exists.
+        Args:
+            key: The key to be inserted.
         """
         self.root = self._insert_and_rebalance(key, self.root)
 
-    def _insert_and_rebalance(self, key: Any, node: BinaryNode) -> BinaryNode:
-        """Recursive insertion and rebalancing."""
+    def _insert_and_rebalance(self, key: Any, node: BinaryNode | None) -> BinaryNode:
+        """Recursive insertion and rebalancing.
+
+        Args:
+            key: The key to be inserted.
+            node: The node under which the key must be inserted.
+
+        Returns:
+            The root of the subtree after inserting the key and rebalancing.
+
+        Raises:
+            KeyError: If the key already exists.
+        """
         if node is None:
             return self.node_class(*self._temp_attributes)
-        elif key < node.key:
+
+        if key < node.key:
             node.left = self._insert_and_rebalance(key, node.left)
         elif key > node.key:
             node.right = self._insert_and_rebalance(key, node.right)
         else:
-            raise ValueError(f"key {key} already exists")
+            raise KeyError(f"key {key} already exists")
 
         return self._rebalance(node)
 
     def _delete_key(self, key: Any) -> None:
         """Delete a key if present.
 
-        Parameters
-        ----------
-        key : Any
-            The key to be deleted.
+        Args:
+            key: The key to be deleted.
         """
         self.root = self._delete_and_rebalance(key, self.root)
 
-    def _delete_and_rebalance(self, key: Any, node: BinaryNode) -> BinaryNode:
-        """Recursive deletion and rebalancing."""
+    def _delete_and_rebalance(self, key: Any, node: BinaryNode | None) -> BinaryNode:
+        """Recursive deletion and rebalancing.
+
+        Args:
+            key: The key to be deleted.
+            node: The node below which the key to be deleted is located.
+
+        Returns:
+            The root of the subtree after deletion and rebalancing.
+
+        Raises:
+            KeyError: If the key is not in the tree.
+        """
         if node is None:
-            raise ValueError(f"key {key} not found")
-        elif key < node.key:
+            raise KeyError(f"key {key} not found")
+
+        if key < node.key:
             node.left = self._delete_and_rebalance(key, node.left)
         elif key > node.key:
             node.right = self._delete_and_rebalance(key, node.right)
@@ -165,10 +167,8 @@ class TreeSet(BaseBinarySearchTree):
     def _pop_at_index(self, idx: int) -> None:
         """Remove item at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index of the element to be removed.
+        Args:
+            idx: The index of the element to be removed.
         """
         self.root = self._pop_at_index_and_rebalance(idx, self.root)
 
@@ -192,23 +192,25 @@ class TreeSet(BaseBinarySearchTree):
 
         return node
 
-    def check_integrity(self) -> bool:
+    def check_integrity(self, verbose: bool = False) -> bool:
         """Integrity check of the tree.
 
-        Checks whether all children have a correct parent reference and the size
-        and heigth is correct in all subtrees. Additionally, the AVL property is
-        checked. Intended for testing purpose.
+        Checks whether all children have a correct parent reference and the size and heigth is
+        correct in all subtrees. Additionally, the AVL property is checked. Intended for debugging
+        purpose.
 
-        Returns
-        -------
-        bool
+        Args:
+            verbose: If True print where the integrity check has failed.
+
+        Returns:
             Whether all integrity checks have been passed.
         """
-        super().check_integrity()
+        super().check_integrity(verbose=verbose)
 
         for node in self._inorder_traversal():
             if abs(node.balance()) > 1:
-                print(f"node {node} is unbalanced")
+                if verbose:
+                    print(f"node {node} is unbalanced")
                 return False
 
 
@@ -222,16 +224,18 @@ class TreeDictNode(BinaryNode):
     def __init__(self, key: Any, value: Any) -> None:
         """Initialize the TreeDict node.
 
-        Parameters
-        ----------
-        key : Any
-            The key of the node. Keys must be unique within a binary search
-            tree.
-        value : Any
-            The value associated with the key.
+        Args:
+            key: The key of the node. Keys must be unique within a binary search tree.
+            value: The value associated with the key.
         """
         super().__init__(key)
         self.value = value
+
+
+class TreeDictIteratorMode(Enum):
+    KEY = 1
+    VALUE = 2
+    KEY_AND_VALUE = 3
 
 
 class TreeDictIterator(BinaryTreeIterator):
@@ -239,46 +243,38 @@ class TreeDictIterator(BinaryTreeIterator):
 
     __slots__ = ("_mode",)
 
-    def __init__(self, tree: "TreeDict", mode: int = 1):
+    def __init__(
+        self,
+        tree: TreeDict,
+        mode: TreeDictIteratorMode = TreeDictIteratorMode.KEY,
+    ) -> None:
         """Initilize the TreeDict iterator.
 
-        Parameters
-        ----------
-        tree : TreeDict
-            The TreeDict instance.
-        mode : int
-            What shall be iterated through (1 = keys, 2 = values, 3 = key-value
-            pairs).
+        Args:
+            tree: The TreeDict instance.
+            mode: What shall be iterated through.
         """
         super().__init__(tree)
 
-        # What is returned?
-        # 1 -- key
-        # 2 -- value
-        # 3 -- (key, value)
         self._mode = mode
 
-    def __iter__(self):
+    def __iter__(self) -> TreeDictIterator:
         return self
 
     def __next__(self) -> Any | tuple[Any, Any]:
         """The next key, value or key-value pair in the binary search tree.
 
-        Returns
-        -------
-        Any or tuple[Any, Any]
+        Returns:
             The next key, value, or key-value pair.
 
-        Raises
-        ------
-        StopIteration
-            When no items are left.
+        Raises:
+            StopIteration: When no items are left.
         """
         try:
             node = next(self._inorder_generator)
-            if self._mode == 1:
+            if self._mode == TreeDictIteratorMode.KEY:
                 return node.key
-            elif self._mode == 2:
+            elif self._mode == TreeDictIteratorMode.VALUE:
                 return node.value
             else:
                 return (node.key, node.value)
@@ -293,46 +289,32 @@ class TreeDict(TreeSet):
     def __getitem__(self, key: Any) -> Any:
         """Return the value associated with the key.
 
-        Overrides the method of the base class where the key at a specified
-        index is returned.
+        Overrides the method of the base class where the key at a specified index is returned.
 
-        Parameters
-        ----------
-        key : Any
-            The key.
+        Args:
+            key: The key.
 
-        Returns
-        -------
-        Any
+        Returns:
             The value associated with the key.
 
-        Raises
-        ------
-        KeyError
-            If the key does not exist.
+        Raises:
+            KeyError: If the key does not exist.
         """
         node = self._find(key)
 
         if not node:
-            raise KeyError(str(key))
+            raise KeyError(f"key {key} is not in the TreeDict")
 
         return node.value
 
     def get(self, item: Any, default: Any = None) -> Any:
-        """Return the value associated with the key or a default value if the
-        key does not exist.
+        """Return the value associated with the key or a default value if the key does not exist.
 
-        Parameters
-        ----------
-        key : Any
-            The key.
-        default : Any, optional
-            The default to be returned if the key does not exist. Defaults to
-            None.
+        Args:
+            key: The key for which to get the asociated value
+            default: The default to be returned if the key does not exist. Defaults to None.
 
-        Returns
-        -------
-        Any
+        Returns:
             The value associated with the key or the default value.
         """
         node = self._find(item)
@@ -345,59 +327,45 @@ class TreeDict(TreeSet):
     def keys(self) -> Iterator[Any]:
         """Iterator for the keys.
 
-        Returns
-        -------
-        Iterator[Any]
+        Returns:
             An iterator for the keys.
         """
-        return self.iterator_class(self, mode=1)
+        return self.iterator_class(self, mode=TreeDictIteratorMode.KEY)
 
     def values(self) -> Iterator[Any]:
         """Iterator for the values.
 
-        Returns
-        -------
-        Iterator[Any]
+        Returns:
             An iterator for the values.
         """
-        return self.iterator_class(self, mode=2)
+        return self.iterator_class(self, mode=TreeDictIteratorMode.VALUE)
 
     def items(self) -> Iterator[tuple[Any, Any]]:
         """Iterator for the key-value pairs.
 
-        Returns
-        -------
-        Iterator[tuple[Any, Any]]
+        Returns:
             An iterator for the key-value pairs.
         """
-        return self.iterator_class(self, mode=3)
+        return self.iterator_class(self, mode=TreeDictIteratorMode.KEY_AND_VALUE)
 
-    def value_at_index(self, idx) -> Any:
+    def value_at_index(self, idx: int) -> Any:
         """Return the value at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index.
+        Args:
+            idx: The index.
 
-        Returns
-        -------
-        Any
+        Returns:
             The value of the node at the index.
         """
         return self._node_at_index(idx).value
 
-    def key_and_value_at_index(self, idx) -> tuple[Any, Any]:
+    def key_and_value_at_index(self, idx: int) -> tuple[Any, Any]:
         """Return the key-value pair at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index.
+        Args:
+            idx: The index.
 
-        Returns
-        -------
-        tuple[Any, Any]
+        Returns:
             The key-value pair of the node at the index.
         """
         node = self._node_at_index(idx)
@@ -407,28 +375,20 @@ class TreeDict(TreeSet):
     def add(self, key: Any, value: Any) -> None:
         """Insert a key and value.
 
-        Parameters
-        ----------
-        key: Any
-            The key to be added.
-        value: Any
-            The associated value.
+        Args:
+            key: The key to be added.
+            value: The associated value.
         """
         self.insert(key, value)
 
     def insert(self, key: Any, value: Any) -> None:
         """Insert a key and value.
 
-        Parameters
-        ----------
-        key: Any
-            The key to be added.
-        value: Any
-            The associated value.
+        Args:
+            key: The key to be added.
+            value: The associated value.
 
-        Raises
-        ------
-        ValueError
+        Raises:
             If the key already exists.
         """
         self._temp_attributes = (key, value)

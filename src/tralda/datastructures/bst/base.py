@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
 from typing import Any
 from typing import Iterator
 from typing import Iterable
@@ -21,16 +20,13 @@ class BinaryNode:
     def __init__(self, key: Any) -> None:
         """Initialize the binary search tree node.
 
-        Parameters
-        ----------
-        key : Any
-            The key/label of the node. Keys must be unique within a binary
-            search tree.
+        Args:
+            key: The key/label of the node. Keys must be unique within a binary search tree.
         """
         self.key: Any = key
 
-        self.left: Optional[BinaryNode] = None
-        self.right: Optional[BinaryNode] = None
+        self.left: BinaryNode | None = None
+        self.right: BinaryNode | None = None
 
         # stores number of elements in its subtree
         self.size: int = 1
@@ -41,9 +37,7 @@ class BinaryNode:
     def __str__(self) -> str:
         """String representation of the node.
 
-        Returns
-        -------
-        str
+        Returns:
             String representation.
         """
         return f"<node: {self.key}>"
@@ -51,20 +45,16 @@ class BinaryNode:
     def get_attributes(self) -> tuple[Any]:
         """Attributes of this node.
 
-        Returns
-        -------
-        tuple[Any]
+        Returns:
             Attributes of this node.
         """
         return tuple(getattr(self, a) for a in self._attributes)
 
-    def set_attributes(self, attributes) -> None:
+    def set_attributes(self, attributes: tuple[Any]) -> None:
         """Set the attributes of this node.
 
-        Parameters
-        ----------
-        attributes : tuple[Any]
-            The attributes, the first item must be the key.
+        Args:
+            attributes: The attributes in the order as defined for this BinaryNode (sub)class.
         """
         for val, a in zip(attributes, self._attributes):
             setattr(self, a, val)
@@ -72,12 +62,14 @@ class BinaryNode:
     def copy_attributes_to_node(self, other: BinaryNode) -> None:
         """Copy attributes of this node to another node.
 
-        Parameters
-        ----------
-        other : BinaryNode
-            The node into which to copy the attributes.
+        Args:
+            other: The node into which to copy the attributes.
+
+        Raises:
+            TypeError: If this instance and other do not have exactly the same type.
         """
-        if not isinstance(other, type(self)):
+        # test both ways as subclasses are not allowed here
+        if not (isinstance(other, type(self)) and isinstance(self, type(other))):
             TypeError(
                 f"nodes must have the same type (self if {type(self)}, other is {type(other)})"
             )
@@ -102,9 +94,7 @@ class BinaryNode:
     def left_size(self) -> int:
         """Size of the left subtree.
 
-        Returns
-        -------
-        int
+        Returns:
             Size of the left subtree.
         """
         return self.left.size if self.left else 0
@@ -112,9 +102,7 @@ class BinaryNode:
     def right_size(self) -> int:
         """Size of the right subtree.
 
-        Returns
-        -------
-        int
+        Returns:
             Size of the right subtree.
         """
         return self.right.size if self.right else 0
@@ -122,9 +110,7 @@ class BinaryNode:
     def balance(self) -> int:
         """Balance factor of the node.
 
-        Returns
-        -------
-        int
+        Returns:
             Balance factor.
         """
         left_height = self.left.height if self.left else 0
@@ -132,11 +118,11 @@ class BinaryNode:
 
         return left_height - right_height
 
-    def copy(self) -> "BinaryNode":
+    def copy(self) -> BinaryNode:
         """A copy of this node.
 
         Returns:
-            BinaryNode: A copy of this node.
+            A copy of this node.
         """
         copy = self.__class__(*self.get_attributes())
         copy.height = self.height
@@ -150,31 +136,31 @@ class BinaryTreeIterator:
 
     __slots__ = ("tree", "_inorder_generator")
 
-    def __init__(self, tree: "BaseBinarySearchTree"):
+    def __init__(self, tree: BaseBinarySearchTree):
         """Initilize the tree iterator.
 
-        Parameters
-        ----------
-        tree : BaseBinarySearchTree
-            The binary search tree.
+        Args:
+            tree: The binary search tree.
         """
         self.tree = tree
         self._inorder_generator = self.tree._inorder_traversal()
 
-    def __iter__(self) -> "BaseBinarySearchTree":
+    def __iter__(self) -> BaseBinarySearchTree:
+        """Iterator function.
+
+        Returns:
+            An iterator for a binary search tree.
+        """
         return self
 
     def __next__(self) -> Any:
         """The next item in the binary search tree.
 
-        Returns
-        -------
+        Returns:
             The next item.
 
-        Raises
-        ------
-        StopIteration
-            When no items are left.
+        Raises:
+            StopIteration: When no items are left.
         """
         try:
             node = next(self._inorder_generator)
@@ -191,19 +177,16 @@ class BaseBinarySearchTree:
 
     def __init__(self) -> None:
         """Initialize the balanced binary search tree."""
-        self.root: Optional[BinaryNode] = None
+        self.root: BinaryNode | None = None
 
-        # for temporarily storing the node attributes for insertion/popping in
-        # recursive functions
-        self._temp_attributes: Optional[Any] = None
+        # for temporarily storing the node attributes for insertion/popping in recursive functions
+        self._temp_attributes: Any | None = None
 
     def __iter__(self) -> Iterator[Any]:
         """An iterator for the binary search tree.
 
-        Returns
-        -------
-        Iterator[Any]
-            An iterator for the tree.
+        Returns:
+            An iterator for the binary search tree.
         """
         return self.iterator_class(self)
 
@@ -213,9 +196,7 @@ class BaseBinarySearchTree:
     def __nonzero__(self) -> bool:
         """Return whether the tree is non-empty.
 
-        Returns
-        -------
-        bool
+        Returns:
             Whether the tree contains elements or not.
         """
         return bool(self.root)
@@ -223,9 +204,7 @@ class BaseBinarySearchTree:
     def __len__(self) -> int:
         """Number of elements in the tree.
 
-        Returns
-        -------
-        int
+        Returns:
             Number of elements.
         """
         return self.root.size if self.root else 0
@@ -233,14 +212,10 @@ class BaseBinarySearchTree:
     def __contains__(self, item: Any) -> bool:
         """Return whether the tree contains the item.
 
-        Parameters
-        ----------
-        item : Any
-            The item.
+        Args:
+            item: The item for which to check whether it is contained in the tree.
 
-        Returns
-        -------
-        bool
+        Returns:
             Whether the tree contains the item.
         """
         return self._find(item) is not None
@@ -250,14 +225,10 @@ class BaseBinarySearchTree:
 
         Same as 'key_at_index(index)'.
 
-        Parameters
-        ----------
-        idx : int
-            The index.
+        Args:
+            idx: The index of the key to get.
 
-        Returns
-        -------
-        Any
+        Returns:
             The key of the node at the index.
         """
         return self._node_at_index(idx).key
@@ -265,14 +236,10 @@ class BaseBinarySearchTree:
     def key_at_index(self, idx: int) -> Any:
         """Return the key at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index.
+        Args:
+            idx: The index of the key to get.
 
-        Returns
-        -------
-        Any
+        Returns:
             The key of the node at the index.
         """
         return self._node_at_index(idx).key
@@ -280,21 +247,14 @@ class BaseBinarySearchTree:
     def _validate_index(self, idx: int) -> int:
         """Return the node at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index to be validated.
+        Args:
+            idx: The index to be validated.
 
-        Returns
-        -------
-        int
-            The input index or the corresponding positive index if the input
-            was negative.
+        Returns:
+            The input index or the corresponding positive index if the input was negative.
 
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
+        Raises:
+            IndexError: If the index is out of bounds.
         """
         if idx < 0:
             if idx < -self.root.size:
@@ -310,23 +270,16 @@ class BaseBinarySearchTree:
     def _node_at_index(self, idx: int) -> BinaryNode:
         """Return the node at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index.
+        Args:
+            idx: The index.
 
-        Returns
-        -------
-        Any
+        Returns:
             The node instance at the index.
 
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        RuntimeError
-            If the index seems valid but the node could not be found. A
-            corrupted integrity of the tree datastructure could be the reason.
+        Raises:
+            IndexError: If the index is out of bounds.
+            RuntimeError: If the index seems valid but the node could not be found. A corrupted
+                integrity of the tree datastructure could be the reason.
         """
         idx = self._validate_index(idx)
         current = self.root
@@ -347,14 +300,12 @@ class BaseBinarySearchTree:
     def add(self, item: Any) -> None:
         """Add an item if not yet present.
 
-        Parameters
-        ----------
-        item : Any
-            The new item to be inserted.
+        Args:
+            item: The new item to be inserted.
         """
         try:
             self.insert(item)
-        except ValueError:
+        except (KeyError, ValueError):
             pass
 
     def insert(self, key: Any) -> None:
@@ -363,15 +314,11 @@ class BaseBinarySearchTree:
         This function will throw a ValueError if the key is already present. If you do not want
         this behavior, use the function add() instead.
 
-        Parameters
-        ----------
-        key : Any
-            The new item to be inserted.
+        Args:
+            key: The new item to be inserted.
 
-        Raises
-        ------
-        ValueError
-            If the key already exists.
+        Raises:
+            KeyError: If the key already exists.
         """
         self._temp_attributes = (key,)
         self._insert_key(key)
@@ -380,43 +327,33 @@ class BaseBinarySearchTree:
     def remove(self, key: Any) -> None:
         """Remove a key from the tree.
 
-        Parameters
-        ----------
-        key : Any
-            The new item to be removed.
+        Args:
+            key: The new item to be removed.
 
-        Raises
-        ------
-        ValueError
-            If the key is not in the tree.
+        Raises:
+            KeyError: If the key is not in the tree.
         """
         self._delete_key(key)
 
     def discard(self, key: Any) -> None:
         """Remove a key from the tree if present.
 
-        Parameters
-        ----------
-        key : Any
-            The new item to be removed.
+        Args:
+            key: The new item to be removed.
         """
         try:
             self._delete_key(key)
-        except ValueError:
+        except KeyError:
             pass
 
     def pop(self) -> Any:
         """Remove and return the greatest item.
 
-        Returns
-        -------
-        Any
+        Returns:
             The greatest item in the tree.
 
-        Raises
-        ------
-        IndexError
-            If the tree is empty.
+        Raises:
+            IndexError: If the tree is empty.
         """
         if not self.root:
             raise IndexError("pop from empty tree")
@@ -430,10 +367,8 @@ class BaseBinarySearchTree:
     def difference_update(self, items: Iterable[Any]) -> None:
         """Discard all elements in the collection.
 
-        Parameters
-        ----------
-        items : Iterable[Any]
-            The items to be discarded.
+        Args:
+            items: The items to be discarded.
         """
         for item in items:
             self.discard(item)
@@ -441,35 +376,25 @@ class BaseBinarySearchTree:
     def remove_at_index(self, idx: int) -> None:
         """Remove node at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index of the element to be removed.
+        Args:
+            idx: The index of the element to be removed.
 
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
+        Raises:
+            IndexError: If the index is out of bounds.
         """
         self.pop_at_index(idx)
 
     def pop_at_index(self, idx: int) -> Any:
         """Remove item at the index.
 
-        Parameters
-        ----------
-        idx : int
-            The index of the element to be removed and returned.
+        Args:
+            idx: The index of the element to be removed and returned.
 
-        Returns
-        -------
-        Any
+        Returns:
             The item at the index.
 
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
+        Raises:
+            IndexError: If the index is out of bounds.
         """
         idx = self._validate_index(idx)
         self._pop_at_index(idx)
@@ -482,17 +407,13 @@ class BaseBinarySearchTree:
 
         return to_pop
 
-    def _find(self, key: Any) -> Optional[BinaryNode]:
+    def _find(self, key: Any) -> BinaryNode | None:
         """Find the node for the specified key.
 
-        Parameters
-        ----------
-        key : Any
-            The key to be searched.
+        Args:
+            key: The key to be searched.
 
-        Returns
-        -------
-        BinaryNode or None
+        Returns:
             The corresponding tree node or None if the key was not found.
         """
         if not self.root:
@@ -510,57 +431,47 @@ class BaseBinarySearchTree:
     def _insert_key(self, key: Any) -> None:
         """Insert a key into the tree if not already present.
 
-        Parameters
-        ----------
-        key : Any
-            The key to be inserted.
+        Args:
+            key: The key to be inserted.
 
-        Raises
-        -------
-        ValueError
-            If the key already exists.
-        NotImplementedError
-            If the child class does not implement this method.
+        Raises:
+            KeyError: If the key already exists.
+            NotImplementedError: If the child class does not implement this method.
         """
         raise NotImplementedError("not implemented for base class")
 
     def _delete_key(self, key: Any) -> None:
         """Delete a key.
 
-        Parameters
-        ----------
-        key : Any
-            The key to be deleted.
+        Args:
+            key: The key to be deleted.
 
-        Raises
-        -------
-        NotImplementedError
-            If the child class does not implement this method.
+        Raises:
+            KeyError: If the key does not exist.
+            NotImplementedError: If the child class does not implement this method.
         """
         raise NotImplementedError("not implemented for base class")
 
     def _pop_at_index(self, idx: int) -> None:
         """Remove item at the index and return it.
 
-        Parameters
-        ----------
-        idx : int
-            The index of the element to be removed.
+        Args:
+            idx: The index of the element to be removed.
 
-        Raises
-        -------
-        NotImplementedError
-            If the child class does not implement this method.
+        Raises:
+            IndexError: If the index is out of bounds.
+            NotImplementedError: If the child class does not implement this method.
         """
         raise NotImplementedError("not implemented for base class")
 
     def _smallest_in_subtree(self, node: BinaryNode) -> BinaryNode:
         """Return the left-most (smallest element) node in the subtree.
 
-        Parameters
-        ----------
-        node : BinaryNode
-            The node whose subtree is to be considered.
+        Args:
+            node: The node whose subtree is to be considered.
+
+        Returns:
+            The node with the smallest key in the subtree.
         """
         current = node
         while current.left:
@@ -568,13 +479,14 @@ class BaseBinarySearchTree:
 
         return current
 
-    def _largest_in_subtree(self, node):
+    def _largest_in_subtree(self, node: BinaryNode) -> BinaryNode:
         """Return the right-most (largest element) node in the subtree.
 
-        Parameters
-        ----------
-        node : BinaryNode
-            The node whose subtree is to be considered.
+        Args:
+            node: The node whose subtree is to be considered.
+
+        Returns:
+            The node with the largest key in the subtree.
         """
         current = node
         while current.right:
@@ -582,12 +494,10 @@ class BaseBinarySearchTree:
 
         return current
 
-    def _inorder_traversal(self):
+    def _inorder_traversal(self) -> Iterator[BinaryNode]:
         """Generator for the nodes in a pre-order traversal of the tree.
 
-        Yields
-        ------
-        TreeNode
+        Yields:
             All nodes of the tree in pre-order.
         """
 
@@ -606,9 +516,7 @@ class BaseBinarySearchTree:
     def copy(self) -> BaseBinarySearchTree:
         """Copy the tree.
 
-        Returns
-        -------
-        BaseBinarySearchTree
+        Returns:
             A copy of the tree.
         """
         tree_copy = self.__class__()
@@ -618,6 +526,14 @@ class BaseBinarySearchTree:
         return tree_copy
 
     def _copy_subtree(self, node: BinaryNode) -> BinaryNode:
+        """Copy a subtree.
+
+        Args:
+            node: The node whose subtree to copy.
+
+        Returns:
+            The copied node (= the root of the copied subtree).
+        """
         node_copy = node.copy()
         if node.left:
             node_copy.left = self._copy_subtree(node.left)
@@ -631,9 +547,7 @@ class BaseBinarySearchTree:
 
         Intended for testing purpose.
 
-        Returns
-        -------
-        str
+        Returns:
             A Newick representation of the tree.
         """
 
@@ -653,15 +567,16 @@ class BaseBinarySearchTree:
 
         return _newick(self.root) if self.root else ""
 
-    def check_integrity(self) -> bool:
+    def check_integrity(self, verbose: bool = False) -> bool:
         """Recursive integrity check of the tree.
 
-        Checks whether the size and heigth is correct in all subtrees.
-        Intended for testing purpose.
+        Checks whether the size and heigth is correct in all subtrees. Intended for debugging
+        purpose.
 
-        Returns
-        -------
-        bool
+        Args:
+            verbose: If True print where the integrity check has failed.
+
+        Returns:
             Whether all integrity checks have been passed.
         """
         for node in self._inorder_traversal():
@@ -676,11 +591,13 @@ class BaseBinarySearchTree:
                 size += node.right.size
 
             if node.height != 1 + max(height_left, height_right):
-                print(f"height of node {node} is incorrect")
+                if verbose:
+                    print(f"height of node {node} is incorrect")
                 return False
 
             if node.size != size:
-                print(f"size of node {node} is incorrect")
+                if verbose:
+                    print(f"size of node {node} is incorrect")
                 return False
 
         return True
