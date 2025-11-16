@@ -1,100 +1,89 @@
 """Heuristic for cograph editing.
 
-References
-----------
-.. [1] Christophe Crespelle.
-   Linear-Time Minimal Cograph Editing.
-   Preprint published 2019.
+References:
+    .. [1] Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
+           Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
+           Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
 """
 
 import random
+from typing import Any
+
 import networkx as nx
 
 from tralda.datastructures.tree import Tree
 from tralda.datastructures.tree import TreeNode
 
 
-def edit_to_cograph(G, run_number=10):
+def edit_to_cograph(graph, run_number: int = 10) -> nx.Graph:
     """Heuristic algorithm for optimal cograph editing.
 
     Time complexity O(|V|^2).
 
-    Parameters
-    ----------
-    G : nexworkx.Graph
-        A graph.
-    run_number : Number of editing runs from which the best editing result is
-        returned.
+    Args:
+        graph: A graph.
+        run_number: Number of editing runs from which the best editing result is returned.
 
-    Returns
-    -------
-    Tree
-        The cotree, i.e., a Tree instance with inner vertex labels 'series'
-        and 'parallel', that corresponds to the best editing result.
+    Returns:
+        The cograph that corresponds to the best editing result.
 
-    References
-    ----------
-    .. [1] Christophe Crespelle.
-       Linear-Time Minimal Cograph Editing.
-       Preprint published 2019.
+    References:
+        .. [1] Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
+            Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
+            Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
     """
-
-    ce = CographEditor(G)
-    best_cotree = ce.cograph_edit()
+    ce = CographEditor(graph)
+    best_cotree = ce.cograph_edit(run_number=run_number)
 
     return best_cotree.to_cograph()
 
 
 class CographEditor:
-    """Heuristic for cograph editing running in O(|V|^2)..
+    """Heuristic for cograph editing running in O(|V|^2).
 
-    References
-    ----------
-    .. [1] Christophe Crespelle.
-       Linear-Time Minimal Cograph Editing.
-       Preprint published 2019.
+    References:
+        .. [1] Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
+            Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
+            Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
     """
 
-    def __init__(self, G):
-        """Constructor of CographEditor class.
+    def __init__(self, graph: nx.Graph) -> None:
+        """Constructor of the CographEditor class.
 
-        Parameters
-        ----------
-        G : networkx.Graph
-            A graph.
+        Args:
+            graph: A graph.
+
+        Raises:
+            ValueError: If the provided graph is empty.
         """
-
-        if not isinstance(G, nx.Graph):
+        if not isinstance(graph, nx.Graph):
             raise TypeError("not a NetworkX Graph")
 
-        self.G = G
-        self.V = [v for v in G.nodes()]
+        self.graph = graph
+        self.V = [v for v in graph.nodes()]
+
+        if len(self.V) == 0:
+            raise ValueError("empty graph in cograph editing")
 
         self.cotrees = []
         self.costs = []
 
-        self.best_T = None
+        self.best_tree = None
         self.best_cost = float("inf")
 
-    def cograph_edit(self, run_number=10):
+    def cograph_edit(self, run_number: int = 10) -> Tree:
         """Run the cograph editing.
 
-        Parameters
-        ----------
-        run_number : Number of editing runs from which the best editing result is
-            returned.
+        Args:
+            run_number: Number of editing runs from which the best editing result is returned.
 
-        Returns
-        -------
-        Tree
-            The cotree, i.e., a Tree instance with inner vertex labels 'series'
-            and 'parallel', that corresponds to the best editing result.
+        Returns:
+            The cotree, i.e., a Tree instance with inner vertex labels 'series' and 'parallel',
+            that corresponds to the best editing result.
         """
-
         for i in range(run_number):
-            T = Tree(None)
             self.aux_counter = {}
-            already_in_T = set()
+            already_in_tree = set()
             leaf_map = {}
             total_cost = 0
 
@@ -103,54 +92,63 @@ class CographEditor:
                 random.shuffle(self.V)
 
             # build starting tree for the first two vertices
-            self._start_tree(T, already_in_T, leaf_map)
+            T = self._start_tree(already_in_tree, leaf_map)
 
             # incrementally insert vertices while updating total cost
-            if len(self.V) > 2:
-                for x in self.V[2:]:
-                    cost, x_node = self._insert(x, T, already_in_T, leaf_map)
+            for x in self.V[2:]:
+                cost, x_node = self._insert(x, T, already_in_tree, leaf_map)
 
-                    # update the number of leaves on the path to the root
-                    current = x_node.parent
-                    while current:
-                        self.aux_counter[current] += 1
-                        current = current.parent
+                # update the number of leaves on the path to the root
+                current = x_node.parent
+                while current:
+                    self.aux_counter[current] += 1
+                    current = current.parent
 
-                    leaf_map[x] = x_node
-                    already_in_T.add(x)
-                    total_cost += cost
+                leaf_map[x] = x_node
+                already_in_tree.add(x)
+                total_cost += cost
 
             self.cotrees.append(T)
             self.costs.append(total_cost)
 
             # update the best cost
             if total_cost < self.best_cost:
-                self.best_T = T
+                self.best_tree = T
                 self.best_cost = total_cost
 
-            # stop if orginal graph was a cograph, i.e. cost is 0
+            # stop if orginal graph was a cograph, i.e., cost is 0
             if self.best_cost <= 0:
                 break
 
-        return self.best_T
+        return self.best_tree
 
-    def _start_tree(self, T, already_in_T, leaf_map):
-        if len(self.V) == 0:
-            raise RuntimeError("empty graph in cograph editing")
-            return
+    def _start_tree(
+        self,
+        already_in_tree: set[Any],
+        leaf_map: dict[Any, TreeNode],
+    ) -> Tree:
+        """Initialize tree with (at most) two leaves.
 
-        elif len(self.V) == 1:
-            T.root = TreeNode(label=self.V[0])
-            return
+        Args:
+            already_in_tree: Set of nodes in the graph that are already added to the tree.
+            leaf_map: Dictionary mapping nodes in the graoh to the corresponding leaf nodes in the
+                tree.
 
+        Returns:
+            The initialized tree.
+        """
+        if len(self.V) == 1:
+            return Tree(TreeNode(label=self.V[0]))
+
+        tree = Tree(None)
         v1, v2 = self.V[0], self.V[1]
-        already_in_T.update([v1, v2])
+        already_in_tree.update([v1, v2])
 
         R = TreeNode(label="series")
         self.aux_counter[R] = 2
-        T.root = R
+        tree.root = R
 
-        if self.G.has_edge(v1, v2):
+        if self.graph.has_edge(v1, v2):
             v1_node = TreeNode(label=v1)
             self.aux_counter[v1_node] = 1
             v2_node = TreeNode(label=v2)
@@ -171,23 +169,43 @@ class CographEditor:
         leaf_map[v1] = v1_node
         leaf_map[v2] = v2_node
 
-    def _insert(self, x, T, already_in_T, leaf_map):
-        # information for non-hollow nodes
-        C_nh = {}  # node u: list of non-hollow children
-        C_nh_number = {}  # node u: number of non-hollow children
+        return tree
 
-        Nx_number = {}  # node u: number of neighbors of x in V(u)
-        completion_forced = {}  # node u: completion-forced or not
-        full = {}  # node u: full or not (i.e. mixed)
-        deletion_forced = {}  # node u: deletion-forced or not
+    def _insert(
+        self,
+        x: Any,
+        T: Tree,
+        already_in_tree: set[Any],
+        leaf_map: dict[Any, TreeNode],
+    ) -> tuple[int, TreeNode]:
+        """Insert the next node x into the tree.
+
+        Args:
+            x: The node from the input graph to be inserted.
+            T: The current tree.
+            already_in_tree: Set of nodes in the graph that are already added to the tree.
+            leaf_map: Dictionary mapping nodes in the graoh to the corresponding leaf nodes in the
+                tree.
+
+        Returns:
+            The cost of the node insertion and the newly inserted leaf node.
+        """
+        # information for non-hollow nodes
+        C_nh = {}  # node --> list of non-hollow children
+        C_nh_number = {}  # node --> number of non-hollow children
+
+        Nx_number = {}  # node --> number of neighbors of x in V(u)
+        completion_forced = {}  # node --> completion-forced or not
+        full = {}  # node --> full or not (i.e. mixed)
+        deletion_forced = {}  # node --> deletion-forced or not
 
         Nx_counter = 0
 
         # ---- FIRST STEP ----
 
         # first traversal (C_nh)
-        for v in self.G.neighbors(x):
-            if v not in already_in_T:
+        for v in self.graph.neighbors(x):
+            if v not in already_in_tree:
                 continue
 
             Nx_counter += 1
@@ -238,6 +256,7 @@ class CographEditor:
                 x_node = TreeNode(label=x)
                 self.aux_counter[x_node] = 1
                 N.add_child(x_node)
+
             return 0, x_node  # cost is 0
 
         # second traversal, postorder
@@ -345,8 +364,7 @@ class CographEditor:
                         if completion_forced[v]:
                             cost = cost_above[u] + (self.aux_counter[v] - Nx_number[v])
                             mincost[u] = (cost, [v])
-                        continue  # otherwise u is not a minimal
-                        # insertion node (Lemma 8)
+                        continue  # otherwise u is not a minimal insertion node (Lemma 8)
 
                     # first step
                     for v in C_mixed[u]:
@@ -359,6 +377,7 @@ class CographEditor:
                     if C_nh_number[u] == len(u.children) and not blue:
                         current_min, current_min_node = float("inf"), None
                         for v in red:
+                            # the following equals:
                             # Nx_number[v] - (self.aux_counter[v] - Nx_number[v])
                             diff = 2 * Nx_number[v] - self.aux_counter[v]
                             if diff < current_min:
@@ -372,6 +391,7 @@ class CographEditor:
                         for i in range(2 - nb_filled):
                             current_min, current_min_node = float("inf"), None
                             for v in blue:
+                                # the following equals:
                                 # (self.aux_counter[v] - Nx_number[v]) - Nx_number[v]
                                 diff = self.aux_counter[v] - 2 * Nx_number[v]
                                 if diff < current_min:
@@ -390,8 +410,7 @@ class CographEditor:
                             Nx_v = Nx_number[v] if v in Nx_number else 0
                             cost = cost_above[u] + Nx_v
                             mincost[u] = (cost, C_full[u])
-                        continue  # otherwise u is not a minimal
-                        # insertion node (Lemma 8)
+                        continue  # otherwise u is not a minimal insertion node (Lemma 8)
 
                     # first step
                     for v in C_mixed[u]:
@@ -404,6 +423,7 @@ class CographEditor:
                     if not C_full[u] and not red:
                         current_min, current_min_node = float("inf"), None
                         for v in blue:
+                            # the following equals:
                             # (self.aux_counter[v] - Nx_number[v]) - Nx_number[v]
                             diff = self.aux_counter[v] - 2 * Nx_number[v]
                             if diff < current_min:
@@ -419,6 +439,7 @@ class CographEditor:
                         for i in range(2 - nb_hollowed):
                             current_min, current_min_node = float("inf"), None
                             for v in red:
+                                # the following equals:
                                 # Nx_number[v] - (self.aux_counter[v] - Nx_number[v])
                                 diff = 2 * Nx_number[v] - self.aux_counter[v]
                                 if diff < current_min:
