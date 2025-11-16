@@ -6,143 +6,129 @@ multipartite graph completion problem.
 
 import itertools
 import random
+from collections.abc import Iterator
+from typing import Any
 
 import networkx as nx
 
 from tralda.datastructures.tree import Tree
+from tralda.datastructures.tree import TreeNode
 from tralda.datastructures.last_common_ancestor import LCA
 from tralda.utils.graph_tools import complete_multipartite_graph_from_sets
 from tralda.cograph.detection import LinearCographDetector
 
 
-def to_cograph(cotree):
+def to_cograph(cotree: Tree) -> nx.Graph:
     """Returns the cograph corresponding to the cotree.
 
-    Parameters
-    ----------
-    cotree : Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
+    Args:
+        cotree: A cotree, i.e., a Tree instance with inner vertex labels 'series' and 'parallel'.
 
-    Returns
-    -------
-    nexworkx.Graph
+    Returns:
         The corresponding cograph with the leaf labels as vertices.
     """
-
     leaves = cotree.leaf_dict()
-    G = nx.Graph()
+    graph = nx.Graph()
 
     for v in leaves[cotree.root]:
-        G.add_node(v.label)
+        graph.add_node(v.label)
 
     for u in cotree.preorder():
-        if u.label == "series":
-            for v1, v2 in itertools.combinations(u.children, 2):
-                for l1, l2 in itertools.product(leaves[v1], leaves[v2]):
-                    G.add_edge(l1.label, l2.label)
+        if u.label != "series":
+            continue
 
-    return G
+        for v1, v2 in itertools.combinations(u.children, 2):
+            for l1, l2 in itertools.product(leaves[v1], leaves[v2]):
+                graph.add_edge(l1.label, l2.label)
+
+    return graph
 
 
-def to_cotree(G):
+def to_cotree(graph: nx.Graph) -> Tree | None:
     """Checks if a graph is a cograph and returns its cotree.
 
     Linear O(|V| + |E|) implementation.
 
-    Parameters
-    ----------
-    G : nexworkx.Graph
-        A graph.
+    Args:
+        graph: A graph.
 
-    Returns
-    -------
-    Tree or bool
-        The cotree representation of the graph, or False if it is not a cograph.
+    Returns:
+            The cotree representation of the graph, or None if it is not a cograph.
 
-    References
-    ----------
-    .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart.
-       A Linear Recognition Algorithm for Cographs.
-       In: SIAM J. Comput., 14(4), 926–934 (1985).
-       doi: 10.1137/0214065
+    References:
+        .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for
+               Cographs. In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
     """
-
-    lcd = LinearCographDetector(G)
-    return lcd.recognition()
+    return LinearCographDetector(graph).recognition()
 
 
-def complement_cograph(cotree, inplace=False):
+def complement_cograph(cotree: Tree, inplace: bool = False) -> Tree:
     """Returns the cotree of the complement cograph.
 
-    Parameters
-    ----------
-    cotree : Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
+    Args:
+        cotree: A cotree, i.e., a Tree instance with inner vertex labels 'series' and 'parallel'.
 
-    Returns
-    -------
-    Tree
+    Returns:
         The cotree of the complement cograph.
-    """
 
+    Raises:
+        ValueError: If the label is not 'series' and 'parallel' for any inner node.
+    """
     tree = cotree if inplace else cotree.copy()
 
     for v in tree.inner_nodes():
-        v.label = "series" if v.label == "parallel" else "parallel"
+        if v.label == "series":
+            v.label = "parallel"
+        elif v.label == "parallel":
+            v.label = "series"
+        else:
+            raise ValueError(f"inner node has label '{v.label}', must be 'series' or 'parallel'")
 
     return tree
 
 
-def paths_of_length_2(cotree):
+def paths_of_length_2(cotree: Tree) -> Iterator[tuple[TreeNode, TreeNode, TreeNode]]:
     """Generator for all paths of length 2 (edges) in the cograph.
 
-    Parameters
-    ----------
-    cotree : Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
+    Args:
+        cotree: A cotree, i.e., a Tree instance with inner vertex labels 'series' and 'parallel'.
 
-    Yields
-    ------
-    tuple of three TreeNode instance
+    Yields:
         All paths of length 2 in the corresponding cograph.
-    """
 
+    Raises:
+        ValueError: If the label is not 'series' and 'parallel' for any inner node.
+    """
     leaves = cotree.leaf_dict()
     lca = LCA(cotree)
 
     for u in cotree.inner_nodes():
         if u.label == "parallel":
             continue
+        elif u.label != "series":
+            raise ValueError(f"inner node has label '{u.label}', must be 'series' or 'parallel'")
 
         for v1, v2 in itertools.permutations(u.children, 2):
             for t1, t2 in itertools.combinations(leaves[v1], 2):
-                if lca(t1, t2).label == "parallel":
-                    for t3 in leaves[v2]:
-                        yield t1, t3, t2
+                if lca(t1, t2).label != "parallel":
+                    continue
+
+                for t3 in leaves[v2]:
+                    yield t1, t3, t2
 
 
-def random_cotree(N, force_series_root=False):
+def random_cotree(number_of_leaves: int, force_series_root: bool = False) -> Tree:
     """Creates a random cotree.
 
-    Parameters
-    ----------
-    N : int
-        The number of leaves in the resulting tree.
-    force_series_root : bool
-        If True, the cograph of the resulting cotree will be connected,
-        otherwise it may be disconnected; the default is False.
+    Args:
+        number_of_leaves: The number of leaves in the resulting tree.
+        force_series_root: If True, the cograph of the resulting cotree will be connected, otherwise
+            it may be disconnected.
 
-    Returns
-    -------
-    Tree
-        A cotree, i.e., a Tree instance with inner vertex labels 'series' and
-        'parallel'.
+    Returns:
+        A cotree, i.e., a Tree instance with inner vertex labels 'series' and 'parallel'.
     """
-
-    cotree = Tree.random_tree(N)
+    cotree = Tree.random_tree(number_of_leaves)
 
     # assign labels ('series', 'parallel')
     for v in cotree.preorder():
@@ -159,105 +145,90 @@ def random_cotree(N, force_series_root=False):
     return cotree
 
 
-def cluster_deletion(cograph):
+def cluster_deletion(cograph: nx.Graph | Tree) -> list[list[Any]]:
     """Cluster deletion for cographs.
 
-    Returns a partition of a cograph into disjoint cliques with a minimal
-    number of edges between the cliques.
+    Returns a partition of a cograph into disjoint cliques with a minimal number of edges between
+    the cliques.
 
-    Parameters
-    ----------
-    cograph : networkx.Graph or Tree
-        The cograph for which cluster deletion shall be performed.
+    Args:
+        cograph: The cograph (as a graph or cotree) for which cluster deletion shall be performed.
 
-    Returns
-    -------
-    list of lists
-        A partition where each sublist corresponds to a clique in a solution
-        of the cluster deletion problem.
+    Returns:
+        A partition where each sublist corresponds to a clique in a solution of the cluster deletion
+        problem.
 
-    Raises
-    ------
-    RuntimeError
-        If the input is not a valid cograph or cotree.
+    Raises:
+        ValueError: If the input is not a valid cograph or cotree.
 
-    References
-    ----------
-    .. [1] Gao Y, Hare DR, Nastos J (2013) The cluster deletion problem for
-    cographs. Discrete Math 313(23):2763–2771, DOI 10.1016/j.disc.2013.08.017.
-    .. [2] Schaller D, Lafond M, Stadler PF, Wieseke N, Hellmuth M (2020)
-    Indirect Identification of Horizontal Gene Transfer. (preprint)
-    arXiv:2012.08897
+    References:
+        .. [1] Gao Y, Hare DR, Nastos J (2013) The cluster deletion problem for cographs. Discrete
+               Math 313(23):2763-2771, DOI: 10.1016/j.disc.2013.08.017.
+        .. [2] Schaller D, Lafond M, Stadler PF, Wieseke N, Hellmuth M (2020) Indirect
+               Identification of Horizontal Gene Transfer. Journal of Mathematical Biology 83(10),
+               DOI: 10.1007/s00285-021-01631-0
     """
-
     cotree = cograph if isinstance(cograph, Tree) else to_cotree(cograph)
 
     if not cotree:
-        raise RuntimeError("not a valid cograph/cotree")
+        raise ValueError("not a valid cograph/cotree")
 
-    P = {}
+    partition = {}
 
     for u in cotree.postorder():
-        P[u] = []
+        partition[u] = []
         if not u.children:
-            P[u].append([u.label])
+            partition[u].append([u.label])
 
         elif u.label == "parallel":
             for v in u.children:
-                P[u].extend(P[v])
+                partition[u].extend(partition[v])
 
             # naive sorting can be replaced by k-way merge-sort
-            P[u].sort(key=len, reverse=True)
+            partition[u].sort(key=len, reverse=True)
 
         elif u.label == "series":
             for v in u.children:
-                for i, Q_i in enumerate(P[v]):
-                    if i >= len(P[u]):
-                        P[u].append([])
-                    P[u][i].extend(Q_i)
+                for i, Q_i in enumerate(partition[v]):
+                    if i >= len(partition[u]):
+                        partition[u].append([])
+                    partition[u][i].extend(Q_i)
 
         else:
-            raise RuntimeError("invalid cotree")
+            raise ValueError("invalid cotree")
 
-    return P[cotree.root]
+    return partition[cotree.root]
 
 
-def complete_multipartite_completion(cograph, supply_graph=False):
+def complete_multipartite_completion(
+    cograph: nx.Graph | Tree,
+    supply_graph: bool = False,
+) -> list[list[Any]] | tuple[list[list[Any]], nx.Graph]:
     """Complete multipartite graph completion for cographs.
 
-    Returns a partition of the vertex set corresponding to the (maximal)
-    independent sets in an optimal edge completion of the cograph to a
-    complete multipartite graph.
+    Returns a partition of the vertex set corresponding to the (maximal) independent sets in an
+    optimal edge completion of the cograph to a complete multipartite graph.
 
-    Parameters
-    ----------
-    cograph : networkx.Graph or Tree
-        The cograph for which complete multipartite graph completion shall be
-        performed.
-    supply_graph : bool, optional
-        If True, the solution is additionally returned as a NetworkX Graph.
+    Args:
+        cograph: The cograph (as a graph or cotree) for which complete multipartite graph completion
+            shall be performed.
+        supply_graph: If True, the solution is additionally returned as a NetworkX Graph.
 
-    Returns
-    -------
-    list of lists
-        A partition where each sublist corresponds to a (maximal) independent
-        set in a solution of the complete multipartite graph completion problem.
-    networkx.Graph, optional
-        The solution as a graph.
+    Returns:
+        A partition where each sublist corresponds to a (maximal) independent set in a solution of
+        the complete multipartite graph completion problem. And, optionally, the solution as a
+        graph.
 
-    Raises
-    ------
-    RuntimeError
-        If the input is not a valid cograph or cotree.
+    Raises:
+        ValueError: If the input is not a valid cograph or cotree.
     """
-
     cotree = cograph if isinstance(cograph, Tree) else to_cotree(cograph)
 
     if not cotree:
-        raise RuntimeError("not a valid cograph/cotree")
+        raise ValueError("not a valid cograph/cotree")
 
-    # complete multipartite graph completion is equivalent to
-    # cluster deletion in the complement cograph
+    # complete multipartite graph completion is equivalent to cluster deletion in the complement
+    # cograph
     compl_cotree = complement_cograph(cotree, inplace=False)
 
     # clusters are then equivalent to the maximal independent sets

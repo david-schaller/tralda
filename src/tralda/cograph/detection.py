@@ -1,6 +1,13 @@
-"""Linear-time cograph detection."""
+"""Linear-time cograph detection.
 
+References:
+    .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for Cographs.
+           In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
+"""
+
+from collections import defaultdict
 from collections import deque
+from typing import Any
 
 import networkx as nx
 
@@ -11,84 +18,72 @@ from tralda.datastructures.tree import TreeNode
 class LinearCographDetector:
     """Linear cograph detection and cotree costruction.
 
-    References
-    ----------
-    .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart.
-       A Linear Recognition Algorithm for Cographs.
-       In: SIAM J. Comput., 14(4), 926–934 (1985).
-       doi: 10.1137/0214065
+    References:
+        .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for
+               Cographs. In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
     """
 
-    def __init__(self, G):
+    def __init__(self, graph: nx.Graph) -> None:
         """Constructor of LinearCographDetector class.
 
-        Parameters
-        ----------
-        G : networkx.Graph
-            A graph.
+        Args:
+            graph: A graph.
         """
-
-        if not isinstance(G, nx.Graph):
+        if not isinstance(graph, nx.Graph):
             raise TypeError("not a NetworkX Graph")
 
-        self.G = G
-        self.V = [v for v in G.nodes()]
+        self.graph = graph
+        self.V: list[Any] = [v for v in graph.nodes()]
 
-        self.T = Tree(None)
-        self.already_in_T = set()
-        self.leaf_map = {}
+        self.tree = Tree(None)
+        self.already_in_tree: set[Any] = set()
+        self.leaf_map: dict[Any, TreeNode] = {}
         self.node_counter = 0
 
-        self.marked = set()
-        self.m_u_children = {}  # lists of marked and unmarked children
+        self.marked: set[TreeNode] = set()
+        self.m_u_children: dict[
+            TreeNode, list[TreeNode]
+        ] = {}  # lists of marked and unmarked children
         self.mark_counter = 0
         self.unmark_counter = 0
-        self.md = {}
+
+        # md is set to zero for all new nodes including leaves as they are added to the tree
+        self.md: dict[TreeNode, int] = defaultdict(int)
 
         self.error_message = ""
 
-    def recognition(self):
+    def recognition(self) -> Tree | None:
         """Run cotree construction.
 
-        Returns
-        -------
-        Tree or bool
-            The cotree representation of the graph, or False if it is not a
-            cograph.
-        """
+        Function COGRAPH-RECOGNITION from Corneil et al. 1985.
 
+        Returns:
+            The cotree representation of the graph, or None if it is not a cograph.
+        """
         if len(self.V) == 0:
             raise RuntimeError("empty graph in cograph recognition")
-            return self.T
-
         elif len(self.V) == 1:
-            self.T.root = TreeNode(label=self.V[0])
-            self.md[self.T.root] = 0
-            return self.T
+            self.tree.root = TreeNode(label=self.V[0])
+
+            return self.tree
 
         v1, v2 = self.V[0], self.V[1]
-        self.already_in_T.update([v1, v2])
+        self.already_in_tree.update([v1, v2])
 
         R = TreeNode(label="series")
-        self.md[R] = 0
-        self.T.root = R
+        self.tree.root = R
 
-        if self.G.has_edge(v1, v2):
+        if self.graph.has_edge(v1, v2):
             v1_node = TreeNode(label=v1)
             v2_node = TreeNode(label=v2)
-            self.md[v1_node] = 0
-            self.md[v2_node] = 0
             R.add_child(v1_node)
             R.add_child(v2_node)
             self.node_counter = 3
         else:
             N = TreeNode(label="parallel")
-            self.md[N] = 0
             R.add_child(N)
             v1_node = TreeNode(label=v1)
             v2_node = TreeNode(label=v2)
-            self.md[v1_node] = 0
-            self.md[v2_node] = 0
             N.add_child(v1_node)
             N.add_child(v2_node)
             self.node_counter = 4
@@ -98,7 +93,7 @@ class LinearCographDetector:
 
         if len(self.V) == 2:
             self._remove_single_child_root()
-            return self.T
+            return self.tree
 
         for x in self.V[2:]:
             # initialization (necessary?)
@@ -106,16 +101,14 @@ class LinearCographDetector:
             self.m_u_children.clear()
             self.mark_counter = 0
             self.unmark_counter = 0
-            self.already_in_T.add(x)  # add x for subsequent iterations
+            self.already_in_tree.add(x)  # add x for subsequent iterations
 
-            # call procedure _MARK(x)
-            self._MARK(x)
+            self._mark(x)
 
             # all nodes in T were marked and unmarked
             if self.node_counter == self.unmark_counter:
-                R = self.T.root
+                R = self.tree.root
                 x_node = TreeNode(label=x)
-                self.md[x_node] = 0
                 R.add_child(x_node)
                 self.node_counter += 1
                 self.leaf_map[x] = x_node
@@ -123,24 +116,20 @@ class LinearCographDetector:
             # no nodes in T were marked and unmarked
             elif self.mark_counter == 0:
                 # d(R)=1
-                if len(self.T.root.children) == 1:
-                    N = self.T.root.children[0]
+                if len(self.tree.root.children) == 1:
+                    N = self.tree.root.children[0]
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     N.add_child(x_node)
                     self.node_counter += 1
                 else:
-                    R_old = self.T.root
+                    R_old = self.tree.root
                     R_new = TreeNode(label="series")
-                    self.md[R_new] = 0
                     N = TreeNode(label="parallel")
-                    self.md[N] = 0
                     R_new.add_child(N)
                     N.add_child(R_old)
-                    self.T.root = R_new
+                    self.tree.root = R_new
 
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     N.add_child(x_node)
                     self.node_counter += 3
                 self.leaf_map[x] = x_node
@@ -148,25 +137,22 @@ class LinearCographDetector:
 
             u = self._find_lowest()
             if not u:
-                return False
+                return
 
             # label(u)=0 and |A|=1
             if u.label == "parallel" and len(self.m_u_children[u]) == 1:
                 w = self.m_u_children[u][0]
                 if w.is_leaf():
                     new_node = TreeNode(label="series")
-                    self.md[new_node] = 0
                     u.remove_child(w)
                     u.add_child(new_node)
                     new_node.add_child(w)
 
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     new_node.add_child(x_node)
                     self.node_counter += 2
                 else:
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     w.add_child(x_node)
                     self.node_counter += 1
 
@@ -180,36 +166,30 @@ class LinearCographDetector:
                         break
                 if w.is_leaf():
                     new_node = TreeNode(label="parallel")
-                    self.md[new_node] = 0
                     u.remove_child(w)
                     u.add_child(new_node)
                     new_node.add_child(w)
 
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     new_node.add_child(x_node)
                     self.node_counter += 2
                 else:
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     w.add_child(x_node)
                     self.node_counter += 1
 
             else:
                 y = TreeNode(label=u.label)
-                self.md[y] = 0
                 for a in self.m_u_children[u]:
                     u.remove_child(a)
                     y.add_child(a)
 
                 if u.label == "parallel":
                     new_node = TreeNode(label="series")
-                    self.md[new_node] = 0
                     u.add_child(new_node)
 
                     new_node.add_child(y)
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     new_node.add_child(x_node)
                 else:
                     par = u.parent
@@ -217,25 +197,29 @@ class LinearCographDetector:
                         par.remove_child(u)
                         par.add_child(y)
                     else:
-                        self.T.root = y  # y becomes the new root
+                        self.tree.root = y  # y becomes the new root
 
                     new_node = TreeNode(label="parallel")
-                    self.md[new_node] = 0
                     y.add_child(new_node)
                     new_node.add_child(u)
                     x_node = TreeNode(label=x)
-                    self.md[x_node] = 0
                     new_node.add_child(x_node)
                 self.node_counter += 3
 
             self.leaf_map[x] = x_node
 
         self._remove_single_child_root()
-        return self.T
 
-    def _MARK(self, x):
-        for v in self.G.neighbors(x):
-            if v in self.already_in_T:
+        return self.tree
+
+    def _mark(self, x: Any) -> None:
+        """Function MARK from Corneil et al. 1985.
+
+        Args:
+            x: A node in the input graph.
+        """
+        for v in self.graph.neighbors(x):
+            if v in self.already_in_tree:
                 self.marked.add(self.leaf_map[v])
                 self.mark_counter += 1
 
@@ -246,7 +230,7 @@ class LinearCographDetector:
             self.marked.remove(u)  # unmark u
             self.unmark_counter += 1
             self.md[u] = 0  # md(u) <- 0
-            if u is not self.T.root:
+            if u is not self.tree.root:
                 w = u.parent  # w <- parent(u)
                 if w not in self.marked:
                     self.marked.add(w)  # mark w
@@ -255,26 +239,35 @@ class LinearCographDetector:
                 if self.md[w] == len(w.children):
                     queue.append(w)
 
-                if w in self.m_u_children:  # append u to list of
-                    self.m_u_children[w].appendleft(u)  # marked and unmarked
-                else:  # children of w
+                # append u to list of marked and unmarked children of w
+                if w in self.m_u_children:
+                    self.m_u_children[w].appendleft(u)
+                else:
                     self.m_u_children[w] = deque([u])
 
         if (
             self.marked  # any vertex remained marked
-            and len(self.T.root.children) == 1
-            and self.T.root not in self.marked
+            and len(self.tree.root.children) == 1
+            and self.tree.root not in self.marked
         ):
-            self.marked.add(self.T.root)
+            self.marked.add(self.tree.root)
             self.mark_counter += 1
 
     def _find_lowest(self):
-        R = self.T.root
+        """Function FIND-LOWEST from Corneil et al. 1985.
+
+        This function checks whether G+x is a cograph and, if so, returns u, the lowest marked
+        vertex of T.
+
+        Returns:
+            The lowest marked vertex in the current tree.
+        """
+        R = self.tree.root
         y = "Lambda"
 
         if R not in self.marked:  # R is not marked
             self.error_message = "(iii): R={}".format(R)
-            return False  # G+x is not a cograph (iii)
+            return  # G+x is not a cograph (iii)
         else:
             if self.md[R] != len(R.children) - 1:
                 y = R
@@ -282,19 +275,20 @@ class LinearCographDetector:
             self.md[R] = 0
             u = w = R
 
-        while self.marked:  # while there are mark vertices
-            u = self.marked.pop()  # choose a arbitrary marked vertex u
+        # while there are marked vertices choose a arbitrary marked vertex u
+        while self.marked:
+            u = self.marked.pop()
 
             if y != "Lambda":
                 self.error_message = "(i) or (ii): y={}".format(y)
-                return False  # G+x is not a cograph (i) or (ii)
+                return  # G+x is not a cograph (i) or (ii)
 
             if u.label == "series":
                 if self.md[u] != len(u.children) - 1:
                     y = u
                 if u.parent in self.marked:
                     self.error_message = "(i) and (vi): u={}".format(u)
-                    return False  # G+x is not a cograph (i) and (vi)
+                    return  # G+x is not a cograph (i) and (vi)
                 else:
                     t = u.parent.parent
             else:
@@ -306,19 +300,19 @@ class LinearCographDetector:
             while t is not w:
                 if t is R:
                     self.error_message = "(iv): t={}".format(t)
-                    return False  # G+x is not a cograph (iv)
+                    return  # G+x is not a cograph (iv)
 
                 if t not in self.marked:
                     self.error_message = "(iii), (v) or (vi): t={}".format(t)
-                    return False  # G+x is not a cograph (iii), (v) or (vi)
+                    return  # G+x is not a cograph (iii), (v) or (vi)
 
                 if self.md[t] != len(t.children) - 1:
                     self.error_message = "(ii): t={}".format(t)
-                    return False  # G+x is not a cograph (ii)
+                    return  # G+x is not a cograph (ii)
 
                 if t.parent in self.marked:
                     self.error_message = "(i): t={}".format(t)
-                    return False  # G+x is not a cograph (i)
+                    return  # G+x is not a cograph (i)
 
                 self.marked.remove(t)  # unmark t
                 self.md[t] = 0  # reset md(t)
@@ -329,7 +323,8 @@ class LinearCographDetector:
         return u
 
     def _remove_single_child_root(self):
-        if len(self.T.root.children) == 1:
-            new_root = self.T.root.children[0]
+        """If necessary, remove the root that has only one child v and make v the new root."""
+        if len(self.tree.root.children) == 1:
+            new_root = self.tree.root.children[0]
             new_root.detach()
-            self.T.root = new_root
+            self.tree.root = new_root

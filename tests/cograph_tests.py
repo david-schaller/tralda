@@ -39,7 +39,7 @@ class TestCographPackage(unittest.TestCase):
         graph = gt.random_graph(100, p=0.3)
         ce = CographEditor(graph)
         ce.cograph_edit(run_number=10)
-        cograph = to_cograph(ce.best_T)
+        cograph = to_cograph(ce.best_tree)
 
         self.assertTrue(to_cotree(cograph))
 
