@@ -1,52 +1,49 @@
-"""Tree Tools."""
+"""Collection of functions for tree analysis and comparison."""
+
+from __future__ import annotations
+
+from collections.abc import Collection
+from typing import Any
 
 from tralda.datastructures.tree import Tree
 
 
-def assert_leaf_sets_equal(trees):
+def assert_leaf_sets_equal(trees: Collection[Tree]) -> set[Any] | None:
     """Checks whether trees have the same set of unique leaf labels.
 
-    Parameters
-    ----------
-    trees : sequence of Tree instances
+    Args:
+        trees: Collection of Tree instances.
 
-    Returns
-    -------
-    set
-        The common set of leaf labels; or False.
+    Returns:
+        The common set of leaf labels; or None if the trees do not share the same set of leaf
+        labels.
 
-    Raises
-    ------
-    TypeError
-        In case of input instances that are not of type Tree.
-    RuntimeError
-        If the sequence contains empty trees, the tree do not share the same
-        set of leaves, or the leaf labels are not unique in one tree.
-    AttributeError
-        If the label attribute is not set for some leaf.
+    Raises:
+        ValueError: If the input collection is empty, contains empty trees, or the leaf labels are
+            not unique in one tree.
+        TypeError: If any of the input elements is not of type Tree.
     """
-
     if not trees:
-        raise RuntimeError("empty list of trees")
+        raise ValueError("empty list of trees")
 
-    L = None
+    leaves = None
 
     for T_i in trees:
         if not isinstance(T_i, Tree):
             raise TypeError("not a 'Tree' instance")
 
-        L2 = set()
+        leaves2 = set()
         for v in T_i.leaves():
-            if v.label in L2:
-                raise RuntimeError("leaf labels not unique")
+            if v.label in leaves2:
+                raise ValueError("leaf labels not unique")
             else:
-                L2.add(v.label)
+                leaves2.add(v.label)
 
-        if not L:
-            L = L2
-            if len(L) == 0:
-                raise RuntimeError("empty tree in tree list")
-        elif L != L2:
-            return False
+        if not leaves:
+            leaves = leaves2
+            if len(leaves) == 0:
+                raise ValueError("empty tree in tree list")
+        elif leaves != leaves2:
+            return
 
-    return L
+    return leaves

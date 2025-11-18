@@ -1,80 +1,111 @@
-"""Graph Tools."""
+"""Collection of functions for graph analysis, comparison, or manipulation."""
 
 from __future__ import annotations
 
 import itertools
 import random
+from collections.abc import Collection
+from collections.abc import Sequence
+from typing import Any
+
 import numpy as np
 import networkx as nx
 
 
-# ----------------------------------------------------------------------------
-#                             Adjacency matrix
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
+#                                      Adjacency matrix
+# --------------------------------------------------------------------------------------------------
 
 
-def build_adjacency_matrix(G):
-    """Return an adjacency matrix."""
+def build_adjacency_matrix(graph: nx.Graph | nx.DiGraph) -> np.ndarray:
+    """Return an adjacency matrix.
 
+    Args:
+        graph: A graph.
+
+    Returns:
+        An adjacency matrix representing the provided graph.
+    """
     # maps node --> row/column index
-    index = {node: i for i, node in enumerate(G.nodes())}
-    M = np.zeros((len(index), len(index)), dtype=np.int8)
+    index = {node: i for i, node in enumerate(graph.nodes())}
+    matrix = np.zeros((len(index), len(index)), dtype=np.int8)
 
-    for x, neighbors in G.adjacency():
+    for x, neighbors in graph.adjacency():
         for y in neighbors:
-            M[index[x], index[y]] = 1
+            matrix[index[x], index[y]] = 1
 
-    return M, index
-
-
-# ----------------------------------------------------------------------------
-#                             Graph comparison
-# ----------------------------------------------------------------------------
+    return matrix, index
 
 
-def graphs_equal(G1, G2):
-    """Returns whether two NetworkX graphs (directed or undirected) are equal."""
+# --------------------------------------------------------------------------------------------------
+#                                      Graph comparison
+# --------------------------------------------------------------------------------------------------
 
-    if (not G1.order() == G2.order()) or (not G1.size() == G2.size()):
+
+def graphs_equal(graph1: nx.Graph | nx.DiGraph, graph2: nx.Graph | nx.DiGraph) -> bool:
+    """Returns whether two NetworkX graphs (directed or undirected) are equal.
+
+    Args:
+        graph1: The first graph.
+        graph2: The second graph.
+
+    Returns:
+        True if the two graphs have the same nodes and edges, False otherwise.
+    """
+    if (not graph1.order() == graph2.order()) or (not graph1.size() == graph2.size()):
         return False
 
-    if set(G1.nodes()) != set(G2.nodes()):
+    if set(graph1.nodes()) != set(graph2.nodes()):
         return False
 
-    for x, y in G1.edges():
-        if not G2.has_edge(x, y):
+    for x, y in graph1.edges():
+        if not graph2.has_edge(x, y):
             return False
 
     return True
 
 
-def is_subgraph(G1, G2):
-    """Returns whether G1 is a subgraph of G2."""
+def is_subgraph(graph1: nx.Graph | nx.DiGraph, graph2: nx.Graph | nx.DiGraph) -> bool:
+    """Returns whether graph1 is a subgraph of graph2.
 
-    if (isinstance(G1, nx.Graph) and isinstance(G2, nx.DiGraph)) or (
-        isinstance(G1, nx.DiGraph) and isinstance(G2, nx.Graph)
+    Args:
+        graph1: The first graph.
+        graph2: The second graph.
+
+    Returns:
+        True if graph1 is a subgraph of graph2, False otherwise.
+    """
+    if (isinstance(graph1, nx.Graph) and isinstance(graph2, nx.DiGraph)) or (
+        isinstance(graph1, nx.DiGraph) and isinstance(graph2, nx.Graph)
     ):
         return False
 
-    if G1.order() > G2.order() or G1.size() > G2.size():
+    if graph1.order() > graph2.order() or graph1.size() > graph2.size():
         return False
 
     # vertex set is not a subset
-    if not set(G1.nodes()) <= set(G2.nodes()):
+    if not set(graph1.nodes()) <= set(graph2.nodes()):
         return False
 
-    for x, y in G1.edges():
-        if not G2.has_edge(x, y):
+    for x, y in graph1.edges():
+        if not graph2.has_edge(x, y):
             return False
 
     return True
 
 
-def symmetric_diff(G1, G2):
-    """Returns the number of edges in the symmetric difference."""
+def symmetric_diff(graph1: nx.Graph | nx.DiGraph, graph2: nx.Graph | nx.DiGraph) -> int:
+    """Returns the number of edges in the symmetric difference.
 
-    set1 = {x for x in G1.nodes()}
-    set2 = {x for x in G2.nodes()}
+    Args:
+        graph1: The first graph.
+        graph2: The second graph.
+
+    Returns:
+        The number of edges in the symmetric difference.
+    """
+    set1 = {x for x in graph1.nodes()}
+    set2 = {x for x in graph2.nodes()}
 
     if set1 != set2:
         raise RuntimeError("graphs do not have the same vertex set")
@@ -82,26 +113,42 @@ def symmetric_diff(G1, G2):
 
     sym_diff_number = 0
 
-    if isinstance(G1, nx.DiGraph):
+    if isinstance(graph1, nx.DiGraph):
         generator = itertools.permutations(set1, 2)
     else:
         generator = itertools.combinations(set1, 2)
 
     for x, y in generator:
-        if G1.has_edge(x, y) and not G2.has_edge(x, y):
+        if graph1.has_edge(x, y) and not graph2.has_edge(x, y):
             sym_diff_number += 1
-        elif not G1.has_edge(x, y) and G2.has_edge(x, y):
+        elif not graph1.has_edge(x, y) and graph2.has_edge(x, y):
             sym_diff_number += 1
 
     return sym_diff_number
 
 
-def contingency_table(true_graph, graph, as_dict=True):
+def contingency_table(
+    true_graph: nx.Graph | nx.DiGraph,
+    graph: nx.Graph | nx.DiGraph,
+    as_dict: bool = True,
+) -> tuple[int, int, int, int] | dict[str, int]:
     """Contingency table for the edge sets of two graphs.
 
     The two graphs must have the same vertex set.
-    """
 
+    Args:
+        true_graph: The 'true' graph.
+        graph: The graph whose edges are compared against the 'true' graph.
+        as_dict: If True, the numbers of true positives, true negatives, false positives, and false
+            negatives are returned as a dictionary.
+
+    Returns:
+        The true positives, true negatives, false positives, and false negatives. Optionally, as a
+        dictionary with keys 'tp', 'tn', 'fp', and 'fn'.
+
+    Raises:
+        ValueError: If the graph do not have the same set of vertices.
+    """
     if true_graph.order() != graph.order() or set(true_graph.nodes()) != set(graph.nodes()):
         raise ValueError("graphs must have the same vertex sets")
 
@@ -128,10 +175,20 @@ def contingency_table(true_graph, graph, as_dict=True):
         return tp, tn, fp, fn
 
 
-def performance(true_graph, graph):
-    """Returns order, size, tp, tn, fp, fn, accuracy, precision and recall
-    of a (directed or undirected) graph w.r.t. true graph."""
+def performance(
+    true_graph: nx.Graph | nx.DiGraph,
+    graph: nx.Graph | nx.DiGraph,
+) -> tuple[int, int, int, int, int, int, float, float, float]:
+    """Returns various metrics for the comparison of a graph against a reference graph.
 
+    Args:
+        true_graph: The 'true' graph.
+        graph: The graph whose edges are compared against the 'true' graph.
+
+    Returns:
+        Order, size, tp, tn, fp, fn, accuracy, precision and recall of a (directed or undirected)
+        graph w.r.t. 'true' graph.
+    """
     tp, tn, fp, fn = contingency_table(true_graph, graph, as_dict=False)
 
     accuracy = (tp + tn) / (tp + tn + fp + fn) if tp + tn + fp + fn > 0 else float("nan")
@@ -141,9 +198,19 @@ def performance(true_graph, graph):
     return (graph.order(), graph.size(), tp, tn, fp, fn, accuracy, precision, recall)
 
 
-def false_edges(true_graph, graph):
-    """Returns a graph containing fn and a graph containg fp edges."""
+def false_edges(
+    true_graph: nx.Graph | nx.DiGraph,
+    graph: nx.Graph | nx.DiGraph,
+) -> tuple[nx.Graph, nx.Graph] | tuple[nx.DiGraph, nx.DiGraph]:
+    """Returns a graph containing false-negative and a graph containg false-positive edges.
 
+    Args:
+        true_graph: The 'true' graph.
+        graph: The graph whose edges are compared against the 'true' graph.
+
+    Returns:
+        A graph containing false-negative and a graph containg false-positive edges.
+    """
     if isinstance(true_graph, nx.DiGraph):
         fn_graph = nx.DiGraph()
         fp_graph = nx.DiGraph()
@@ -165,28 +232,53 @@ def false_edges(true_graph, graph):
     return fn_graph, fp_graph
 
 
-# ----------------------------------------------------------------------------
-#                             Graph coloring
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
+#                                        Graph coloring
+# --------------------------------------------------------------------------------------------------
 
 
-def is_properly_colored(G):
+def is_properly_colored(graph: nx.Graph | nx.DiGraph, color_attribute: str = "color") -> bool:
     """Returns whether a (di)graph is properly colored.
 
-    Raises a KeyError if, in any edge, a vertex has no 'color' attribute."""
+    A graph is properly color if, for any edge uv, the vertices u and v have different colors.
 
-    for u, v in G.edges():
-        if G.nodes[u]["color"] == G.nodes[v]["color"]:
+    Args:
+        graph: The input graph whose vertices should have some color attribute.
+        color_attribute: The vertex attribute that shall be used as color.
+
+    Returns:
+        Whether or not the graph is properly colored.
+
+    Raises:
+        KeyError: If, in any edge, a vertex does not have the color attribute.
+    """
+    for u, v in graph.edges():
+        if graph.nodes[u][color_attribute] == graph.nodes[v][color_attribute]:
             return False
 
     return True
 
 
-def sort_by_colors(graph):
+def sort_by_colors(
+    graph: nx.Graph | nx.DiGraph,
+    color_attribute: str = "color",
+) -> dict[Any, list[Any]]:
+    """Sort the vertices of a graph by color.
+
+    Args:
+        graph: The input graph whose vertices should have some color attribute.
+        color_attribute: The vertex attribute that shall be used as color.
+
+    Returns:
+        A dictionary with the colors as keys and lists of corresponding vertices as values.
+
+    Raises:
+        KeyError: If any vertex does not have the color attribute.
+    """
     color_dict = {}
 
     for v in graph.nodes():
-        color = graph.nodes[v]["color"]
+        color = graph.nodes[v][color_attribute]
 
         if color not in color_dict:
             color_dict[color] = [v]
@@ -196,51 +288,90 @@ def sort_by_colors(graph):
     return color_dict
 
 
-def copy_node_attributes(from_graph, to_graph):
-    """Copy node label and color from one graph to another."""
+def copy_node_attributes(
+    from_graph: nx.Graph | nx.DiGraph,
+    to_graph: nx.Graph | nx.DiGraph,
+    attributes: str | tuple[str, ...] | list[str] = ("label", "color"),
+) -> None:
+    """Copy node attributes from one graph to another.
+
+    By default, the 'label' and 'color' attributes are copied.
+
+    Args:
+        from_graph: The source graph from which to copy node attributes.
+        to_graph: The target graph to which to copy node attributes.
+        attributes: The attributes to copy.
+    """
+    if isinstance(attributes, str):
+        attributes = [attributes]
 
     for x in from_graph.nodes():
-        if to_graph.has_node(x):
-            to_graph.nodes[x]["label"] = from_graph.nodes[x]["label"]
-            to_graph.nodes[x]["color"] = from_graph.nodes[x]["color"]
+        if not to_graph.has_node(x):
+            continue
+
+        for attribute in attributes:
+            to_graph.nodes[x][attribute] = from_graph.nodes[x][attribute]
 
 
-# ----------------------------------------------------------------------------
-#                      Graph generation/manipulation
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
+#                                Graph generation/manipulation
+# --------------------------------------------------------------------------------------------------
 
 
-def random_graph(N, p=0.5):
-    """Construct a random graph on N nodes.
+def random_graph(number_of_nodes, p: float = 0.5) -> nx.Graph:
+    """Construct a random graph with the specified number of nodes.
 
-    Keyword arguments:
-        p - probability that an edge xy is inserted
+    The nodes are numbered continuously from 1 to number_of_nodes.
+
+    Args:
+        number_of_nodes: The number of nodes that the graph shall have.
+        p: Probability that an edge xy is inserted.
+
+    Returns:
+        The generated random graph.
     """
+    graph = nx.Graph()
+    graph.add_nodes_from(range(1, number_of_nodes + 1))
 
-    G = nx.Graph()
-    G.add_nodes_from(range(1, N + 1))
-
-    for x, y in itertools.combinations(range(1, N + 1), 2):
+    for x, y in itertools.combinations(range(1, number_of_nodes + 1), 2):
         if random.random() < p:
-            G.add_edge(x, y)
+            graph.add_edge(x, y)
 
-    return G
+    return graph
 
 
 def disturb_graph(
-    graph, insertion_prob, deletion_prob, inplace=False, preserve_properly_colored=True
-):
-    """Randomly insert/delete edges in a graph."""
+    graph: nx.Graph | nx.DiGraph,
+    insertion_prob: float,
+    deletion_prob: float,
+    inplace: bool = False,
+    preserve_properly_colored: bool = True,
+    color_attribute: str = "color",
+) -> nx.Graph | nx.DiGraph:
+    """Randomly insert and/or delete edges in a graph.
 
+    Args:
+        graph: The input graph.
+        insertion_prob: The probability with which a missing edge gets inserted.
+        deletion_prob: The probability with which a present edge gets deleted.
+        inplace: If True, manipulate the graph inplace. Otherwise, a copy of the graph gets
+            manipulated and returned.
+        preserve_properly_colored: Whether to preserve the property that the graph is properly
+            colored.
+        color_attribute: The vertex attribute that shall be used as color.
+
+    Returns:
+        The disturbed graph.
+    """
     if not inplace:
         graph = graph.copy()
 
     for x, y in itertools.combinations(graph.nodes, 2):
         if (
             preserve_properly_colored
-            and "color" in graph.nodes[x]
-            and "color" in graph.nodes[y]
-            and graph.nodes[x]["color"] == graph.nodes[y]["color"]
+            and color_attribute in graph.nodes[x]
+            and color_attribute in graph.nodes[y]
+            and graph.nodes[x][color_attribute] == graph.nodes[y][color_attribute]
         ):
             continue
 
@@ -262,42 +393,53 @@ def disturb_graph(
     return graph
 
 
-# ----------------------------------------------------------------------------
-#                      Complete multipartite graphs
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
+#                                  Complete multipartite graphs
+# --------------------------------------------------------------------------------------------------
 
 
-def independent_sets(G):
-    """Independent sets of a complete multipartite (i.e. a Fitch graph).
+def independent_sets(graph: nx.graph) -> list[list[Any]] | None:
+    """Independent sets of a complete multipartite (i.e., a Fitch graph).
 
-    Returns a partition of the graph's vertex set that corresponds to its
-    set of independent set if the graph is complete multipartite, and
-    False otherwise.
+    Returns a partition of the graph's vertex set that corresponds to its set of independent set if
+    the graph is complete multipartite, and None otherwise.
+
+    Args:
+        graph: The input graph.
+
+    Returns:
+        A list of lists that represent the independent set.
     """
-
     # independent sets are equivalent to cliques in the complement graph
-    G = nx.complement(G)
+    graph = nx.complement(graph)
 
-    ccs = [list(cc) for cc in nx.connected_components(G)]
+    ccs = [list(cc) for cc in nx.connected_components(graph)]
 
     for cc in ccs:
         for x, y in itertools.combinations(cc, 2):
-            if not G.has_edge(x, y):  # not a clique
-                return False
+            if not graph.has_edge(x, y):  # not a clique
+                return
 
     return ccs
 
 
-def complete_multipartite_graph_from_sets(partition):
-    """Construct the complete multipartite graphs from the independent sets."""
+def complete_multipartite_graph_from_sets(partition: Sequence[Collection[Any]]) -> nx.Graph:
+    """Construct the complete multipartite graphs from the independent sets.
 
-    G = nx.Graph()
+    Args:
+        partition: A partition of the vertices for the graph to construct. The partition represents
+            the independent sets of the graph.
+
+    Returns:
+        A complete multipartite graph whose independent sets are the sets in the input partition.
+    """
+    graph = nx.Graph()
 
     for i in range(len(partition)):
-        G.add_nodes_from(partition[i])
+        graph.add_nodes_from(partition[i])
 
         for j in range(i + 1, len(partition)):
             for x, y in itertools.product(partition[i], partition[j]):
-                G.add_edge(x, y)
+                graph.add_edge(x, y)
 
-    return G
+    return graph
