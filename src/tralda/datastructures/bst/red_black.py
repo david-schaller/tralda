@@ -188,6 +188,65 @@ class TreeSet(BaseBinarySearchTree):
 
         return True
 
+    @classmethod
+    def join(cls, tree_left: TreeSet, tree_right: TreeSet, key: Any | None = None) -> TreeSet:
+        """Join function for two red-black trees.
+
+        Join two red-black trees T_L and T_R with x < key < y for all x in T_L and y in T_R. The
+        resulting tree will contain all keys in T_L and T_R and additionally the new provided key.
+        If no key is provided, a dummy key will be added during the join operation, which will be
+        removed in the end, keeping the total O(log(n)) time complexity.
+
+        NOTE: The input red-black tree instances should no longer be used afterwards.
+
+        Args:
+            tree_left: The tree T_L with the smaller elements.
+            tree_right: The tree T_R with the larger elements.
+            key: The new key to be added. If None, a dummy node will be temporarily inserted and
+                removed in the end.
+
+        Raises:
+            TypeError: If one of the two trees is not an instance of the correct red-black tree
+                type.
+
+        Returns:
+            The joined tree.
+        """
+        if not isinstance(tree_left, cls):
+            raise TypeError(f"tree_left must be of type {cls}, but is {type(tree_left)}")
+        if not isinstance(tree_right, cls):
+            raise TypeError(f"tree_right must be of type {cls}, but is {type(tree_right)}")
+
+        new_node = cls.node_class(0) if key is None else cls.node_class(key)
+
+        # both trees are empty --> re-use instance tree_left
+        if not tree_left and not tree_right:
+            tree_left.root = new_node
+            return tree_left
+        # only tree_right is non-empty --> insert new_node as new smallest element
+        elif not tree_left:
+            parent = tree_right._smallest_in_subtree(tree_right.root)
+            tree_right._insert_node(new_node, parent, 0)
+            return tree_right
+        # only tree_left is non-empty --> insert new_node as new largest element
+        elif not tree_right:
+            parent = tree_left._largest_in_subtree(tree_left.root)
+            tree_left._insert_node(new_node, parent, 1)
+            return tree_left
+
+        # create a new tree if both trees are non-empty
+        tree = cls()
+        tree.root = tree._join(tree_left.root, tree_right.root, new_node)
+
+        # update all nodes on the path from the new node to the root
+        tree._traverse_to_root_and_update(new_node)
+
+        # if no key was provided, remove the dummy node
+        if key is None:
+            tree._delete_node(new_node)
+
+        return tree
+
     def _copy_subtree(self, node: RedBlackTreeNode) -> RedBlackTreeNode:
         """Recursive auxiliary function to copy a subtree under the provided node.
 
@@ -297,7 +356,7 @@ class TreeSet(BaseBinarySearchTree):
                 raise KeyError(f"key {key} already exists")
 
         # create and insert the new node, rebalance, update nodes on the way to the root
-        new_node = RedBlackTreeNode(key)
+        new_node = self.node_class(key)
         self._insert_node(new_node, parent, direction)
         self._traverse_to_root_and_update(new_node)
 
@@ -458,33 +517,7 @@ class TreeSet(BaseBinarySearchTree):
         close_nephew = None
         distant_nephew = None
         direction = node.direction
-
-        def case_5():
-            nonlocal sibling
-            nonlocal close_nephew
-            nonlocal distant_nephew
-            nonlocal direction
-
-            self._rotate_subtree(sibling, 1 - direction)
-            sibling.turn_red()
-            close_nephew.turn_black()
-            distant_nephew = sibling
-            sibling = close_nephew
-            case_6()
-
-        def case_6():
-            nonlocal parent
-            nonlocal sibling
-            nonlocal distant_nephew
-            nonlocal direction
-
-            self._rotate_subtree(parent, direction)
-            if parent.is_red:
-                sibling.turn_red()
-            else:
-                sibling.turn_black()
-            parent.turn_black()
-            distant_nephew.turn_black()
+        skip_case_5 = False
 
         parent.set_child(direction, None)
 
@@ -502,13 +535,12 @@ class TreeSet(BaseBinarySearchTree):
 
                 distant_nephew = sibling.child(1 - direction)
                 if distant_nephew and distant_nephew.is_red:
-                    case_6()
-                    return
+                    skip_case_5 = True
+                    break  # go to case 6
                 close_nephew = sibling.child(direction)
 
                 if close_nephew and close_nephew.is_red:
-                    case_5()
-                    return
+                    break  # go to case 5
 
                 # case 4
                 sibling.turn_red()
@@ -516,12 +548,11 @@ class TreeSet(BaseBinarySearchTree):
                 return
 
             if distant_nephew and distant_nephew.is_red:
-                case_6()
-                return
+                skip_case_5 = True
+                break  # go to case 6
 
             if close_nephew and close_nephew.is_red:
-                case_5()
-                return
+                break  # go to case 5
 
             if not parent:
                 # case 1
@@ -541,3 +572,126 @@ class TreeSet(BaseBinarySearchTree):
             if not parent:
                 break
             direction = node.direction
+
+        if not skip_case_5:
+            # case 5
+            self._rotate_subtree(sibling, 1 - direction)
+            sibling.turn_red()
+            close_nephew.turn_black()
+            distant_nephew = sibling
+            sibling = close_nephew
+
+        # case 6
+        self._rotate_subtree(parent, direction)
+        if parent.is_red:
+            sibling.turn_red()
+        else:
+            sibling.turn_black()
+        parent.turn_black()
+        distant_nephew.turn_black()
+
+    def _join_subtrees(
+        self,
+        parent: RedBlackTreeNode,
+        left_child: RedBlackTreeNode,
+        right_child: RedBlackTreeNode,
+    ) -> None:
+        """Attach two nodes to a common parent.
+
+        Args:
+            parent: The parent node.
+            left_child: The new left child.
+            right_child: The new right child.
+        """
+        parent.left = left_child
+        left_child.parent = parent
+        parent.right = right_child
+        right_child = parent
+
+    def _join(
+        self,
+        root_left: RedBlackTreeNode,
+        root_right: RedBlackTreeNode,
+        new_node: RedBlackTreeNode,
+    ) -> RedBlackTreeNode:
+        """Join two non-empty red-black trees.
+
+        Args:
+            root_left: The root of the left tree (containing the smaller elements).
+            root_right: The root of the right tree (containing the larger elements).
+            new_node: The new node used to join the trees.
+
+        Returns:
+            The root of the joined tree.
+        """
+        if root_left.black_height > root_right.black_height:
+            new_root = self._join_right(root_left, root_right, new_node)
+            new_root.turn_black()
+        elif root_left.black_height < root_right.black_height:
+            new_root = self._join_left(root_left, root_right, new_node)
+            new_root.turn_black()
+        else:
+            new_root = new_node
+            self._join_subtrees(new_root, root_left, root_right)
+
+        return new_root
+
+    def _join_right(
+        self,
+        root_left: RedBlackTreeNode,
+        root_right: RedBlackTreeNode,
+        new_node: RedBlackTreeNode,
+    ) -> RedBlackTreeNode:
+        """Recursively move done the right spine of the left tree to join the trees.
+
+        Args:
+            root_left: The root of the left tree (containing the smaller elements).
+            root_right: The root of the right tree (containing the larger elements).
+            new_node: The new node used to join the trees.
+
+        Returns:
+            The root of the joined tree.
+        """
+        if root_left.is_black and root_left.black_height == root_right.black_height:
+            new_node.turn_red()
+            self._join_subtrees(new_node, root_left, root_right)
+            return new_node
+
+        root_left.right = self._join_right(root_left.right, root_right, new_node)
+        root_left.right.parent = root_left
+
+        if root_left.is_black and root_left.right.is_red and root_left.right.right.is_red:
+            root_left.right.right.turn_black()
+            return self._rotate_subtree(root_left, 0)  # left rotation
+
+        return root_left
+
+    def _join_left(
+        self,
+        root_left: RedBlackTreeNode,
+        root_right: RedBlackTreeNode,
+        new_node: RedBlackTreeNode,
+    ) -> RedBlackTreeNode:
+        """Recursively move done the left spine of the right tree to join the trees.
+
+        Args:
+            root_left: The root of the left tree (containing the smaller elements).
+            root_right: The root of the right tree (containing the larger elements).
+            new_node: The new node used to join the trees.
+
+        Returns:
+            The root of the joined tree.
+        """
+        if root_right.is_black and root_left.black_height == root_right.black_height:
+            new_node.turn_red()
+            self._join_subtrees(new_node, root_left, root_right)
+            return new_node
+
+        root_right.left = self._join_left(root_left, root_right.left, new_node)
+        root_right.left.parent = root_right
+
+        if root_right.is_black and root_right.left.is_red and root_right.left.left.is_red:
+            root_right.left.left.turn_black()
+            return self._rotate_subtree(root_right, 1)  # right rotation
+
+        return root_right
