@@ -20,7 +20,30 @@ class TreeSet(BaseBinarySearchTree):
     node_class = BinaryNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
 
-    def rotate_right(self, node: BinaryNode) -> BinaryNode:
+    def check_integrity(self, verbose: bool = False) -> bool:
+        """Integrity check of the tree.
+
+        Checks whether all children have a correct parent reference and the size and heigth is
+        correct in all subtrees. Additionally, the AVL property is checked. Intended for debugging
+        and testing purpose.
+
+        Args:
+            verbose: If True print where the integrity check has failed.
+
+        Returns:
+            Whether all integrity checks have been passed.
+        """
+        super().check_integrity(verbose=verbose)
+
+        for node in self._inorder_traversal():
+            if abs(node.balance()) > 1:
+                if verbose:
+                    print(f"node {node} is unbalanced")
+                return False
+
+        return True
+
+    def _rotate_right(self, node: BinaryNode) -> BinaryNode:
         """Perform a right rotation on the node.
 
         Args:
@@ -38,7 +61,7 @@ class TreeSet(BaseBinarySearchTree):
 
         return left_child
 
-    def rotate_left(self, node: BinaryNode) -> BinaryNode:
+    def _rotate_left(self, node: BinaryNode) -> BinaryNode:
         """Perform a left rotation on the node.
 
         Args:
@@ -71,19 +94,19 @@ class TreeSet(BaseBinarySearchTree):
         if balance > 1:
             if node.left.balance() >= 0:
                 # single rotation needed
-                node = self.rotate_right(node)
+                node = self._rotate_right(node)
             else:
                 # double rotation needed
-                node.left = self.rotate_left(node.left)
-                node = self.rotate_right(node)
+                node.left = self._rotate_left(node.left)
+                node = self._rotate_right(node)
         elif balance < -1:
             if node.right.balance() <= 0:
                 # single rotation needed
-                node = self.rotate_left(node)
+                node = self._rotate_left(node)
             else:
                 # double rotation needed
-                node.right = self.rotate_right(node.right)
-                node = self.rotate_left(node)
+                node.right = self._rotate_right(node.right)
+                node = self._rotate_left(node)
 
         return node
 
@@ -191,27 +214,6 @@ class TreeSet(BaseBinarySearchTree):
             node = self._rebalance(node)
 
         return node
-
-    def check_integrity(self, verbose: bool = False) -> bool:
-        """Integrity check of the tree.
-
-        Checks whether all children have a correct parent reference and the size and heigth is
-        correct in all subtrees. Additionally, the AVL property is checked. Intended for debugging
-        purpose.
-
-        Args:
-            verbose: If True print where the integrity check has failed.
-
-        Returns:
-            Whether all integrity checks have been passed.
-        """
-        super().check_integrity(verbose=verbose)
-
-        for node in self._inorder_traversal():
-            if abs(node.balance()) > 1:
-                if verbose:
-                    print(f"node {node} is unbalanced")
-                return False
 
 
 class TreeDictNode(BinaryNode):

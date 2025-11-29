@@ -5,7 +5,8 @@ import unittest
 import numpy as np
 
 from tralda.datastructures.bst.simple import BinarySearchTree
-from tralda.datastructures.bst.avl import TreeSet
+from tralda.datastructures.bst.avl import TreeSet as AVLTreeSet
+from tralda.datastructures.bst.red_black import TreeSet as RBTreeSet
 
 
 class TestTrees(unittest.TestCase):
@@ -30,11 +31,16 @@ class TestTrees(unittest.TestCase):
 
         self.assertEqual(self.reference_after_removal, [x for x in tree])
 
+        self.assertTrue(tree.check_integrity(verbose=True))
+
     def test_simple_search_tree(self):
         self._insertion_and_removal(BinarySearchTree)
 
     def test_avl_tree(self):
-        self._insertion_and_removal(TreeSet)
+        self._insertion_and_removal(AVLTreeSet)
+
+    def test_red_black_tree(self):
+        self._insertion_and_removal(RBTreeSet)
 
 
 if __name__ == "__main__":

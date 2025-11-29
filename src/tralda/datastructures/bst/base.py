@@ -495,13 +495,13 @@ class BaseBinarySearchTree:
         return current
 
     def _inorder_traversal(self) -> Iterator[BinaryNode]:
-        """Generator for the nodes in a pre-order traversal of the tree.
+        """Generator for the nodes in a in-order traversal of the tree.
 
         Yields:
-            All nodes of the tree in pre-order.
+            All nodes of the tree in in-order.
         """
 
-        def _inorder(node):
+        def _inorder(node: BinaryNode) -> Iterator[BinaryNode]:
             if node.left:
                 yield from _inorder(node.left)
             yield node
@@ -510,6 +510,25 @@ class BaseBinarySearchTree:
 
         if self.root:
             yield from _inorder(self.root)
+        else:
+            yield from []
+
+    def _postorder_traversal(self) -> Iterator[BinaryNode]:
+        """Generator for the nodes in a post-order traversal of the tree.
+
+        Yields:
+            All nodes of the tree in post-order.
+        """
+
+        def _postorder(node: BinaryNode) -> Iterator[BinaryNode]:
+            if node.left:
+                yield from _postorder(node.left)
+            if node.right:
+                yield from _postorder(node.right)
+            yield node
+
+        if self.root:
+            yield from _postorder(self.root)
         else:
             yield from []
 
@@ -568,10 +587,10 @@ class BaseBinarySearchTree:
         return _newick(self.root) if self.root else ""
 
     def check_integrity(self, verbose: bool = False) -> bool:
-        """Recursive integrity check of the tree.
+        """Integrity check of the tree.
 
-        Checks whether the size and heigth is correct in all subtrees. Intended for debugging
-        purpose.
+        Checks whether the size and heigth is correct in all subtrees. Intended for debugging and
+        testing purpose.
 
         Args:
             verbose: If True print where the integrity check has failed.
@@ -579,7 +598,7 @@ class BaseBinarySearchTree:
         Returns:
             Whether all integrity checks have been passed.
         """
-        for node in self._inorder_traversal():
+        for node in self._postorder_traversal():
             height_left, height_right, size = 0, 0, 1
 
             if node.left:
