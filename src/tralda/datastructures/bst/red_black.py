@@ -1,6 +1,6 @@
 """Red-black tree implementation.
 
-Balanced binary search tree implementation of a set (TreeSet) and dictionary (TreeDict).
+Balanced binary search tree implementation of a set (TreeSet).
 
 References:
     [1] https://en.wikipedia.org/wiki/Red-black_tree
@@ -109,6 +109,17 @@ class RedBlackTreeNode(BinaryNode):
 
         self._is_red = False
 
+    def detach_children(self) -> None:
+        """Disconnect this node from its children."""
+        if self.left:
+            self.left.parent = None
+            self.left = None
+        if self.right:
+            self.right.parent = None
+            self.right = None
+
+        self.update()
+
     def update(self) -> None:
         """Update height, size, and black height of (the subtree under) the node."""
         super().update()
@@ -139,6 +150,83 @@ class TreeSet(BaseBinarySearchTree):
     def __init__(self) -> None:
         """Constructor of the TreeSet class (red-black tree implementation)."""
         super().__init__()
+
+    @classmethod
+    def join(cls, tree_left: TreeSet, tree_right: TreeSet, key: Any | None = None) -> TreeSet:
+        """Join function for two red-black trees.
+
+        Join two red-black trees T_L and T_R with x < key < y for all x in T_L and y in T_R. The
+        resulting tree will contain all keys in T_L and T_R and additionally the new provided key.
+        If no key is provided, a dummy key will be added during the join operation, which will be
+        removed in the end, keeping the total O(log(n)) time complexity.
+
+        NOTE: The input red-black tree instances should no longer be used afterwards.
+
+        Args:
+            tree_left: The tree T_L with the smaller elements.
+            tree_right: The tree T_R with the larger elements.
+            key: The new key to be added. If None, a dummy node will be temporarily inserted and
+                removed in the end.
+
+        Raises:
+            TypeError: If one of the two trees is not an instance of the correct red-black tree
+                type.
+
+        Returns:
+            The joined tree.
+
+        References:
+            .. [1] https://en.wikipedia.org/wiki/Red-black_tree#Set_operations_and_bulk_operations
+        """
+        if not isinstance(tree_left, cls):
+            raise TypeError(f"tree_left must be of type {cls}, but is {type(tree_left)}")
+        if not isinstance(tree_right, cls):
+            raise TypeError(f"tree_right must be of type {cls}, but is {type(tree_right)}")
+
+        new_node = cls.node_class(0) if key is None else cls.node_class(key)
+
+        tree = cls._join(tree_left, tree_right, new_node)
+
+        # if no key was provided, remove the dummy node
+        if key is None:
+            tree._delete_node(new_node)
+
+        return tree
+
+    def split_at_node(
+        self,
+        node: RedBlackTreeNode,
+        keep_node_left: bool = False,
+        keep_node_right: bool = False,
+    ) -> tuple[TreeSet, TreeSet]:
+        """Split the tree at a given node.
+
+        Considering the key of the provided node, the items x in the first set (left tree) will
+        satisfy x <= key, and the items x in the second set (right tree) will satisfy x >= key.
+        The key itself is only optionally retained in one of the two sets.
+
+        NOTE: The red-black tree instance should no longer be used afterwards.
+
+        Args:
+            node: The node at which to split the tree.
+            keep_node_left: Whether to keep the provided node in the set with the smaller keys
+                (left tree).
+            keep_node_right: Whether to keep the provided node in the set with the larger keys
+                (right tree).
+
+        Raises:
+            ValueError: If both keep_node_left and keep_node_right are set to True.
+
+        Returns:
+            A tuple containing the left tree and the right tree (i.e., the sets after splitting).
+
+        References:
+            .. [1] https://en.wikipedia.org/wiki/Red-black_tree#Set_operations_and_bulk_operations
+        """
+        if keep_node_left and keep_node_right:
+            raise ValueError("node cannot be kept in both left are right tree")
+
+        return self._split_at_node(node, keep_node_left, keep_node_right)
 
     def check_integrity(self, verbose: bool = False) -> bool:
         """Integrity check of the tree.
@@ -187,65 +275,6 @@ class TreeSet(BaseBinarySearchTree):
                 return False
 
         return True
-
-    @classmethod
-    def join(cls, tree_left: TreeSet, tree_right: TreeSet, key: Any | None = None) -> TreeSet:
-        """Join function for two red-black trees.
-
-        Join two red-black trees T_L and T_R with x < key < y for all x in T_L and y in T_R. The
-        resulting tree will contain all keys in T_L and T_R and additionally the new provided key.
-        If no key is provided, a dummy key will be added during the join operation, which will be
-        removed in the end, keeping the total O(log(n)) time complexity.
-
-        NOTE: The input red-black tree instances should no longer be used afterwards.
-
-        Args:
-            tree_left: The tree T_L with the smaller elements.
-            tree_right: The tree T_R with the larger elements.
-            key: The new key to be added. If None, a dummy node will be temporarily inserted and
-                removed in the end.
-
-        Raises:
-            TypeError: If one of the two trees is not an instance of the correct red-black tree
-                type.
-
-        Returns:
-            The joined tree.
-        """
-        if not isinstance(tree_left, cls):
-            raise TypeError(f"tree_left must be of type {cls}, but is {type(tree_left)}")
-        if not isinstance(tree_right, cls):
-            raise TypeError(f"tree_right must be of type {cls}, but is {type(tree_right)}")
-
-        new_node = cls.node_class(0) if key is None else cls.node_class(key)
-
-        # both trees are empty --> re-use instance tree_left
-        if not tree_left and not tree_right:
-            tree_left.root = new_node
-            return tree_left
-        # only tree_right is non-empty --> insert new_node as new smallest element
-        elif not tree_left:
-            parent = tree_right._smallest_in_subtree(tree_right.root)
-            tree_right._insert_node(new_node, parent, 0)
-            return tree_right
-        # only tree_left is non-empty --> insert new_node as new largest element
-        elif not tree_right:
-            parent = tree_left._largest_in_subtree(tree_left.root)
-            tree_left._insert_node(new_node, parent, 1)
-            return tree_left
-
-        # create a new tree if both trees are non-empty
-        tree = cls()
-        tree.root = tree._join(tree_left.root, tree_right.root, new_node)
-
-        # update all nodes on the path from the new node to the root
-        tree._traverse_to_root_and_update(new_node)
-
-        # if no key was provided, remove the dummy node
-        if key is None:
-            tree._delete_node(new_node)
-
-        return tree
 
     def _copy_subtree(self, node: RedBlackTreeNode) -> RedBlackTreeNode:
         """Recursive auxiliary function to copy a subtree under the provided node.
@@ -358,9 +387,25 @@ class TreeSet(BaseBinarySearchTree):
         # create and insert the new node, rebalance, update nodes on the way to the root
         new_node = self.node_class(key)
         self._insert_node(new_node, parent, direction)
-        self._traverse_to_root_and_update(new_node)
 
     def _insert_node(
+        self,
+        node: RedBlackTreeNode,
+        parent: RedBlackTreeNode | None,
+        direction: int,
+    ):
+        """Insert a node at the specified location, rebalance, and update the nodes.
+
+        Args:
+            node: The new node to insert.
+            parent: The parent below which to insert the new node.
+            direction: The direction where to insert the new node below parent (0 = left, 1 =
+                right).
+        """
+        self._insert_node_and_rebalance(node, parent, direction)
+        self._traverse_to_root_and_update(node)
+
+    def _insert_node_and_rebalance(
         self,
         node: RedBlackTreeNode,
         parent: RedBlackTreeNode | None,
@@ -590,11 +635,53 @@ class TreeSet(BaseBinarySearchTree):
         parent.turn_black()
         distant_nephew.turn_black()
 
+    @classmethod
+    def _join(cls, tree_left: TreeSet, tree_right: TreeSet, new_node: RedBlackTreeNode) -> TreeSet:
+        """Join function for two red-black trees.
+
+        Join two red-black trees T_L and T_R using a new node. The resulting tree will contain all
+        keys in T_L, the new key, and all keys in T_R (order w.r.t. to an in-order traversal).
+
+        Args:
+            tree_left: The tree T_L.
+            tree_right: The tree T_R.
+            key: The new node the will be between the nodes of T_L and T_R in an in-order traversal.
+
+        Returns:
+            The joined tree.
+        """
+        # both trees are empty --> re-use instance tree_left
+        if not tree_left and not tree_right:
+            tree_left.root = new_node
+            assert tree_left.check_integrity()
+            return tree_left
+        # only tree_right is non-empty --> insert new_node as new smallest element
+        elif not tree_left:
+            parent = tree_right._smallest_in_subtree(tree_right.root)
+            tree_right._insert_node(new_node, parent, 0)
+            assert tree_right.check_integrity()
+            return tree_right
+        # only tree_left is non-empty --> insert new_node as new largest element
+        elif not tree_right:
+            parent = tree_left._largest_in_subtree(tree_left.root)
+            tree_left._insert_node(new_node, parent, 1)
+            assert tree_left.check_integrity()
+            return tree_left
+
+        # create a new tree if both trees are non-empty
+        tree = cls()
+        tree.root = tree._join_nonempty_trees(tree_left.root, tree_right.root, new_node)
+
+        # update all nodes on the path from the new node to the root
+        tree._traverse_to_root_and_update(new_node)
+
+        return tree
+
     def _join_subtrees(
         self,
         parent: RedBlackTreeNode,
-        left_child: RedBlackTreeNode,
-        right_child: RedBlackTreeNode,
+        left_child: RedBlackTreeNode | None,
+        right_child: RedBlackTreeNode | None,
     ) -> None:
         """Attach two nodes to a common parent.
 
@@ -604,11 +691,14 @@ class TreeSet(BaseBinarySearchTree):
             right_child: The new right child.
         """
         parent.left = left_child
-        left_child.parent = parent
-        parent.right = right_child
-        right_child = parent
+        if left_child:
+            left_child.parent = parent
 
-    def _join(
+        parent.right = right_child
+        if right_child:
+            right_child = parent
+
+    def _join_nonempty_trees(
         self,
         root_left: RedBlackTreeNode,
         root_right: RedBlackTreeNode,
@@ -652,7 +742,9 @@ class TreeSet(BaseBinarySearchTree):
         Returns:
             The root of the joined tree.
         """
-        if root_left.is_black and root_left.black_height == root_right.black_height:
+        if not root_left or (
+            root_left.is_black and root_left.black_height == root_right.black_height
+        ):
             new_node.turn_red()
             self._join_subtrees(new_node, root_left, root_right)
             return new_node
@@ -682,7 +774,9 @@ class TreeSet(BaseBinarySearchTree):
         Returns:
             The root of the joined tree.
         """
-        if root_right.is_black and root_left.black_height == root_right.black_height:
+        if not root_right or (
+            root_right.is_black and root_left.black_height == root_right.black_height
+        ):
             new_node.turn_red()
             self._join_subtrees(new_node, root_left, root_right)
             return new_node
@@ -695,3 +789,76 @@ class TreeSet(BaseBinarySearchTree):
             return self._rotate_subtree(root_right, 1)  # right rotation
 
         return root_right
+
+    def _split_at_node(
+        self,
+        node: RedBlackTreeNode,
+        keep_node_left: bool,
+        keep_node_right: bool,
+    ) -> tuple[TreeSet, TreeSet]:
+        """Split the tree at a given node.
+
+        Args:
+            node: The node at which to split the tree.
+            keep_node_left: Whether to keep the provided node in the left tree.
+            keep_node_right: Whether to keep the provided node in the right tree.
+
+        Returns:
+            A tuple containing the left tree and the right tree (i.e., the sets after splitting).
+        """
+        cls = self.__class__
+        tree_left = cls()
+        tree_right = cls()
+
+        # initialize the two trees with the subtrees of the node's children
+        tree_left.root = node.left
+        tree_right.root = node.right
+        node.detach_children()
+        node.turn_black()
+
+        parent = node.parent
+        if parent:
+            direction_parent = node.direction
+            parent.set_child(direction_parent, None)
+            node.parent = None
+
+        # keep the node in the left tree
+        if keep_node_left and not tree_left:
+            tree_left.root = node
+        elif keep_node_left:
+            rightmost_node = tree_left._largest_in_subtree(tree_left.root)
+            tree_left._insert_node(node, rightmost_node, 1)
+
+        # keep the node in the right tree
+        if keep_node_right and not tree_right:
+            tree_right.root = node
+        elif keep_node_right:
+            leftmost_node = tree_right._smallest_in_subtree(tree_right.root)
+            tree_right._insert_node(node, leftmost_node, 0)
+
+        # now traverse to the root
+        while parent:
+            node = parent
+            direction = direction_parent
+            parent = node.parent
+            if parent:
+                direction_parent = node.direction
+                parent.set_child(direction_parent, None)
+                node.parent = None
+
+            other_child = node.child(1 - direction)
+            node.detach_children()
+            node.turn_black()
+
+            # create a subtree rooted at other_child that can be joined with tree_left / tree_right
+            subtree = cls()
+            subtree.root = other_child
+
+            # coming from left --> node and subtree have to go into the right subtree
+            if direction == 0:
+                tree_right = cls._join(tree_right, subtree, node)
+            # coming from right --> node and subtree have to go into the left subtree
+            else:
+                tree_left = cls._join(subtree, tree_left, node)
+
+        return tree_left, tree_right
