@@ -13,6 +13,36 @@ import networkx as nx
 
 
 # --------------------------------------------------------------------------------------------------
+#                                        Miscellaneous
+# --------------------------------------------------------------------------------------------------
+
+
+def sort_edge(u: Any, v: Any) -> tuple[Any, Any]:
+    """Sort u and v in an edge (u, v) such that the smaller element comes first.
+
+    If u and v are not comparable, the are sorted such the the object with the smaller object id
+    comes first.
+
+    Args:
+        u: The first node.
+        v: The second node.
+
+    Returns:
+        The sorted edge as a tuple.
+    """
+    try:
+        if u < v:
+            return u, v
+        else:
+            return v, u
+    except TypeError:
+        if id(u) < id(v):
+            return u, v
+        else:
+            return v, u
+
+
+# --------------------------------------------------------------------------------------------------
 #                                      Adjacency matrix
 # --------------------------------------------------------------------------------------------------
 

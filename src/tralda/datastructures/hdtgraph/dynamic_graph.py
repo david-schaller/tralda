@@ -2,256 +2,479 @@
 
 Implementation of the poly-logarithmic dynamic graph structure described by Holm et al. 2001.
 The datastructure uses Euler tour trees (Henzinger and King 1999) to determine in O(log n) time
-whether to given nodes are connected.
+whether two given nodes are connected.
 
 References:
-    - Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup.
-      Poly-logarithmic deterministic fully-dynamic algorithms for
-      connectivity, minimum spanning tree, 2-edge, and biconnectivity.
-      J. ACM, 48(4):723–760, July 2001.
-    - Monika Rauch Henzinger, Valerie King. Randomized fully dynamic graph
-      algorithms with polylogarithmic time per operation. J. ACM 46(4)
-      July 1999. 502–536.
+    .. [1] Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic deterministic
+           fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge, and
+           biconnectivity. J. ACM, 48(4):723-760, July 2001.
+    .. [2] Monika Rauch Henzinger, Valerie King. Randomized fully dynamic graph algorithms with
+           polylogarithmic time per operation. J. ACM 46(4). July 1999. 502-536.
 """
 
 from __future__ import annotations
 
+from typing import Any
+from typing import Iterator
+
+from tralda.datastructures.doubly_linked import DLList
 from tralda.datastructures.hdtgraph.et_tree import ETTree
 from tralda.datastructures.hdtgraph.et_tree import ETTreeNode
-from tralda.datastructures.hdtgraph.et_tree import DGNode
+from tralda.datastructures.hdtgraph.et_tree import EdgeOccurrences
 from tralda.datastructures.tree import Tree
+from tralda.utils.graph_tools import sort_edge
 
 
-class Edge:
-    __slots__ = ["e", "level", "tree_edge", "dllist_entries"]
+class _Edge:
+    """Class for storing edge attributes and associated references."""
 
-    def __init__(self, e, level=0, tree_edge=False):
+    __slots__ = ["e", "level", "is_tree_edge", "dllist_entries"]
+
+    def __init__(
+        self,
+        e: tuple[Any, Any],
+        level: int = 0,
+        is_tree_edge: bool = False,
+    ) -> None:
+        """Constructor od the _Edge class.
+
+        Args:
+            e: A tuple containing the two endpoints of the edge.
+            level: The level of the edge.
+            is_tree_edge: Whether the edge is a tree edge.
+        """
         self.e = e  # edge as tuple (u, v)
-        self.level = level  # current level of this edge
-        self.tree_edge = tree_edge  # is it a tree edge
+        self.level = level
+        self.is_tree_edge = is_tree_edge
 
         # reference to doubly-linked-list entries (both ends)
         self.dllist_entries = None
 
-    def __eq__(self, other):
-        return self.e == other.e
 
-    def __hash__(self):
-        return hash(self.e)
+class _Level:
+    """Class for maintaining the Euler Tour tree forest of a level in the HDT datastructure."""
 
-    def __repr__(self):
-        tree = " tree" if self.tree_edge else ""
-        return "{},{}{}".format(self.e, self.level, tree)
+    def __init__(self, index: int) -> None:
+        """Constructor of the _Level class.
 
-
-class Level:
-    def __init__(self, index):
+        Args:
+            index: The index of the level in the HDT datastructure.
+        """
         self.index = index
-        self.forest = set()  # spanning forest (ET trees)
-        self.nodedict = dict()  # maps value --> DGNode (of this level)
+        self.forest: set[ETTree] = set()
 
-    def connected(self, u, v):
-        """Determine whether u and v are connected on this level."""
-        node1, node2 = None, None
-        if u in self.nodedict:
-            node1 = self.nodedict[u]
+        self.node2active_occurrence: dict[Any, ETTreeNode] = {}
+        self.node2tree_edges: dict[Any, DLList] = {}
+        self.node2nontree_edges: dict[Any, DLList] = {}
 
-        if v in self.nodedict:
-            node2 = self.nodedict[v]
+        # references to the occurrences of the nodes in the Euler Tour tree
+        self.edge2occurrences: dict[tuple[Any, Any], EdgeOccurrences] = {}
 
-        if not (node1 and node2):
+    def connected(self, u: Any, v: Any) -> bool:
+        """Determine whether u and v are connected on this level.
+
+        Args:
+            u: The first element.
+            v: The second element.
+
+        Returns:
+            Whether u and v are connected on this level.
+        """
+        ettree_node1 = self.node2active_occurrence.get(u)
+        ettree_node2 = self.node2active_occurrence.get(v)
+
+        if not (ettree_node1 and ettree_node2):
             return False
 
-        return node1.active_occ.get_root() is node2.active_occ.get_root()
+        return ettree_node1.get_root() is ettree_node2.get_root()
 
-    def add_node(self, v):
-        """Add a loose node on this level."""
-        new_etnode = ETTreeNode(v, active=True)
-        self.nodedict[v] = DGNode(v, active_occ=new_etnode)
-        self.forest.add(
-            ETTree(root=new_etnode, nodedict=self.nodedict, start=new_etnode, end=new_etnode)
-        )
+    def add_node(self, v: Any) -> None:
+        """Add a node and add it as a single-node Euler Tour tree to the forest on this level.
 
-    def connect(self, u, v, edge=None):
-        """Connect to ETTs by the edge (u,v) on this level.
-
-        Keyword argument:
-            edge - reference to the edge (u,v), use this if the edge is
-                   a tree edge on this level, default=None
+        Args:
+            u: The element to add as a node on this level.
         """
-        if u not in self.nodedict:
+        ett_node = self.add_loose_node(v)
+
+        # Euler Tour tree that will contain only the new node
+        ett = ETTree()
+        ett.root = ett_node
+
+        # the root stores a reference to the ETTree instance
+        ett_node.ett = ett
+
+        self.forest.add(ett)
+
+    def add_loose_node(self, v: Any) -> ETTree:
+        """Add a loose node on this level.
+
+        This function does not create a Euler Tour tree that contains the new node.
+
+        Args:
+            u: The element to add as a node on this level.
+        """
+        ett_node = ETTreeNode(v, active=True)
+
+        self.node2active_occurrence[v] = ett_node
+        self.node2tree_edges[v] = DLList()
+        self.node2nontree_edges[v] = DLList()
+
+        return ett_node
+
+    def connect(self, u: Any, v: Any, edge: _Edge | None = None) -> None:
+        """Connect two Euler Tour trees by the edge (u, v) on this level.
+
+        Args:
+            u: The first element.
+            v: The second element.
+            edge: Reference to the edge (u, v). Use this if the edge is a tree edge on this level.
+        """
+        if u not in self.node2active_occurrence:
             self.add_node(u)
 
-        if v not in self.nodedict:
+        if v not in self.node2active_occurrence:
             self.add_node(v)
 
-        ett1 = self.nodedict[u].active_occ.get_root().ett
-        ett2 = self.nodedict[v].active_occ.get_root().ett
+        ett1 = self.node2active_occurrence[u].get_root().ett
+        ett2 = self.node2active_occurrence[v].get_root().ett
 
         if ett1 is ett2:
-            print("Nodes", u, "and", v, "on level", self.index, "are already connected!")
-            return
+            raise RuntimeError(f"nodes {u} and {v} on level {self.index} are already connected")
 
-        new_ett = ETTree.link(ett1, ett2, u, v)
-        if not new_ett:
-            print("Link operation was not successful!")
-            return
+        new_ett = ett1.join_by_edge(
+            self.node2active_occurrence[u],
+            self.node2active_occurrence[v],
+            ett2,
+            self.node2active_occurrence,
+            self.edge2occurrences,
+        )
 
         if edge:
             edge.dllist_entries = (
-                self.nodedict[u].tree_edges.append(edge),
-                self.nodedict[v].tree_edges.append(edge),
+                self.node2tree_edges[u].append(edge),
+                self.node2tree_edges[v].append(edge),
             )
 
         self.forest.remove(ett1)
         self.forest.remove(ett2)
         self.forest.add(new_ett)
 
-        return True
+    def add_nontree_edge(self, edge: _Edge) -> None:
+        """Add a non-tree edge to its end points on this level.
 
-    def add_nontree_edge(self, e):
-        """Add a non-tree edge to its end points on this level."""
-
-        u, v = e.e[0], e.e[1]
-        if u not in self.nodedict:  # Can this case ever happen?
+        Args:
+            edge: The edge to add as a non-tree edge on this level.
+        """
+        u, v = edge.e
+        if u not in self.node2active_occurrence:  # Can this case ever happen?
             self.add_node(u)
-        if v not in self.nodedict:  # Can this case ever happen?
+        if v not in self.node2active_occurrence:  # Can this case ever happen?
             self.add_node(v)
-        e.dllist_entries = (
-            self.nodedict[u].nontree_edges.append(e),
-            self.nodedict[v].nontree_edges.append(e),
+
+        edge.dllist_entries = (
+            self.node2nontree_edges[u].append(edge),
+            self.node2nontree_edges[v].append(edge),
         )
 
-    def cut(self, u, v):
-        """Cut the tree edge (u,v) on this level."""
-        if not (u in self.nodedict and v in self.nodedict):
-            print("Could not find nodes", u, "and", v, "on level", self.index, "!")
-            return
+    def cut(self, u: Any, v: Any) -> None:
+        """Cut the tree edge (u, v) on this level.
 
-        ett1 = self.nodedict[u].active_occ.get_root().ett
-        ett2 = self.nodedict[v].active_occ.get_root().ett
+        Args:
+            u: The first endpoint of the edge.
+            v: The second endpoint of the edge.
+        """
+        if u not in self.node2active_occurrence:
+            raise KeyError(f"could not find node {u} on level {self.index}")
 
-        if ett1 is not ett2:
-            print("Nodes", u, "and", v, "are not connected on level", self.index, "!")
+        if v not in self.node2active_occurrence:
+            raise KeyError(f"could not find node {v} on level {self.index}")
 
-        result = ett1.cut(u, v)
+        ett = self.node2active_occurrence[u].get_root().ett
 
-        if not result:
-            print("Nodes", u, "and", v, "on level", self.index, "are not connected!")
-            return
+        if ett is not self.node2active_occurrence[v].get_root().ett:
+            raise RuntimeError(f"nodes {u} and {v} are not connected on level {self.index}")
 
-        # result[0] is the original instance and therefore already in the forest
-        self.forest.add(result[1])
+        ett1, ett2 = ett.delete_edge(
+            self.edge2occurrences[u, v],
+            self.node2active_occurrence,
+            self.edge2occurrences,
+        )
 
-        return True
+        self.forest.remove(ett)
+        self.forest.add(ett1)
+        self.forest.add(ett2)
 
 
 class HDTGraph:
-    def __init__(self):
-        self.levels = [Level(0)]
-        self.edges = dict()
+    """Undirected graph datastructure for poly-logarithmic connectivity queries.
 
-    def get_nodes(self):
-        """Generator for the nodes in the graph."""
-        yield from self.levels[0].nodedict.keys()
+    Implementation of the poly-logarithmic dynamic graph structure (HDT datastructure).
 
-    def get_edges(self):
-        """Generator for the edges in the graph."""
-        yield from self.edges.keys()
+    References:
+        .. [1] Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic
+            deterministic fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge,
+            and biconnectivity. J. ACM, 48(4):723-760, July 2001.
+    """
 
-    def has_node(self, v):
-        """Determine whether a node is in the graph."""
-        return v in self.levels[0].nodehash
+    def __init__(self) -> None:
+        """Constructor of the undirected graph for poly-logarithmic connectivity queries."""
+        self._levels: list[_Level] = [_Level(0)]
+        self._edges: dict[tuple[Any, Any], _Edge] = dict()
 
-    def has_edge(self, u, v):
-        """Determine whether an edge is in the graph."""
-        try:
-            if u > v:
-                u, v = v, u
-        except TypeError:
-            if id(u) > id(v):
-                u, v = v, u
+    def get_nodes(self) -> Iterator[Any]:
+        """Generator for the nodes in the graph.
 
-        return (u, v) in self.edges
+        Yields:
+            The nodes in the graph.
+        """
+        yield from self._levels[0].node2active_occurrence.keys()
 
-    def connected(self, u, v, level=0):
-        """Determine in O(log n) whether u and v are connected in the graph."""
-        return self.levels[level].connected(u, v)
+    def get_edges(self) -> Iterator[tuple[Any, Any]]:
+        """Generator for the edges in the graph.
 
-    def get_component(self, u):
-        """Return the connected component (ETT) of a given value."""
-        if u in self.levels[0].nodedict:
-            return self.levels[0].nodedict[u].active_occ.get_root().ett
-        else:
-            return None
+        Yields:
+            The edges in the graph.
+        """
+        yield from self._edges.keys()
 
-    def insert_node(self, v):
-        """Insert a loose node into the graph."""
-        if v in self.levels[0].nodedict:
-            print("Node", v, "is already in the graph.")
-        else:
-            self.levels[0].add_node(v)
+    def has_node(self, node: Any) -> bool:
+        """Determine whether a node is in the graph.
 
-    def insert_edge(self, u, v):
-        """Insert an edge into the graph."""
-        try:
-            if u > v:
-                u, v = v, u
-        except TypeError:
-            if id(u) > id(v):
-                u, v = v, u
+        Args:
+            node: The node for which to check if it is in the graph.
+
+        Return:
+            Whether the node is contained in the graph.
+        """
+        return node in self._levels[0].node2active_occurrence
+
+    def has_edge(self, u: Any, v: Any) -> bool:
+        """Determine whether an edge is in the graph.
+
+        Args:
+            u: The first node.
+            v: The second node.
+
+        Returns:
+            Whether the graph has the undirected edge (u, v).
+        """
+        return sort_edge(u, v) in self._edges
+
+    def connected(self, u: Any, v: Any, level: int = 0) -> bool:
+        """Determine in O(log n) whether u and v are connected in the graph.
+
+        Args:
+            u: The first node.
+            v: The second node.
+            level: If provided, check for connectivity on that level. The default is 0 which checks
+                for connectivity in the full current graph.
+
+        Returns:
+            Whether u and v are connected by a path in the graph.
+        """
+        return self._levels[level].connected(u, v)
+
+    def get_component(self, node: Any) -> ETTree:
+        """Return the connected component (ETT) of a given value.
+
+        Args:
+            node: A node in the graph.
+
+        Returns:
+            The connected component that contains the node.
+
+        Raises:
+            KeyError: If the node is not in the graph.
+        """
+        active_occurence = self._levels[0].node2active_occurrence.get(node)
+
+        if active_occurence is None:
+            raise KeyError(f"{node} is not a node in the graph")
+
+        return active_occurence.get_root().ett if active_occurence is not None else None
+
+    def insert_node(self, node: Any) -> None:
+        """Insert a loose node into the graph.
+
+        Args:
+            node: The node to add to the graph.
+
+        Raises:
+            KeyError: If the node is already in the graph.
+        """
+        if node in self._levels[0].node2active_occurrence:
+            raise KeyError(f"node {node} is already in the graph")
+
+        self._levels[0].add_node(node)
+
+    def insert_edge(self, u: Any, v: Any) -> None:
+        """Insert an edge (u, v) into the graph.
+
+        Args:
+            u: The first node.
+            v: The second node.
+        """
+        u, v = sort_edge(u, v)
         e = (u, v)
-        if e in self.edges:  # edge already exists
+
+        if e in self._edges:
             return
 
         if self.connected(u, v):
-            new_edge = Edge(e, tree_edge=False)  # new edge on level 0
-            self.levels[0].add_nontree_edge(new_edge)  # append nontree edge to u and v
+            new_edge = _Edge(e, is_tree_edge=False)  # new edge on level 0
+            self._levels[0].add_nontree_edge(new_edge)  # append nontree edge to u and v
         else:
-            new_edge = Edge(e, tree_edge=True)  # new edge on level 0
-            self.levels[0].connect(u, v, edge=new_edge)  # connect + append tree edge to u and v
-        self.edges[e] = new_edge
+            new_edge = _Edge(e, is_tree_edge=True)  # new edge on level 0
+            self._levels[0].connect(u, v, edge=new_edge)  # connect + append tree edge to u and v
 
-    def delete_edge(self, u, v):
-        """Delete an edge from the graph."""
-        try:
-            if u > v:
-                u, v = v, u
-        except TypeError:
-            if id(u) > id(v):
-                u, v = v, u
-        e = (u, v)
-        if e not in self.edges:  # edge does not exist
+        self._edges[e] = new_edge
+
+    def delete_edge(self, u: Any, v: Any) -> None:
+        """Delete an edge from the graph.
+
+        Args:
+            u: The first endpoint of the edge.
+            v: The second endpoint of the edge.
+        """
+        u, v = sort_edge(u, v)
+        edge = self._edges.get((u, v))
+
+        if edge is None:  # edge does not exist
             return
-        e = self.edges[e]
-        self.edges.pop(e.e)
-        level = self.levels[e.level]
+
+        self._edges.pop(edge.e)
+        level = self._levels[edge.level]
 
         # e is not a tree edge --> simply delete e
-        if not e.tree_edge:
-            if u in level.nodedict:
-                level.nodedict[u].nontree_edges.remove_node(e.dllist_entries[0])
-            if v in level.nodedict:
-                level.nodedict[v].nontree_edges.remove_node(e.dllist_entries[1])
+        if not edge.is_tree_edge:
+            if u in level.node2active_occurrence:
+                level.node2nontree_edges[u].remove_node(edge.dllist_entries[0])
+            if v in level.node2active_occurrence:
+                level.node2nontree_edges[v].remove_node(edge.dllist_entries[1])
 
         # e is a tree edge --> search for replacement
         else:
-            level.nodedict[u].tree_edges.remove_node(e.dllist_entries[0])
-            level.nodedict[v].tree_edges.remove_node(e.dllist_entries[1])
-            # remove e on all levels <= l(e)
+            level.node2tree_edges[u].remove_node(edge.dllist_entries[0])
+            level.node2tree_edges[v].remove_node(edge.dllist_entries[1])
+
+            # remove the edge on all levels <= l(e)
             for i in range(level.index, -1, -1):
-                if not self.levels[i].cut(u, v):
-                    print("Something went wrong on level", i)
-                    return
+                self._levels[i].cut(u, v)
 
             self._replace(u, v, level)
 
-    def _replace(self, u, v, level):
-        """Search for an replacement edge to reconnect u and v on the given level."""
-        ett1 = level.nodedict[u].active_occ.get_root().ett
-        ett2 = level.nodedict[v].active_occ.get_root().ett
+    def add_loose_tree(self, tree: Tree) -> None:
+        """Add the edges of a (rooted) tree as undirected edges.
 
-        if ett1.get_size() <= ett2.get_size():
+        The elements of the 'Tree' instance must not yet be nodes in the graph.
+
+        Args:
+            tree: The tree whoose nodes and edges shall be added to the graph.
+
+        Raises:
+            TypeError: If tree is not an instance of type Tree.
+        """
+        if not isinstance(tree, Tree):
+            raise TypeError("instance of type 'Tree' required")
+
+        # empty tree --> nothing to add
+        if not tree.root:
+            return
+
+        node2active_occurrence = self._levels[0].node2active_occurrence
+        node2tree_edges = self._levels[0].node2tree_edges
+        edge2occurrences = self._levels[0].edge2occurrences
+
+        ett = ETTree()
+
+        # construct the Euler Tour tree
+        previous_ett_node = None
+        for node in tree.euler_generator():
+            if node not in node2active_occurrence:
+                ett_node = self._levels[0].add_loose_node(node)
+            else:
+                ett_node = ETTreeNode(node, active=False)
+
+            ett.add_right_child_and_rebalance(previous_ett_node, ett_node, edge2occurrences)
+            previous_ett_node = ett_node
+
+        # create and add the _Edge instances (which are already represented in the ET tree)
+        for node in tree.preorder():
+            if not node.parent:
+                continue
+
+            e = sort_edge(node, node.parent)
+            edge = _Edge(e, level=0, is_tree_edge=True)
+            edge.dllist_entries = (
+                node2tree_edges[e[0]].append(edge),
+                node2tree_edges[e[1]].append(edge),
+            )
+            self._edges[e] = edge
+
+        # the root stores a reference to the ETTree instance
+        ett.root.ett = ett
+
+        # finally, add the new component to the forest
+        self._levels[0].forest.add(ett)
+
+    def is_connected(self) -> bool:
+        """Determine if the graph is connected (on level 0).
+
+        Returns:
+            Whether the graph is connected.
+        """
+        return len(self._levels[0].forest) == 1
+
+    def component_iterator(self, representative: Any) -> Iterator[Any]:
+        """Iterator over the connected component of a given value.
+
+        Args:
+            representative: A representative node of the component.
+
+        Yields:
+            The nodes in the connected component.
+        """
+        ett = self.get_component(representative)
+
+        if ett is None:
+            raise KeyError(f"representative node {representative} is not contained in the graph")
+
+        for occ in ett:
+            if occ.active:
+                yield occ.key
+
+    def print_ett_forest(self, level: str | int = "all") -> None:
+        """Print Euler tour of the spanning forest.
+
+        Intended for testing purpose.
+
+        Args:
+            level: Level of the ETT spanning forest to be printed. The default is "all" in which
+                case all levels are printed.
+        """
+        if level == "all":
+            for level_i in self._levels:
+                print(f"----- Level {level_i.index} -----")
+                for ett in level_i.forest:
+                    print([occ.key for occ in ett], ett.num_active_occurrences)
+        elif isinstance(level, int):
+            for ett in self._levels[level].forest:
+                print([occ.key for occ in ett], ett.num_active_occurrences)
+        else:
+            ValueError(f"invalid level: {level} of type {type(level)}")
+
+    def _replace(self, u: Any, v: Any, level: _Level) -> None:
+        """Search for an replacement edge to reconnect u and v on the given level.
+
+        Args:
+            u: The first node.
+            v: The second node.
+            level: The level on which to search for a replacement edge of (u, v).
+        """
+        ett1 = level.node2active_occurrence[u].get_root().ett
+        ett2 = level.node2active_occurrence[v].get_root().ett
+
+        if ett1.num_active_occurrences <= ett2.num_active_occurrences:
             smaller_ett = ett1
             root2 = ett2.root
         else:
@@ -262,121 +485,69 @@ class HDTGraph:
         found = None
 
         for occ in smaller_ett:
-            if occ.active:
-                dgnode = level.nodedict[occ.value]
-                while dgnode.nontree_edges:
-                    f = dgnode.nontree_edges.popleft()
-                    if f.e[0] == dgnode.value:
-                        other_end = f.e[1]
-                        level.nodedict[other_end].nontree_edges.remove_node(f.dllist_entries[1])
-                    else:
-                        other_end = f.e[0]
-                        level.nodedict[other_end].nontree_edges.remove_node(f.dllist_entries[0])
+            if not occ.active:
+                continue
 
-                    # f is a replacement edge
-                    if (other_end in level.nodedict) and (
-                        level.nodedict[other_end].active_occ.get_root() is root2
-                    ):
-                        found = f
-                        break
-                    # f is not a replacement edge --> raise to next level
-                    else:
-                        f.level += 1
-                        self.levels[level.index + 1].add_nontree_edge(f)
+            nontree_edges = level.node2nontree_edges[occ.key]
+
+            while nontree_edges:
+                edge = nontree_edges.popleft()
+
+                # also remove the non-tree edge at the other node
+                i = 1 - int(edge.e[0] != occ.key)
+                other_end = edge.e[i]
+                level.node2nontree_edges[other_end].remove_node(edge.dllist_entries[i])
+
+                # edge is a replacement edge
+                if (other_end in level.node2active_occurrence) and (
+                    level.node2active_occurrence[other_end].get_root() is root2
+                ):
+                    found = edge
+                    break
+
+                # edge is not a replacement edge --> raise to next level
+                edge.level += 1
+                self._levels[level.index + 1].add_nontree_edge(edge)
+
             if found:
                 break
 
         if found:
-            found.tree_edge = True
+            found.is_tree_edge = True
             found.dllist_entries = None
             u, v = found.e[0], found.e[1]
             level.connect(u, v, found)
-            for i in range(level.index - 1, -1, -1):  # reconnect on all lower levels
-                self.levels[i].connect(u, v)
-        elif level.index > 0:
-            self._replace(u, v, self.levels[level.index - 1])
 
-    def _raise_tree_edges(self, ett, level):
-        """Raise all tree edges of an ETT to the next level."""
-        if level.index >= len(self.levels) - 1:
-            self.levels.append(Level(len(self.levels)))  # create new level
+            # reconnect on all lower levels
+            for i in range(level.index - 1, -1, -1):
+                self._levels[i].connect(u, v)
+
+        # no replament edge found --> try on lower levels if available
+        elif level.index > 0:
+            self._replace(u, v, self._levels[level.index - 1])
+
+    def _raise_tree_edges(self, ett: ETTree, level: _Level) -> None:
+        """Raise all tree edges of an Euler Tour tree (ETT) to the next level.
+
+        Args:
+            ett: The ETT whose edges shall be raised up a level.
+            level: The current level of the edges represented by the ETT.
+        """
+        # create new level if necessary
+        if level.index >= len(self._levels) - 1:
+            self._levels.append(_Level(len(self._levels)))
 
         for occ in ett:
-            if occ.active:
-                dgnode = level.nodedict[occ.value]
-                for tree_edge in dgnode.tree_edges:
-                    if tree_edge.level == level.index:
-                        tree_edge.level += 1
-                        u, v = tree_edge.e[0], tree_edge.e[1]
-                        self.levels[level.index + 1].connect(u, v, edge=tree_edge)
+            if not occ.active:
+                continue
 
-                # remove all tree edges (of this ET tree) on this level
-                dgnode.tree_edges.clear()
+            tree_edges = level.node2tree_edges[occ.key]
 
-    def _add_tree_edges(self, node):
-        nodedict = self.levels[0].nodedict
-        for child in node.children:
-            nodedict[child] = DGNode(child)
-            if id(node) < id(child):
-                e = (node, child)
-            else:
-                e = (child, node)
+            for edge in tree_edges:
+                if edge.level == level.index:
+                    edge.level += 1
+                    u, v = edge.e[0], edge.e[1]
+                    self._levels[level.index + 1].connect(u, v, edge=edge)
 
-            new_edge = Edge(e, level=0, tree_edge=True)
-            new_edge.dllist_entries = (
-                nodedict[e[0]].tree_edges.append(new_edge),
-                nodedict[e[1]].tree_edges.append(new_edge),
-            )
-            self.edges[e] = new_edge
-            self._add_tree_edges(child)
-
-    def add_loose_tree(self, tree):
-        """Add the edges of a tree as undirected edges.
-
-        The elements of the 'Tree' instance must not yet be nodes in the graph.
-        """
-
-        if not isinstance(tree, Tree):
-            raise TypeError("instance of type 'Tree' required")
-
-        nodedict = self.levels[0].nodedict
-        nodedict[tree.root] = DGNode(tree.root)
-        self._add_tree_edges(tree.root)
-        ett = ETTree.initialize_from_tree(tree, nodedict=nodedict)
-        if not ett:
-            return
-        self.levels[0].forest.add(ett)
-
-    def is_connected(self):
-        """Determine if the graph is connected (on level 0)."""
-
-        if len(self.levels[0].forest) == 1:
-            for ett in self.levels[0].forest:
-                return ett
-        else:
-            return False
-
-    def component_iterator(self, representative):
-        """Iterator over the connected component of a given value."""
-
-        for occ in self.get_component(representative):
-            if occ.active:
-                yield occ.value
-
-    def print_ett_forest(self, level=0):
-        """Print Euler tour of the spanning forest.
-
-        Intended for testing purpose.
-        Keyword argument:
-            level - level of the ETT spanning forest to be printed,
-                    choose "all" for printing all levels, default=0
-        """
-
-        if level == "all":
-            for level_i in self.levels:
-                print("----- Level {} -----".format(level_i.index))
-                for ett in level_i.forest:
-                    print(ett.ET_to_list(), ett.get_size())
-        else:
-            for ett in self.levels[level].forest:
-                print(ett.ET_to_list(), ett.get_size())
+            # remove all tree edges (of this ET tree) on this level
+            tree_edges.clear()
