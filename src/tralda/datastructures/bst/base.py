@@ -130,6 +130,30 @@ class BinaryNode:
 
         return copy
 
+    def smallest_in_subtree(self) -> BinaryNode:
+        """Return the left-most node (smallest element) in the subtree under this node.
+
+        Returns:
+            The node with the smallest key in the subtree.
+        """
+        current = self
+        while current.left:
+            current = current.left
+
+        return current
+
+    def largest_in_subtree(self) -> BinaryNode:
+        """Return the right-most node (largest element) in the subtree under this node.
+
+        Returns:
+            The node with the largest key in the subtree.
+        """
+        current = self
+        while current.right:
+            current = current.right
+
+        return current
+
 
 class BinaryTreeIterator:
     """Iterator for binary search trees."""
@@ -165,6 +189,44 @@ class BinaryTreeIterator:
         try:
             node = next(self._inorder_generator)
             return node.key
+        except StopIteration:
+            raise StopIteration
+
+
+class BinaryTreeNodeIterator:
+    """Iterator for nodes in binary search trees."""
+
+    __slots__ = ("tree", "_inorder_generator")
+
+    def __init__(self, tree: BaseBinarySearchTree):
+        """Initilize the tree node iterator.
+
+        Args:
+            tree: The binary search tree.
+        """
+        self.tree = tree
+        self._inorder_generator = self.tree._inorder_traversal()
+
+    def __iter__(self) -> BaseBinarySearchTree:
+        """Iterator function.
+
+        Returns:
+            An iterator for the nodes in a binary search tree.
+        """
+        return self
+
+    def __next__(self) -> BinaryNode:
+        """The next node in the binary search tree.
+
+        Returns:
+            The next node.
+
+        Raises:
+            StopIteration: When no nodes are left.
+        """
+        try:
+            node = next(self._inorder_generator)
+            return node
         except StopIteration:
             raise StopIteration
 
@@ -464,36 +526,6 @@ class BaseBinarySearchTree:
         """
         raise NotImplementedError("not implemented for base class")
 
-    def _smallest_in_subtree(self, node: BinaryNode) -> BinaryNode:
-        """Return the left-most (smallest element) node in the subtree.
-
-        Args:
-            node: The node whose subtree is to be considered.
-
-        Returns:
-            The node with the smallest key in the subtree.
-        """
-        current = node
-        while current.left:
-            current = current.left
-
-        return current
-
-    def _largest_in_subtree(self, node: BinaryNode) -> BinaryNode:
-        """Return the right-most (largest element) node in the subtree.
-
-        Args:
-            node: The node whose subtree is to be considered.
-
-        Returns:
-            The node with the largest key in the subtree.
-        """
-        current = node
-        while current.right:
-            current = current.right
-
-        return current
-
     def _inorder_traversal(self) -> Iterator[BinaryNode]:
         """Generator for the nodes in a in-order traversal of the tree.
 
@@ -609,14 +641,17 @@ class BaseBinarySearchTree:
                 height_right = node.right.height
                 size += node.right.size
 
-            if node.height != 1 + max(height_left, height_right):
+            height = 1 + max(height_left, height_right)
+            if node.height != height:
                 if verbose:
-                    print(f"height of node {node} is incorrect")
+                    print(
+                        f"height of node {node} is incorrect (expected {height}, got {node.height})"
+                    )
                 return False
 
             if node.size != size:
                 if verbose:
-                    print(f"size of node {node} is incorrect")
+                    print(f"size of node {node} is incorrect (expected {size}, got {node.size})")
                 return False
 
         return True

@@ -84,7 +84,7 @@ class BinarySearchTree(BaseBinarySearchTree):
             elif node.right is None:
                 node = node.left
             else:
-                subst_node = self._smallest_in_subtree(node.right)
+                subst_node = node.right.smallest_in_subtree()
                 subst_node.copy_attributes_to_node(node)
 
                 # now find and delete subst_node

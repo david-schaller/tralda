@@ -240,6 +240,21 @@ class TreeSet(BaseBinarySearchTree):
         Returns:
             Whether all integrity checks have been passed.
         """
+        # check that all parents are set correctly
+        for i, node in enumerate(self._postorder_traversal()):
+            if node.left and node.left.parent is not node:
+                if verbose:
+                    print(f"node {node.left} should have parent {node} but has {node.left.parent}")
+                return False
+
+            if node.right and node.right.parent is not node:
+                if verbose:
+                    print(
+                        f"node {node.right} should have parent {node} but has {node.right.parent}"
+                    )
+                return False
+
+        # check size and height
         if not super().check_integrity(verbose=verbose):
             return False
 
@@ -428,7 +443,7 @@ class TreeSet(BaseBinarySearchTree):
         node.turn_red()
         node.parent = parent
 
-        # tree was empty before --> new node becoms the root
+        # tree was empty before --> new node becomes the root
         if not parent:
             self.root = node
             return
@@ -495,6 +510,26 @@ class TreeSet(BaseBinarySearchTree):
         self._temp_attributes = node.get_attributes()
         self._delete_node(node)
 
+    def _replace_node_to_remove(self, node: RedBlackTreeNode) -> RedBlackTreeNode:
+        """Find the inorder successor of a node to be removed instead.
+
+        The inorder successor is guaranteed to have at most one child (the right child). The
+        attributes of this node will be copied into the original node to remove.
+
+        Args:
+            node: The node whose content shall be removed.
+
+        Returns:
+            The instance of the inorder successor node which can now be removed instead.
+        """
+        # find smallest node of right subtree ("inorder successor" of current node)
+        inorder_successor = node.right.smallest_in_subtree()
+
+        # copy inorder successor's data to current node (but keep its color)
+        inorder_successor.copy_attributes_to_node(node)
+
+        return inorder_successor
+
     def _delete_node(self, node: RedBlackTreeNode) -> None:
         """Delete a node from the tree.
 
@@ -506,15 +541,7 @@ class TreeSet(BaseBinarySearchTree):
         """
         # node to delete has 2 children
         if node.left and node.right:
-            # find smallest node of right subtree ("inorder successor" of current node)
-            inorder_successor = self._smallest_in_subtree(node.right)
-
-            # copy inorder successor's data to current node (keep its color)
-            inorder_successor.copy_attributes_to_node(node)
-
-            # continue with deleting the inorder sucessor instead, it can only have a right child
-            # or no child at all
-            node = inorder_successor
+            node = self._replace_node_to_remove(node)
 
         parent = node.parent
 
@@ -615,7 +642,8 @@ class TreeSet(BaseBinarySearchTree):
 
             parent = node.parent
             if not parent:
-                break
+                return
+
             direction = node.direction
 
         if not skip_case_5:
@@ -653,19 +681,16 @@ class TreeSet(BaseBinarySearchTree):
         # both trees are empty --> re-use instance tree_left
         if not tree_left and not tree_right:
             tree_left.root = new_node
-            assert tree_left.check_integrity()
             return tree_left
         # only tree_right is non-empty --> insert new_node as new smallest element
         elif not tree_left:
-            parent = tree_right._smallest_in_subtree(tree_right.root)
+            parent = tree_right.root.smallest_in_subtree()
             tree_right._insert_node(new_node, parent, 0)
-            assert tree_right.check_integrity()
             return tree_right
         # only tree_left is non-empty --> insert new_node as new largest element
         elif not tree_right:
-            parent = tree_left._largest_in_subtree(tree_left.root)
+            parent = tree_left.root.largest_in_subtree()
             tree_left._insert_node(new_node, parent, 1)
-            assert tree_left.check_integrity()
             return tree_left
 
         # create a new tree if both trees are non-empty
@@ -696,7 +721,7 @@ class TreeSet(BaseBinarySearchTree):
 
         parent.right = right_child
         if right_child:
-            right_child = parent
+            right_child.parent = parent
 
     def _join_nonempty_trees(
         self,
@@ -826,14 +851,14 @@ class TreeSet(BaseBinarySearchTree):
         if keep_node_left and not tree_left:
             tree_left.root = node
         elif keep_node_left:
-            rightmost_node = tree_left._largest_in_subtree(tree_left.root)
+            rightmost_node = tree_left.root.largest_in_subtree()
             tree_left._insert_node(node, rightmost_node, 1)
 
         # keep the node in the right tree
         if keep_node_right and not tree_right:
             tree_right.root = node
         elif keep_node_right:
-            leftmost_node = tree_right._smallest_in_subtree(tree_right.root)
+            leftmost_node = tree_right.root.smallest_in_subtree()
             tree_right._insert_node(node, leftmost_node, 0)
 
         # now traverse to the root

@@ -394,7 +394,7 @@ class _ConnectedComp:
         Returns:
             The number of elements in this connected component.
         """
-        return len(self.hdt_graph.get_component(self.representative))
+        return self.hdt_graph.get_component(self.representative).num_active_occurrences
 
     def __iter__(self) -> Iterator[TreeNode | _XpNode]:
         """Iterator for the elements in the component.
