@@ -234,6 +234,8 @@ class BinaryTreeNodeIterator:
 class BaseBinarySearchTree:
     """Base class for binary search trees."""
 
+    __slots__ = ("root", "_temp_attributes")
+
     node_class = BinaryNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
 

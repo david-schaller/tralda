@@ -17,6 +17,8 @@ from tralda.datastructures.bst.base import BinaryTreeIterator
 class TreeSet(BaseBinarySearchTree):
     """AVL tree implementation of a sorted set."""
 
+    __slots__ = ()
+
     node_class = BinaryNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
 
@@ -285,6 +287,8 @@ class TreeDictIterator(BinaryTreeIterator):
 
 
 class TreeDict(TreeSet):
+    __slots__ = ()
+
     node_class = TreeDictNode
     iterator_class: Iterator[Any] = TreeDictIterator
 
