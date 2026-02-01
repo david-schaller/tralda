@@ -12,6 +12,8 @@ from tralda.datastructures.bst.base import BinaryTreeIterator
 class BinarySearchTree(BaseBinarySearchTree):
     """Simple binary search tree."""
 
+    __slots__ = ()
+
     node_class = BinaryNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
 

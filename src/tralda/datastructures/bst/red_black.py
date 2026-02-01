@@ -144,6 +144,8 @@ class RedBlackTreeNode(BinaryNode):
 class TreeSet(BaseBinarySearchTree):
     """Red-black tree."""
 
+    __slots__ = ()
+
     node_class = RedBlackTreeNode
     iterator_class: Iterator[Any] = BinaryTreeIterator
 

@@ -213,6 +213,8 @@ class EdgeOccurrences:
 class ETTree(TreeSet):
     """Euler Tour (ET) tree datastructure."""
 
+    __slots__ = ()
+
     node_class = ETTreeNode
     iterator_class: Iterator[Any] = BinaryTreeNodeIterator
 
