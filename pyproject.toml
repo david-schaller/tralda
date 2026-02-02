@@ -21,9 +21,6 @@ Issues = "https://github.com/david-schaller/tralda/issues"
 requires = ["uv_build>=0.9.7,<0.10.0"]
 build-backend = "uv_build"
 
-[tool.ruff]
-line-length = 100
-target-version = "py310"
 
 [dependency-groups]
 dev = [
@@ -31,3 +28,10 @@ dev = [
     "pandas>=2.3.3",
     "seaborn>=0.13.2",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.codespell]
+ignore-words-list = "stoer"

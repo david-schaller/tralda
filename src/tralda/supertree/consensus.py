@@ -232,7 +232,7 @@ def merge_trees(tree1, tree2):
     """Common refinement of two compatible trees T1 and T2 with the same leaf set.
 
     Both input trees must be phylogenetic and have the same set of leaf labels. In each tree, the
-    leaves' label attributess must be set and unique.
+    leaves' label attributes must be set and unique.
 
     Args:
         tree1: The tree T1.

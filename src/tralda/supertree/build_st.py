@@ -317,7 +317,7 @@ class BuildST:
 
         Args:
             Y1: The first connected component (should be the smaller one).
-            Y2: The second connected compnent.
+            Y2: The second connected component.
             first_swap: Should be set to True if Y1 (i.e., the smaller component) contains the
                 information about count, List and singleton instead of Y2. In this case, these
                 attributes need to be swapped first.

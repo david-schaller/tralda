@@ -16,7 +16,7 @@ from tralda.datastructures.tree import TreeNode
 
 
 class LinearCographDetector:
-    """Linear cograph detection and cotree costruction.
+    """Linear cograph detection and cotree construction.
 
     References:
         .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for

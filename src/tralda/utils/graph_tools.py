@@ -232,14 +232,14 @@ def false_edges(
     true_graph: nx.Graph | nx.DiGraph,
     graph: nx.Graph | nx.DiGraph,
 ) -> tuple[nx.Graph, nx.Graph] | tuple[nx.DiGraph, nx.DiGraph]:
-    """Returns a graph containing false-negative and a graph containg false-positive edges.
+    """Returns a graph containing false-negative and a graph containing false-positive edges.
 
     Args:
         true_graph: The 'true' graph.
         graph: The graph whose edges are compared against the 'true' graph.
 
     Returns:
-        A graph containing false-negative and a graph containg false-positive edges.
+        A graph containing false-negative and a graph containing false-positive edges.
     """
     if isinstance(true_graph, nx.DiGraph):
         fn_graph = nx.DiGraph()

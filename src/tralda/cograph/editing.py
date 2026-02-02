@@ -116,7 +116,7 @@ class CographEditor:
                 self.best_tree = T
                 self.best_cost = total_cost
 
-            # stop if orginal graph was a cograph, i.e., cost is 0
+            # stop if original graph was a cograph, i.e., cost is 0
             if self.best_cost <= 0:
                 break
 
