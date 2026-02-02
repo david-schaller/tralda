@@ -24,3 +24,10 @@ build-backend = "uv_build"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[dependency-groups]
+dev = [
+    "matplotlib>=3.10.8",
+    "pandas>=2.3.3",
+    "seaborn>=0.13.2",
+]
