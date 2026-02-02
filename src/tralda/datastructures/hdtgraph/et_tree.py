@@ -151,7 +151,7 @@ class EdgeOccurrences:
     """Class for storing and maintaining the occurrences a1, b1, b2, a2 that represent an edge ab.
 
     Every edge is traversed two times in an Euler tour. Hence, an edge is associated with four (or
-    three, if an endpoint is a leaf) occurences of its endpoints. This class is used to store and
+    three, if an endpoint is a leaf) occurrences of its endpoints. This class is used to store and
     maintain these occurrence for a given edge.
     For the stored occurrences a1, b1, b2, and a2, one of the following orders should hold in the
     Euler tour:
@@ -457,7 +457,7 @@ class ETTree(TreeSet):
     ) -> bool:
         """Integrity check of the tree.
 
-        Checks whether the size and heigth is correct in all subtrees. Moreover, the red-black
+        Checks whether the size and height is correct in all subtrees. Moreover, the red-black
         properties are checked. Intended for debugging and testing purpose.
 
         Args:
@@ -517,7 +517,7 @@ class ETTree(TreeSet):
             edge_occurrences = edge2occurrences.get(
                 (predecessor.key, node.key), edge2occurrences.get((node.key, predecessor.key))
             )
-            occurence_list = (
+            occurrence_list = (
                 edge_occurrences._a1,
                 edge_occurrences._a2,
                 edge_occurrences._b1,
@@ -525,11 +525,11 @@ class ETTree(TreeSet):
             )
 
             for x in (predecessor, node):
-                if x in occurence_list:
+                if x in occurrence_list:
                     continue
                 if verbose:
                     print(f"{x} ({id(x)}) is not among the edge occurrences:")
-                    for y in occurence_list:
+                    for y in occurrence_list:
                         print(f"  - {y} ({id(y)})")
                 return False
 

@@ -62,7 +62,7 @@ class LCA:
         self._euler_tour = []
         # levels of the vertices in the Euler tour
         self._L = []
-        # repres. of vertices in the Euler tour (index of first occurence)
+        # repres. of vertices in the Euler tour (index of first occurrence)
         self._R = [None for _ in range(len(self._V))]
 
         for j, (v, level) in enumerate(self._tree.euler_and_level()):

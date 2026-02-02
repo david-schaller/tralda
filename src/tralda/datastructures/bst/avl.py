@@ -25,7 +25,7 @@ class TreeSet(BaseBinarySearchTree):
     def check_integrity(self, verbose: bool = False) -> bool:
         """Integrity check of the tree.
 
-        Checks whether all children have a correct parent reference and the size and heigth is
+        Checks whether all children have a correct parent reference and the size and height is
         correct in all subtrees. Additionally, the AVL property is checked. Intended for debugging
         and testing purpose.
 
@@ -252,7 +252,7 @@ class TreeDictIterator(BinaryTreeIterator):
         tree: TreeDict,
         mode: TreeDictIteratorMode = TreeDictIteratorMode.KEY,
     ) -> None:
-        """Initilize the TreeDict iterator.
+        """Initialize the TreeDict iterator.
 
         Args:
             tree: The TreeDict instance.
@@ -317,8 +317,8 @@ class TreeDict(TreeSet):
         """Return the value associated with the key or a default value if the key does not exist.
 
         Args:
-            key: The key for which to get the asociated value
-            default: The default to be returned if the key does not exist. Defaults to None.
+            key: The key for which to get the associated value.
+            default: The default to be returned if the key does not exist.
 
         Returns:
             The value associated with the key or the default value.

@@ -286,12 +286,12 @@ class HDTGraph:
         Raises:
             KeyError: If the node is not in the graph.
         """
-        active_occurence = self._levels[0].node2active_occurrence.get(node)
+        active_occurrence = self._levels[0].node2active_occurrence.get(node)
 
-        if active_occurence is None:
+        if active_occurrence is None:
             raise KeyError(f"{node} is not a node in the graph")
 
-        return active_occurence.get_root().ett if active_occurence is not None else None
+        return active_occurrence.get_root().ett if active_occurrence is not None else None
 
     def insert_node(self, node: Any) -> None:
         """Insert a loose node into the graph.
@@ -369,7 +369,7 @@ class HDTGraph:
         The elements of the 'Tree' instance must not yet be nodes in the graph.
 
         Args:
-            tree: The tree whoose nodes and edges shall be added to the graph.
+            tree: The tree whose nodes and edges shall be added to the graph.
 
         Raises:
             TypeError: If tree is not an instance of type Tree.

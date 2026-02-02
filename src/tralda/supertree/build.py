@@ -278,7 +278,7 @@ class MTT:
         L: Collection[Any],
         F: Iterable[Triple] | None = None,
     ) -> None:
-        """Constructor for class implemening the MTT algorithm.
+        """Constructor for class implementing the MTT algorithm.
 
         Args:
             L: A collection of leaf labels.
@@ -557,14 +557,14 @@ def minimal_identifying_triple_set(tree: Tree) -> Iterator[Triple]:
 
 
 def tree_profile_to_triples(trees: Iterable[Tree]) -> tuple[set[Any], set[Triple]]:
-    """Construct leaf set and reprentative triples from a profile of trees.
+    """Construct leaf set and representative triples from a profile of trees.
 
     Args:
         trees: An iterable of Tree instances.
 
     Returns
         The first set contains all leaf labels that appear in the tree profilea, and the second set
-        contains a representive set of triples.
+        contains a representative set of triples.
     """
     leaves = set()
     triples = set()

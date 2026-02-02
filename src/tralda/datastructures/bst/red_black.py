@@ -35,7 +35,7 @@ class RedBlackTreeNode(BinaryNode):
         self._is_red: bool = False
 
         # the black height is the number of black vertices on the path from the node to any of the
-        # leaves below it where NIL node (= None) count as black nodes (hence, we intialize to 2)
+        # leaves below it where NIL node (= None) count as black nodes (hence, we initialize to 2)
         self.black_height: int = 2
 
     @property
@@ -233,7 +233,7 @@ class TreeSet(BaseBinarySearchTree):
     def check_integrity(self, verbose: bool = False) -> bool:
         """Integrity check of the tree.
 
-        Checks whether the size and heigth is correct in all subtrees. Moreover, the red-black
+        Checks whether the size and height is correct in all subtrees. Moreover, the red-black
         properties are checked. Intended for debugging and testing purpose.
 
         Args:
@@ -680,7 +680,7 @@ class TreeSet(BaseBinarySearchTree):
         Returns:
             The joined tree.
         """
-        # both trees are empty --> re-use instance tree_left
+        # both trees are empty --> reuse instance tree_left
         if not tree_left and not tree_right:
             tree_left.root = new_node
             return tree_left

@@ -161,7 +161,7 @@ class BinaryTreeIterator:
     __slots__ = ("tree", "_inorder_generator")
 
     def __init__(self, tree: BaseBinarySearchTree):
-        """Initilize the tree iterator.
+        """Initialize the tree iterator.
 
         Args:
             tree: The binary search tree.
@@ -199,7 +199,7 @@ class BinaryTreeNodeIterator:
     __slots__ = ("tree", "_inorder_generator")
 
     def __init__(self, tree: BaseBinarySearchTree):
-        """Initilize the tree node iterator.
+        """Initialize the tree node iterator.
 
         Args:
             tree: The binary search tree.
@@ -623,7 +623,7 @@ class BaseBinarySearchTree:
     def check_integrity(self, verbose: bool = False) -> bool:
         """Integrity check of the tree.
 
-        Checks whether the size and heigth is correct in all subtrees. Intended for debugging and
+        Checks whether the size and height is correct in all subtrees. Intended for debugging and
         testing purpose.
 
         Args:

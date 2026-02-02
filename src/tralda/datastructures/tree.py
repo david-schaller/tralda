@@ -799,7 +799,7 @@ class Tree:
                 child_string: The string to split into the direct children.
 
             Returns:
-                The splitted string.
+                The split string.
 
             Raises:
                 ValueError: If the input is not a valid Newick string.
