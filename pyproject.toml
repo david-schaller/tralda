@@ -1,6 +1,5 @@
 [project]
 name = "tralda"
-version = "2.0.0"
 description = "A library for tree data structures and algorithms"
 readme = "README.md"
 authors = [
@@ -12,15 +11,34 @@ dependencies = [
     "networkx>=3.4.2",
     "numpy>=2.2.6",
 ]
+dynamic = ["version"]
+keywords = [
+    "tree",
+    "graph",
+    "datastructure",
+    "LCA",
+    "last common ancestor",
+    "least common ancestor",
+    "supertree",
+    "BuildST",
+    "triple",
+    "dynamic",
+    "connectivity",
+    "BST",
+    "balanced binary search tree",
+    "AVL",
+    "red-black tree",
+    "HDT datastructure",
+    "cograph",
+]
 
 [project.urls]
 Repository = "https://github.com/david-schaller/tralda.git"
 Issues = "https://github.com/david-schaller/tralda/issues"
 
 [build-system]
-requires = ["uv_build>=0.9.7,<0.10.0"]
-build-backend = "uv_build"
-
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
@@ -28,6 +46,12 @@ dev = [
     "pandas>=2.3.3",
     "seaborn>=0.13.2",
 ]
+
+[tool.setuptools.packages.find]
+include = ["tralda*"]
+
+[tool.setuptools.dynamic.version]
+attr = "tralda.__version__"
 
 [tool.ruff]
 line-length = 100
