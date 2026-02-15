@@ -7,6 +7,7 @@ from tralda.cograph import random_cotree
 from tralda.cograph import to_cograph
 from tralda.cograph import to_cotree
 from tralda.cograph import CographEditor
+from tralda.cograph import edit_to_cograph
 from tralda.cograph import complete_multipartite_completion
 
 import tralda.utils.graph_tools as gt
@@ -36,6 +37,11 @@ class TestCographPackage(unittest.TestCase):
         self.assertGreater(ce.best_cost, 0)
 
     def test_editing(self):
+        graph = gt.random_graph(100, p=0.3)
+        cograph = edit_to_cograph(graph)
+        self.assertTrue(to_cotree(cograph))
+
+    def test_editing_class(self):
         graph = gt.random_graph(100, p=0.3)
         ce = CographEditor(graph)
         ce.cograph_edit(run_number=10)
