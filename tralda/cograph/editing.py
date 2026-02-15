@@ -11,6 +11,7 @@ from typing import Any
 
 import networkx as nx
 
+from tralda.cograph.functions import to_cograph
 from tralda.datastructures.tree import Tree
 from tralda.datastructures.tree import TreeNode
 
@@ -35,7 +36,7 @@ def edit_to_cograph(graph, run_number: int = 10) -> nx.Graph:
     ce = CographEditor(graph)
     best_cotree = ce.cograph_edit(run_number=run_number)
 
-    return best_cotree.to_cograph()
+    return to_cograph(best_cotree)
 
 
 class CographEditor:
