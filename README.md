@@ -8,22 +8,18 @@ A Python library for **tr**ee **al**gorithms and **da**ta structures.
 ## Installation
 
 The package requires Python 3.10 or higher.
-
-#### Easy installation with pip
-
 The `tralda` package is available on [PyPI](https://pypi.org/project/tralda/):
 
-    pip install tralda
+```bash
+pip install tralda
+```
 
-For details about how to install Python packages see [here](https://packaging.python.org/tutorials/installing-packages/).
+Alternatively, you can clone the repo, go to the root folder of package and install it using the
+command:
 
-#### Installation with the setup file
-
-Alternatively, you can download or clone the repo, go to the root folder of package and install it using the command:
-
-    python setup.py install
-
-#### Dependencies
+```bash
+pip install .
+```
 
 The package has several dependencies (which are installed automatically when using `pip`):
 * [NetworkX](https://networkx.github.io/)
@@ -33,8 +29,11 @@ The package has several dependencies (which are installed automatically when usi
 
 ### Tree data structure
 
-The class `Tree` implements the tree data structure which is essential for most of the modules in the package and can be imported from the subpackage `tralda.datastructures`.
-It provides methods for tree traversals and manipulation, output in Newick format, as well as the linear-time computation of last common ancestors by Bender & Farach-Colton (class `LCA` which is initialized with an instance of type `Tree`).
+The class `Tree` implements the tree data structure which is essential for most of the modules in
+the package and can be imported from the subpackage `tralda.datastructures`.
+It provides methods for tree traversals and manipulation, output in Newick format, as well as the
+linear-time computation of last common ancestors by Bender & Farach-Colton (class `LCA` which is
+initialized with an instance of type `Tree`).
 `Tree` instances can be serialized in pickle or json format.
 
 <details>
@@ -58,6 +57,7 @@ It provides methods for tree traversals and manipulation, output in Newick forma
 
 | Function | Description |
 | --- | --- |
+| `height()` | height of the tree (number of edges in the longest path from the root to a leaf) |
 | `leaves()` | generator for the leaf nodes |
 | `preorder()` | generator for preorder (=top-down) traversal |
 | `postorder()` | generator for postorder (=bottom-up) traversal |
@@ -126,32 +126,49 @@ It provides methods for tree traversals and manipulation, output in Newick forma
 
 ### Supertree computation
 
-The subpackage `tralda.supertree` implements a number of algorithms for the computation of supertrees:
+The subpackage `tralda.supertree` implements a number of algorithms for the computation of
+supertrees:
 * BUILD (Aho et al. 1981), class `Build` or function `build_supertree`
 * BuildST (Deng & Fernández-Baca 2016), class `BuildST` or function `build_st`
-* Loose_Cons_Tree (Jansson et al. 2016), class `LooseConsensusTree` or function `loose_consensus_tree`
+* Loose_Cons_Tree (Jansson et al. 2016), class `LooseConsensusTree` or function
+  `loose_consensus_tree`
 * LinCR (Schaller et al. 2021), class `LinCR` or function `linear_common_refinement`
 
-The latter two algorithms compute the loose consensus tree and the common refinement, resp., for a sequence of trees on the same set of leaves in linear time.
+The latter two algorithms compute the loose consensus tree and the common refinement, resp., for a
+sequence of trees on the same set of leaves in linear time.
 
 ### Cographs and cotrees
 
-The subpackage `tralda.cograph` contains an efficient algorithm for cograph recognition and heuristics for cograph editing:
-* function `to_cotree` recognizes cographs and returns a `Tree` representation in the positive case (Corneil et al. 1985)
-* function `edit_to_cograph` edits an arbitrary graph to a cograph (algorithm from Crespelle 2019) and returns a `Tree` representation
+The subpackage `tralda.cograph` contains an efficient algorithm for cograph recognition and
+heuristics for cograph editing:
+* function `to_cotree` recognizes cographs and returns a `Tree` representation in the positive case
+  (Corneil et al. 1985)
+* function `edit_to_cograph` edits an arbitrary graph to a cograph (algorithm from Crespelle 2019)
+  and returns a `Tree` representation
+
+### Dynamic graph connectivity
+
+The package contains an implementation of the poly-logarithmic dynamic graph structure described
+by Holm, de Lichtenberg & Thorup (2001), called HDT data datastructure after the authors.
+The datastructure uses Euler tour trees (Henzinger and King 1999) to determine in O(log n) time
+whether two given nodes are connected.
+The class `HDTGraph` can be imported from `tralda.datastructures` and provides functions for adding
+and deleting nodes and edges, as well as querying node and graph connectivity.
 
 ### Other data structures
 
 The following auxiliary data structures can be imported from the subpackage `tralda.datastructures`:
 * linked list: class `LinkedList`
 * doubly-linked list: class `DoublyLinkedList`
-* HDT dynamic graph data structure (Holm, de Lichtenberg & Thorup in 2001): class `HDTGraph`
-* AVL trees: classes `TreeSet` and `TreeDict` implement data structures for sorted sets and dictionaries, respectively
+* AVL trees: classes `TreeSet` and `TreeDict` implement data structures for sorted sets and
+  dictionaries, respectively
 
 ## Contributing
 
-If you want to contribute to `tralda`, please use the package and project manager [uv](https://docs.astral.sh/uv/).
-See [this page](https://docs.astral.sh/uv/getting-started/installation/) for installation instructions.
+If you want to contribute to `tralda`, please use the package and project manager
+[uv](https://docs.astral.sh/uv/).
+See [this page](https://docs.astral.sh/uv/getting-started/installation/) for installation
+instructions.
 
 Moreover, please use [pre-commit](https://pre-commit.com) for automated code formatting and linting.
 
@@ -170,9 +187,12 @@ To install it and initialize it for your local `tralda` repository, follow these
 
 If you use `tralda` in your project or code from it, please consider citing:
 
-* **Schaller, D., Hellmuth, M., Stadler, P.F. (2021) A Simple Linear-Time Algorithm for the Common Refinement of Rooted Phylogenetic Trees on a Common Leaf Set.**
+> Schaller, D., Hellmuth, M., Stadler, P.F. (2021)
+> A Simple Linear-Time Algorithm for the Common Refinement of Rooted Phylogenetic Trees on a
+> Common Leaf Set.
 
 Additional references to algorithms that were implemented are given in the source code.
 
-Please report any bugs and questions in the [Issues](https://github.com/david-schaller/tralda/issues) section.
+Please report any bugs and questions in the
+[Issues](https://github.com/david-schaller/tralda/issues) section.
 Also, feel free to make suggestions for improvement and/or new functionalities.
