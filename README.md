@@ -1,7 +1,10 @@
 # tralda
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![pypi version](https://img.shields.io/badge/pypi-v2.0.0-blue.svg)](https://pypi.org/project/tralda/)
+[![pypi version](https://img.shields.io/pypi/v/tralda)](https://pypi.org/project/tralda/)
+[![Python](https://img.shields.io/pypi/pyversions/tralda)](https://pypi.org/project/tralda/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/tralda)](https://pypi.org/project/tralda/)
+[![DOI](https://img.shields.io/badge/DOI-10.1186/s13015--021--00202--8-blue)](https://doi.org/10.1186/s13015-021-00202-8)
 
 A Python library for **tr**ee **al**gorithms and **da**ta structures.
 
