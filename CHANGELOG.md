@@ -1,6 +1,12 @@
 # Change Log
 
-## Unreleased
+## 2.0.1
+
+* Cograph detection and editing functions now accept any graph object that implements the methods 
+  `nodes()`, `has_edge()`, and `neighbors()`, as in `networkx.Graph`. This allows for more flexible
+  usage of these functions without requiring a specific graph library.
+
+## 2.0.0
 
 ### Added
 
