@@ -1,15 +1,13 @@
 """Linear-time cograph detection.
 
 References:
-    .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for Cographs.
-           In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
+    1. D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for Cographs.
+       In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
 """
 
 from collections import defaultdict
 from collections import deque
 from typing import Any
-
-import networkx as nx
 
 from tralda.datastructures.tree import Tree
 from tralda.datastructures.tree import TreeNode
@@ -19,21 +17,24 @@ class LinearCographDetector:
     """Linear cograph detection and cotree construction.
 
     References:
-        .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for
-               Cographs. In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
+        1. D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for Cographs.
+           In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
     """
 
-    def __init__(self, graph: nx.Graph) -> None:
+    def __init__(self, graph: Any) -> None:
         """Constructor of LinearCographDetector class.
 
         Args:
-            graph: A graph.
+            graph: A graph. Must implement ``nodes()``, ``has_edge()``, and ``neighbors()``
+                (as in :class:`networkx.Graph`).
         """
-        if not isinstance(graph, nx.Graph):
-            raise TypeError("not a NetworkX Graph")
+        if not (
+            hasattr(graph, "nodes") and hasattr(graph, "has_edge") and hasattr(graph, "neighbors")
+        ):
+            raise TypeError("graph must implement nodes(), has_edge(), and neighbors()")
 
         self.graph = graph
-        self.V: list[Any] = [v for v in graph.nodes()]
+        self.V: list[Any] = [v for v in self.graph.nodes()]
 
         self.tree = Tree(None)
         self.already_in_tree: set[Any] = set()

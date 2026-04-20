@@ -1,9 +1,9 @@
 """Heuristic for cograph editing.
 
 References:
-    .. [1] Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
-           Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
-           Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
+    1. Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
+       Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
+       Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
 """
 
 import random
@@ -16,22 +16,23 @@ from tralda.datastructures.tree import Tree
 from tralda.datastructures.tree import TreeNode
 
 
-def edit_to_cograph(graph, run_number: int = 10) -> nx.Graph:
+def edit_to_cograph(graph: Any, run_number: int = 10) -> nx.Graph:
     """Heuristic algorithm for optimal cograph editing.
 
     Time complexity O(|V|^2).
 
     Args:
-        graph: A graph.
+        graph: A graph. Must implement ``nodes()``, ``has_edge()``, and ``neighbors()`` (as in
+            :class:`networkx.Graph`).
         run_number: Number of editing runs from which the best editing result is returned.
 
     Returns:
         The cograph that corresponds to the best editing result.
 
     References:
-        .. [1] Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
-            Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
-            Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
+        1. Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
+           Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
+           Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
     """
     ce = CographEditor(graph)
     best_cotree = ce.cograph_edit(run_number=run_number)
@@ -43,25 +44,28 @@ class CographEditor:
     """Heuristic for cograph editing running in O(|V|^2).
 
     References:
-        .. [1] Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
-            Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
-            Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
+        1. Christophe Crespelle (2021). Linear-Time Minimal Cograph Editing. In: Bampis, E.,
+           Pagourtzis, A. (eds) Fundamentals of Computation Theory. FCT 2021. Lecture Notes in
+           Computer Science, vol 12867. Springer, Cham. DOI: 10.1007/978-3-030-86593-1_12
     """
 
-    def __init__(self, graph: nx.Graph) -> None:
+    def __init__(self, graph: Any) -> None:
         """Constructor of the CographEditor class.
 
         Args:
-            graph: A graph.
+            graph: A graph. Must implement ``nodes()``, ``has_edge()``, and ``neighbors()``
+                (as in :class:`networkx.Graph`).
 
         Raises:
             ValueError: If the provided graph is empty.
         """
-        if not isinstance(graph, nx.Graph):
-            raise TypeError("not a NetworkX Graph")
+        if not (
+            hasattr(graph, "nodes") and hasattr(graph, "has_edge") and hasattr(graph, "neighbors")
+        ):
+            raise TypeError("graph must implement nodes(), has_edge(), and neighbors()")
 
         self.graph = graph
-        self.V = [v for v in graph.nodes()]
+        self.V = [v for v in self.graph.nodes()]
 
         if len(self.V) == 0:
             raise ValueError("empty graph in cograph editing")
@@ -132,7 +136,7 @@ class CographEditor:
 
         Args:
             already_in_tree: Set of nodes in the graph that are already added to the tree.
-            leaf_map: Dictionary mapping nodes in the graoh to the corresponding leaf nodes in the
+            leaf_map: Dictionary mapping nodes in the graph to the corresponding leaf nodes in the
                 tree.
 
         Returns:
@@ -185,7 +189,7 @@ class CographEditor:
             x: The node from the input graph to be inserted.
             T: The current tree.
             already_in_tree: Set of nodes in the graph that are already added to the tree.
-            leaf_map: Dictionary mapping nodes in the graoh to the corresponding leaf nodes in the
+            leaf_map: Dictionary mapping nodes in the graph to the corresponding leaf nodes in the
                 tree.
 
         Returns:

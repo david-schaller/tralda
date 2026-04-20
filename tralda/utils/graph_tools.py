@@ -105,9 +105,7 @@ def is_subgraph(graph1: nx.Graph | nx.DiGraph, graph2: nx.Graph | nx.DiGraph) ->
     Returns:
         True if graph1 is a subgraph of graph2, False otherwise.
     """
-    if (isinstance(graph1, nx.Graph) and isinstance(graph2, nx.DiGraph)) or (
-        isinstance(graph1, nx.DiGraph) and isinstance(graph2, nx.Graph)
-    ):
+    if graph1.is_directed() != graph2.is_directed():
         return False
 
     if graph1.order() > graph2.order() or graph1.size() > graph2.size():
@@ -143,7 +141,7 @@ def symmetric_diff(graph1: nx.Graph | nx.DiGraph, graph2: nx.Graph | nx.DiGraph)
 
     sym_diff_number = 0
 
-    if isinstance(graph1, nx.DiGraph):
+    if graph1.is_directed():
         generator = itertools.permutations(set1, 2)
     else:
         generator = itertools.combinations(set1, 2)
@@ -194,7 +192,7 @@ def contingency_table(
         if not graph.has_edge(u, v):
             fn += 1
 
-    if isinstance(graph, nx.DiGraph):
+    if graph.is_directed():
         tn = (graph.order() * (graph.order() - 1)) - (tp + fp + fn)
     else:
         tn = (graph.order() * (graph.order() - 1) // 2) - (tp + fp + fn)
@@ -241,7 +239,7 @@ def false_edges(
     Returns:
         A graph containing false-negative and a graph containing false-positive edges.
     """
-    if isinstance(true_graph, nx.DiGraph):
+    if true_graph.is_directed():
         fn_graph = nx.DiGraph()
         fp_graph = nx.DiGraph()
     else:
@@ -411,7 +409,7 @@ def disturb_graph(
             graph.remove_edge(x, y)
 
         # done for undirected graphs
-        if not isinstance(graph, nx.DiGraph):
+        if not graph.is_directed():
             continue
 
         # other direction for digraphs
@@ -428,7 +426,7 @@ def disturb_graph(
 # --------------------------------------------------------------------------------------------------
 
 
-def independent_sets(graph: nx.graph) -> list[list[Any]] | None:
+def independent_sets(graph: nx.Graph) -> list[list[Any]] | None:
     """Independent sets of a complete multipartite (i.e., a Fitch graph).
 
     Returns a partition of the graph's vertex set that corresponds to its set of independent set if
