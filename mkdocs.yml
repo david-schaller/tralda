@@ -1,0 +1,73 @@
+site_name: tralda
+site_description: Python library for tree algorithms and data structures
+site_url: !ENV [MKDOCS_SITE_URL, 'https://david-schaller.github.io/tralda/']
+repo_url: https://github.com/david-schaller/tralda
+repo_name: david-schaller/tralda
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: orange
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: orange
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_signature_annotations: true
+            members_order: source
+            show_root_heading: true
+            show_root_full_path: false
+            heading_level: 3
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - User Guide:
+    - Overview: guide/index.md
+  - API Reference:
+    - Data Structures:
+      - Trees: api/trees.md
+      - Binary Search Trees: api/binary_search_trees.md
+      - Additional Data Structures: api/additional_datastructures.md
+    - Supertrees: api/supertrees.md
+    - Cographs: api/cographs.md
+    - Utils: api/utils.md
+  - Citation: citation.md
+  - Contributing: contributing.md

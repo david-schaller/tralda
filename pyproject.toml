@@ -53,6 +53,10 @@ dev = [
     "pandas>=2.3.3",
     "seaborn>=0.13.2",
 ]
+docs = [
+    "mkdocs-material>=9.7.6",
+    "mkdocstrings[python]>=1.0.3",
+]
 
 [tool.setuptools.packages.find]
 include = ["tralda*"]
