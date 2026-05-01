@@ -1,6 +1,6 @@
 # tralda
 
-tralda is an open-source Python library for for **tr**ee **al**gorithms and **da**ta structures.
+tralda is an open-source Python library for **tr**ee **al**gorithms and **da**ta structures.
 It provides efficient implementations of algorithms for tree manipulation and analysis, as well as
 a tree data structure with various methods for tree traversal and manipulation.
 
@@ -13,7 +13,7 @@ pip install tralda
 ```python
 from tralda.datastructures import Tree
 
-tree = Tree.random_tree(10)
+tree = Tree.random_tree(10)  # random tree with 10 leaves
 tree.print_tree()
 ```
 
