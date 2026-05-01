@@ -83,8 +83,8 @@ class CographEditor:
             run_number: Number of editing runs from which the best editing result is returned.
 
         Returns:
-            The cotree, i.e., a Tree instance with inner vertex labels 'series' and 'parallel',
-            that corresponds to the best editing result.
+            The cotree, i.e., a Tree instance with inner vertex labels `"series"` and `"parallel"`,
+                that corresponds to the best editing result.
         """
         for i in range(run_number):
             self.aux_counter = {}

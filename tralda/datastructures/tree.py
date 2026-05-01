@@ -24,7 +24,7 @@ class TreeNode:
         children (dll.DLList): Child nodes of this node in a doubly-linked list.
     """
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """Constructor for TreeNode class.
 
         Args:
@@ -409,8 +409,8 @@ class Tree:
         subtree rooted at the node.
 
         Returns:
-            The leaves under each vertex (as a dictionary with TreeNode keys and lists of TreeNode
-            objects as values).
+            The leaves under each vertex (as a dictionary with `TreeNode` keys and lists of
+                `TreeNode` objects as values).
         """
         leaves = {}
 
@@ -434,7 +434,7 @@ class Tree:
 
         Returns:
             The original tree with contracted edges or a copy in which the contractions are
-            performed.
+                performed.
         """
         contracted = set()
 
@@ -466,7 +466,7 @@ class Tree:
 
         Returns:
             List of tuples where each tuple (a, b, c) represents the triple ab|c (=ba|c), i.e., the
-            first two items are closer related in the tree.
+                first two items are closer related in the tree.
         """
         if label_only:
             return [(a.label, b.label, c.label) for a, b, c in self._triple_generator()]
@@ -500,7 +500,7 @@ class Tree:
 
         Returns:
             The parent of the node, if it could be deleted, or None, if the node could not be
-            deleted, i.e., it has no parent.
+                deleted, i.e., it has no parent.
         """
         parent = node.parent
 
@@ -528,7 +528,7 @@ class Tree:
             A randomly samples list of the leaves of the tree.
 
         Raises:
-            If 'proportion' is not a number between 0 and 1.
+            ValueError: If 'proportion' is not a number between 0 and 1.
         """
         if not isinstance(proportion, (float, int)) or proportion < 0 or proportion > 1:
             raise ValueError("proportion must be a number 0 <= p <= 1")
@@ -553,9 +553,9 @@ class Tree:
         return True
 
     def is_phylogenetic(self) -> bool:
-        """Check whether the tree is a phylogetic tree.
+        """Check whether the tree is a phylogenetic tree.
 
-        Nodes in (rooted) phylogentic trees are either leaves or have at least two children.
+        Nodes in (rooted) phylogenetic trees are either leaves or have at least two children.
 
         Returns:
             True if the tree is phylogenetic, else False.
@@ -574,7 +574,7 @@ class Tree:
 
         Returns:
             A set of tuples representing the hierarchy where the leaves are represented by their
-            labels.
+                labels.
         """
         leaves = self.leaf_dict()
         hierarchy = set()
@@ -648,8 +648,8 @@ class Tree:
         """Check whether all nodes in the tree are connected properly to their parents.
 
         Raises:
-            RuntimeError: If the is a loop or a child of a node is not connected to that node via
-                the 'parent' attribute.
+            RuntimeError: If there is a loop or a child of a node is not connected to that node via
+                the `parent` attribute.
 
         Returns:
             True if the integrity check has been passed successfully.
@@ -879,7 +879,8 @@ class Tree:
 
         Returns:
             A graph representation of the tree and the object id of the root (and thus the
-            corresponding node in the graph) in order to be able to completely reconstruct the tree.
+                corresponding node in the graph) in order to be able to completely reconstruct the
+                tree.
         """
         self._assert_integrity()
         graph = nx.DiGraph()
@@ -901,7 +902,7 @@ class Tree:
         return graph, id(self.root)
 
     @classmethod
-    def parse_nx(cls, graph: nx.DiGraph, root: int):
+    def parse_nx(cls, graph: nx.DiGraph, root: int) -> Tree:
         """Convert a NetworkX DiGraph version back into a Tree.
 
         Args:
@@ -916,7 +917,7 @@ class Tree:
         if root is None:
             return cls(None)
 
-        def _build_tree(graphnode, parent=None):
+        def _build_tree(graphnode, parent=None) -> TreeNode:
             nonlocal number_of_leaves
 
             treenode = TreeNode()
@@ -1039,7 +1040,7 @@ class Tree:
                 which case the mode is inferred from the file extension.
 
         Raises:
-            If the serialization mode is unknown or could not be inferred.
+            ValueError: If the serialization mode is unknown or could not be inferred.
         """
         if not mode:
             mode = Tree._infer_serialization_mode(filename)
@@ -1149,7 +1150,7 @@ class Tree:
     # --------------------------------------------------------------------------
 
     @classmethod
-    def random_tree(cls, number_of_leaves, binary: bool = False) -> Tree:
+    def random_tree(cls, number_of_leaves: int, binary: bool = False) -> Tree:
         """A simple function to generate a random tree.
 
         The tree is generated by iteratively sampling a random node to which a new leaf is attached
@@ -1165,10 +1166,10 @@ class Tree:
             A randomly generated tree with the specified number of leaves.
 
         Raises:
-            TypeError: If 'number_of_leaves' is not an integer >= 1.
+            TypeError: If `number_of_leaves` is not an integer >= 1.
         """
         if not (isinstance(number_of_leaves, int)) or number_of_leaves < 1:
-            raise TypeError("N must be an 'int' > 0")
+            raise TypeError("`number_of_leaves` must be an `int` > 0")
 
         root = TreeNode(label=0)
         tree = cls(root)

@@ -16,12 +16,12 @@ def assert_leaf_sets_equal(trees: Collection[Tree]) -> set[Any] | None:
 
     Returns:
         The common set of leaf labels; or None if the trees do not share the same set of leaf
-        labels.
+            labels.
 
     Raises:
         ValueError: If the input collection is empty, contains empty trees, or the leaf labels are
             not unique in one tree.
-        TypeError: If any of the input elements is not of type Tree.
+        TypeError: If any of the input elements is not of type `Tree`.
     """
     if not trees:
         raise ValueError("empty list of trees")
@@ -30,7 +30,7 @@ def assert_leaf_sets_equal(trees: Collection[Tree]) -> set[Any] | None:
 
     for T_i in trees:
         if not isinstance(T_i, Tree):
-            raise TypeError("not a 'Tree' instance")
+            raise TypeError("not a `Tree` instance")
 
         leaves2 = set()
         for v in T_i.leaves():

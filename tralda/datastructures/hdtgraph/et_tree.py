@@ -3,8 +3,8 @@
 Implementation of an Euler tour tree for dynamic graph algorithm.
 
 References:
-    .. [1] Monika Rauch Henzinger, Valerie King. Randomized fully dynamic graph algorithms with
-           polylogarithmic time per operation. J. ACM 46(4). July 1999. 502-536.
+    1. Monika Rauch Henzinger, Valerie King. Randomized fully dynamic graph algorithms with
+       polylogarithmic time per operation. J. ACM 46(4). July 1999. 502-536.
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ class ETTreeNode(RedBlackTreeNode):
 
         Raises:
             ValueError: If the nodes are not in the same tree (i.e., they are not connected to the
-            same root node).
+                same root node).
         """
         if self is other:
             return False
@@ -407,14 +407,14 @@ class ETTree(TreeSet):
             node_a: An occurrence of the node a in the edge ab. Must be located in the Euler Tour
                 tree.
             node_b: An occurrence of the node b in the edge ab.
-            tree_b: The ETTree instance in which b is located.
+            tree_b: The `ETTree` instance in which b is located.
             node2active_occurrence: Dictionary mapping keys to active occurrences in this Euler Tour
-                tree, tree_b, and possible other Euler Tour trees.
-            edge2occurrences: Dictionary mapping edges to corresponding EdgeOccurrences instances.
+                tree, `tree_b`, and possible other Euler Tour trees.
+            edge2occurrences: Dictionary mapping edges to corresponding `EdgeOccurrences` instances.
 
         Returns:
-            A new ETTree instance representing the new tree that is given by joining the two trees
-            by the edge ab.
+            A new `ETTree` instance representing the new tree that is given by joining the two trees
+                by the edge ab.
         """
         # reroot T' at b
         if node_b is not tree_b.root.smallest_in_subtree():

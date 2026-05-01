@@ -313,7 +313,7 @@ class TreeDict(TreeSet):
 
         return node.value
 
-    def get(self, item: Any, default: Any = None) -> Any:
+    def get(self, key: Any, default: Any = None) -> Any:
         """Return the value associated with the key or a default value if the key does not exist.
 
         Args:
@@ -323,7 +323,7 @@ class TreeDict(TreeSet):
         Returns:
             The value associated with the key or the default value.
         """
-        node = self._find(item)
+        node = self._find(key)
 
         if node:
             return node.value
@@ -395,7 +395,7 @@ class TreeDict(TreeSet):
             value: The associated value.
 
         Raises:
-            If the key already exists.
+            KeyError: If the key already exists.
         """
         self._temp_attributes = (key, value)
         self._insert_key(key)
