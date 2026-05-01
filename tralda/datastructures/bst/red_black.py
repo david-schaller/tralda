@@ -3,7 +3,7 @@
 Balanced binary search tree implementation of a set (TreeSet).
 
 References:
-    [1] https://en.wikipedia.org/wiki/Red-black_tree
+    1. https://en.wikipedia.org/wiki/Red-black_tree
 """
 
 from __future__ import annotations
@@ -178,7 +178,7 @@ class TreeSet(BaseBinarySearchTree):
             The joined tree.
 
         References:
-            .. [1] https://en.wikipedia.org/wiki/Red-black_tree#Set_operations_and_bulk_operations
+            1. https://en.wikipedia.org/wiki/Red-black_tree#Set_operations_and_bulk_operations
         """
         if not isinstance(tree_left, cls):
             raise TypeError(f"tree_left must be of type {cls}, but is {type(tree_left)}")
@@ -223,7 +223,7 @@ class TreeSet(BaseBinarySearchTree):
             A tuple containing the left tree and the right tree (i.e., the sets after splitting).
 
         References:
-            .. [1] https://en.wikipedia.org/wiki/Red-black_tree#Set_operations_and_bulk_operations
+            1. https://en.wikipedia.org/wiki/Red-black_tree#Set_operations_and_bulk_operations
         """
         if keep_node_left and keep_node_right:
             raise ValueError("node cannot be kept in both left are right tree")
@@ -437,7 +437,7 @@ class TreeSet(BaseBinarySearchTree):
                 right).
 
         References:
-            .. [1] https://en.wikipedia.org/wiki/Red-black_tree#Insertion
+            1. https://en.wikipedia.org/wiki/Red-black_tree#Insertion
         """
         # cases follow the implementation in https://en.wikipedia.org/wiki/Red-black_tree#Insertion
         # (accessed Nov 29, 2025)
@@ -539,7 +539,7 @@ class TreeSet(BaseBinarySearchTree):
             node: The node to delete from the tree.
 
         References:
-            .. [1] https://en.wikipedia.org/wiki/Red-black_tree#Removal
+            1. https://en.wikipedia.org/wiki/Red-black_tree#Removal
         """
         # node to delete has 2 children
         if node.left and node.right:

@@ -1,9 +1,9 @@
 """Fast computation of a common refinement of trees on the same leaf set.
 
 References:
-    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
-           common refinement of rooted phylogenetic trees on a common leaf set.
-           Algorithms Mol Biol. 16(1):23. DOI: 10.1186/s13015-021-00202-8.
+    1. D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the common
+       refinement of rooted phylogenetic trees on a common leaf set. Algorithms Mol Biol. 16(1):23.
+       DOI: 10.1186/s13015-021-00202-8.
 """
 
 from __future__ import annotations
@@ -29,9 +29,9 @@ def linear_common_refinement(trees: Collection[Tree]) -> Tree | None:
         A common refinement of the input trees if existent, None otherwise.
 
     References:
-    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
-           common refinement of rooted phylogenetic trees on a common leaf set.
-           Algorithms Mol Biol. 16(1):23. DOI: 10.1186/s13015-021-00202-8.
+        1. D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
+           common refinement of rooted phylogenetic trees on a common leaf set. Algorithms Mol Biol.
+           16(1):23. DOI: 10.1186/s13015-021-00202-8.
     """
     cr = LinCR(trees)
 
@@ -42,9 +42,9 @@ class LinCR:
     """Minimal common refinement for a set of trees with the same leaf set in linear time.
 
     References:
-    .. [1] D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
-           common refinement of rooted phylogenetic trees on a common leaf set.
-           Algorithms Mol Biol. 16(1):23. DOI: 10.1186/s13015-021-00202-8.
+        1. D. Schaller, M. Hellmuth, P.F. Stadler (2021). A simpler linear-time algorithm for the
+           common refinement of rooted phylogenetic trees on a common leaf set. Algorithms Mol Biol.
+           16(1):23. DOI: 10.1186/s13015-021-00202-8.
     """
 
     def __init__(self, trees: Collection[Tree]) -> None:

@@ -5,11 +5,11 @@ The datastructure uses Euler tour trees (Henzinger and King 1999) to determine i
 whether two given nodes are connected.
 
 References:
-    .. [1] Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic deterministic
-           fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge, and
-           biconnectivity. J. ACM, 48(4):723-760, July 2001.
-    .. [2] Monika Rauch Henzinger, Valerie King. Randomized fully dynamic graph algorithms with
-           polylogarithmic time per operation. J. ACM 46(4). July 1999. 502-536.
+    1. Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic deterministic
+       fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge, and biconnectivity.
+       J. ACM, 48(4):723-760, July 2001.
+    2. Monika Rauch Henzinger, Valerie King. Randomized fully dynamic graph algorithms with
+       polylogarithmic time per operation. J. ACM 46(4). July 1999. 502-536.
 """
 
 from __future__ import annotations
@@ -211,9 +211,9 @@ class HDTGraph:
     Implementation of the poly-logarithmic dynamic graph structure (HDT datastructure).
 
     References:
-        .. [1] Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic
-            deterministic fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge,
-            and biconnectivity. J. ACM, 48(4):723-760, July 2001.
+        1. Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic deterministic
+           fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge, and
+           biconnectivity. J. ACM, 48(4):723-760, July 2001.
     """
 
     def __init__(self) -> None:

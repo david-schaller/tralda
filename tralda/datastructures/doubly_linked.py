@@ -42,7 +42,7 @@ class DLList:
 
     __slots__ = ("_first", "_last", "_count")
 
-    def __init__(self, *args):
+    def __init__(self, *args: Any) -> None:
         """Constructor of the doubly-linked list.
 
         Args:
@@ -56,7 +56,7 @@ class DLList:
                 for item in arg:
                     self.append(item)
             else:
-                self.append(item)
+                self.append(arg)
 
     def __len__(self) -> int:
         """Number of items in the list.
@@ -66,11 +66,11 @@ class DLList:
         """
         return self._count
 
-    def __nonzero__(self):
+    def __nonzero__(self) -> bool:
         """Returns whether the list is non-empty.
 
         Returns:
-            Return True if the list is non-empty.
+            True if the list is non-empty, False otherwise.
         """
         return self._count > 0
 
@@ -181,7 +181,7 @@ class DLList:
         """Append multiple items to the list.
 
         Args:
-            An iterable of values to be inserted at the end of the list.
+            iterable: An iterable of values to be inserted at the end of the list.
         """
         for value in iterable:
             self.append(value)

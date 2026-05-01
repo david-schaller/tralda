@@ -78,7 +78,7 @@ def mtt_partition(
 
     Returns:
         The auxiliary partition for the MTT algorithm and a graph representation of this auxiliary
-        partition.
+            partition.
     """
     # auxiliary graph initialized as Aho graph
     graph = aho_graph(R, L, weighted=False)
@@ -121,7 +121,7 @@ class Build:
     """BUILD algorithm.
 
     References:
-        .. [1] A. V. Aho, Y. Sagiv, T. G. Szymanski, and J. D. Ullman. Inferring a tree from lowest
+        1. A. V. Aho, Y. Sagiv, T. G. Szymanski, and J. D. Ullman. Inferring a tree from lowest
            common ancestors with an application to the optimization of relational expressions.
            SIAM Journal on Computing, 10:405-421, 1981. DOI: 10.1137/0210030.
     """
@@ -239,7 +239,7 @@ class Build:
 
         Returns:
             The connected components of the Aho graph or the result of applying the MinCut algorithm
-            for resolving triple inconsistencies.
+                for resolving triple inconsistencies.
         """
         conn_comps = list(nx.connected_components(aho_graph))
         if (not self.mincut) or len(conn_comps) > 1:
@@ -267,9 +267,9 @@ class MTT:
     """MTT algorithm.
 
     References:
-        .. [1] Y.-J. He, T. N. D. Huynh, J. Jansson, and W.-K. Sung.Inferring phylogenetic
-           relationships avoiding forbidden rooted triplets. Journal of Bioinformatics and
-           Computational Biology, 4: 59-74, 2006. DOI: 10.1142/S0219720006001709.
+        1. Y.-J. He, T. N. D. Huynh, J. Jansson, and W.-K. Sung.Inferring phylogenetic relationships
+           avoiding forbidden rooted triplets. Journal of Bioinformatics and Computational Biology,
+           4: 59-74, 2006. DOI: 10.1142/S0219720006001709.
     """
 
     def __init__(
@@ -299,7 +299,7 @@ class MTT:
 
         Returns:
             A tree on leaf set L displaying all triples in R and none in F, if such a tree exists,
-            and None otherwise.
+                and None otherwise.
         """
         self.total_cost = 0
 
@@ -534,9 +534,8 @@ def minimal_identifying_triple_set(tree: Tree) -> Iterator[Triple]:
         Triples in minimal set of triples that identifies the tree.
 
     References:
-        .. [1] Stefan Grünewald, Mike Steel and M. Shel Swenson. Closure operations in
-               phylogenetics. Mathematical Biosciences 208 (2007) 521-537.
-               DOI: 10.1016/j.mbs.2006.11.005
+        1. Stefan Grünewald, Mike Steel and M. Shel Swenson. Closure operations in phylogenetics.
+           Mathematical Biosciences 208 (2007) 521-537. DOI: 10.1016/j.mbs.2006.11.005
     """
     # representative leaf for each vertex
     repres = {}

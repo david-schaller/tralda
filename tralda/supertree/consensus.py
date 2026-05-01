@@ -28,8 +28,8 @@ def loose_consensus_tree(trees: Collection[Tree]) -> Tree | None:
         The loose consensus tree; None if 'trees' is empty.
 
     References:
-        .. [1] J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus
-               Trees. J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
+        1. J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus Trees.
+           J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
     """
     loose_consensus = LooseConsensusTree(trees)
 
@@ -40,8 +40,8 @@ class LooseConsensusTree:
     """Construction of the loose consensus tree.
 
     References:
-        .. [1] J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus
-               Trees. J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
+        1. J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus Trees.
+           J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
     """
 
     def __init__(self, trees: Collection[Tree]) -> None:
@@ -97,7 +97,7 @@ class LooseConsensusTree:
         return self.T
 
 
-def merge_all(trees: Collection[Tree]):
+def merge_all(trees: Collection[Tree]) -> Tree | None:
     """Common refinement for compatible trees with the same leaf set.
 
     All input trees must be phylogenetic and have the same set of leaf labels. In each tree, the
@@ -228,7 +228,7 @@ def _preprocess(
     return tree2, L_tree2, lca, depth, start, stop, x_left, x_right
 
 
-def merge_trees(tree1, tree2):
+def merge_trees(tree1, tree2) -> Tree:
     """Common refinement of two compatible trees T1 and T2 with the same leaf set.
 
     Both input trees must be phylogenetic and have the same set of leaf labels. In each tree, the
@@ -242,8 +242,8 @@ def merge_trees(tree1, tree2):
         A tree whose clusters are the union of the cluster of T1 and T2.
 
     References:
-        .. [1] J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus
-               Trees. J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
+        1. J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus Trees.
+           J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
     """
     # T2 gets copied in _preprocess, so input trees remain unchanged
     tree2, L_tree2, lca, depth, start, stop, x_left, x_right = _preprocess(tree1, tree2)
@@ -296,14 +296,14 @@ def one_way_compatible(
 
     Returns:
         A copy of T1 with all clusters removed (i.e. the corresponding edges are contracted) that
-        are incompatible with T2.
+            are incompatible with T2.
 
     Raises:
         RuntimeError: If a vertex unexpectedly does not have a parent.
 
     References:
-        .. [1] J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus
-               Trees. J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
+        1. J. Jansson, C. Shen, W.-K. Sung. Improved Algorithms for Constructing Consensus Trees.
+           J. ACM 63, 3, Article 28 (June 2016), 24 pages. DOI: 10.1145/2925985.
     """
     # T2 gets copied in _preprocess, so input trees remain unchanged
     tree2, L_tree2, lca, depth, start, stop, x_left, x_right = _preprocess(tree1, tree2)

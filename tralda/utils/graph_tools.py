@@ -172,7 +172,7 @@ def contingency_table(
 
     Returns:
         The true positives, true negatives, false positives, and false negatives. Optionally, as a
-        dictionary with keys 'tp', 'tn', 'fp', and 'fn'.
+            dictionary with keys 'tp', 'tn', 'fp', and 'fn'.
 
     Raises:
         ValueError: If the graph do not have the same set of vertices.
@@ -215,7 +215,7 @@ def performance(
 
     Returns:
         Order, size, tp, tn, fp, fn, accuracy, precision and recall of a (directed or undirected)
-        graph w.r.t. 'true' graph.
+            graph w.r.t. 'true' graph.
     """
     tp, tn, fp, fn = contingency_table(true_graph, graph, as_dict=False)
 
@@ -346,7 +346,7 @@ def copy_node_attributes(
 # --------------------------------------------------------------------------------------------------
 
 
-def random_graph(number_of_nodes, p: float = 0.5) -> nx.Graph:
+def random_graph(number_of_nodes: int, p: float = 0.5) -> nx.Graph:
     """Construct a random graph with the specified number of nodes.
 
     The nodes are numbered continuously from 1 to number_of_nodes.

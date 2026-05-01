@@ -5,9 +5,9 @@ Fernández-Baca in 2016. The class 'BuildST' accepts a list of trees and compute
 it exists.
 
 References:
-    .. [1] Yun Deng and David Fernández-Baca. Fast Compatibility Testing for Rooted Phylogenetic
-           Trees. 27th Annual Symposium on Combinatorial Pattern Matching (CPM 2016).
-           DOI: 10.4230/LIPIcs.CPM.2016.12
+    1. Yun Deng and David Fernández-Baca. Fast Compatibility Testing for Rooted Phylogenetic Trees.
+       27th Annual Symposium on Combinatorial Pattern Matching (CPM 2016).
+       DOI: 10.4230/LIPIcs.CPM.2016.12
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ def build_st(trees: Collection[Tree]) -> Tree | None:
         The constructed supertree if it exists; None otherwise.
 
     References:
-    .. [1] Yun Deng and David Fernández-Baca. Fast Compatibility Testing for Rooted Phylogenetic
+        1. Yun Deng and David Fernández-Baca. Fast Compatibility Testing for Rooted Phylogenetic
            Trees. 27th Annual Symposium on Combinatorial Pattern Matching (CPM 2016).
            DOI: 10.4230/LIPIcs.CPM.2016.12
     """
@@ -86,7 +86,7 @@ class BuildST:
     exist.
 
     References:
-    .. [1] Yun Deng and David Fernández-Baca. Fast Compatibility Testing for Rooted Phylogenetic
+        1. Yun Deng and David Fernández-Baca. Fast Compatibility Testing for Rooted Phylogenetic
            Trees. 27th Annual Symposium on Combinatorial Pattern Matching (CPM 2016).
            DOI: 10.4230/LIPIcs.CPM.2016.12
     """
@@ -458,7 +458,7 @@ class _ConnectedComp:
 
         Returns:
             The list of connected components into which this connected component breaks apart (may
-            contain only this connected component if the components do not change).
+                contain only this connected component if the components do not change).
         """
         self.hdt_graph.delete_edge(u, v)
 
@@ -475,7 +475,7 @@ class _ConnectedComp:
         """Return the label nodes in the connected component.
 
         Returns:
-            A list of label nodes (_XpNode instances) in this components
+            A list of label nodes (`_XpNode` instances) in this components
         """
         result = []
         if not self.representative:

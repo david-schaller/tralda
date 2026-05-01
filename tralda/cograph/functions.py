@@ -56,8 +56,8 @@ def to_cotree(graph: nx.Graph) -> Tree | None:
             The cotree representation of the graph, or None if it is not a cograph.
 
     References:
-        .. [1] D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for
-               Cographs. In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
+        1. D. G. Corneil, Y. Perl, and L. K. Stewart. A Linear Recognition Algorithm for Cographs.
+           In: SIAM J. Comput., 14(4), 926-934 (1985). DOI: 10.1137/0214065
     """
     return LinearCographDetector(graph).recognition()
 
@@ -156,17 +156,17 @@ def cluster_deletion(cograph: nx.Graph | Tree) -> list[list[Any]]:
 
     Returns:
         A partition where each sublist corresponds to a clique in a solution of the cluster deletion
-        problem.
+            problem.
 
     Raises:
         ValueError: If the input is not a valid cograph or cotree.
 
     References:
-        .. [1] Gao Y, Hare DR, Nastos J (2013) The cluster deletion problem for cographs. Discrete
-               Math 313(23):2763-2771, DOI: 10.1016/j.disc.2013.08.017.
-        .. [2] Schaller D, Lafond M, Stadler PF, Wieseke N, Hellmuth M (2020) Indirect
-               Identification of Horizontal Gene Transfer. Journal of Mathematical Biology 83(10),
-               DOI: 10.1007/s00285-021-01631-0
+        1. Gao Y, Hare DR, Nastos J (2013) The cluster deletion problem for cographs. Discrete Math
+           313(23):2763-2771, DOI: 10.1016/j.disc.2013.08.017.
+        2. Schaller D, Lafond M, Stadler PF, Wieseke N, Hellmuth M (2020) Indirect Identification
+           of Horizontal Gene Transfer. Journal of Mathematical Biology 83(10),
+           DOI: 10.1007/s00285-021-01631-0
     """
     cotree = cograph if isinstance(cograph, Tree) else to_cotree(cograph)
 
@@ -216,8 +216,8 @@ def complete_multipartite_completion(
 
     Returns:
         A partition where each sublist corresponds to a (maximal) independent set in a solution of
-        the complete multipartite graph completion problem. And, optionally, the solution as a
-        graph.
+            the complete multipartite graph completion problem. And, optionally, the solution as a
+            graph.
 
     Raises:
         ValueError: If the input is not a valid cograph or cotree.

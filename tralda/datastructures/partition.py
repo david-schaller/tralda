@@ -79,7 +79,7 @@ class Partition:
 
         Returns:
             True if x and y are in the same set of the partition and z is in a different one, False
-            otherwise.
+                otherwise.
 
         Raises:
             KeyError: If x, y, or z is not an item in the partition.

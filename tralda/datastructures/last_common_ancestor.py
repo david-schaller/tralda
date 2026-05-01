@@ -1,11 +1,11 @@
 """Efficient computation of last/least common ancestors in trees.
 
 References:
-    .. [1] M. A. Bender, M. Farach-Colton, G. Pemmasani, S. Skiena, P. Sumazin. Lowest common
-           ancestors in trees and directed acyclic graphs. In: Journal of Algorithms. 57, Nr. 2,
-           November 2005, S. 75-94. DOI: 10.1016/j.jalgor.2005.08.001
-    .. [2] https://cp-algorithms.com/data_structures/sparse-table.html
-    .. [3] https://cp-algorithms.com/graph/lca_farachcoltonbender.html
+    1. M. A. Bender, M. Farach-Colton, G. Pemmasani, S. Skiena, P. Sumazin. Lowest common ancestors
+       in trees and directed acyclic graphs. In: Journal of Algorithms. 57, Nr. 2, November 2005,
+       S. 75-94. DOI: 10.1016/j.jalgor.2005.08.001
+    2. https://cp-algorithms.com/data_structures/sparse-table.html
+    3. https://cp-algorithms.com/graph/lca_farachcoltonbender.html
 """
 
 from __future__ import annotations
@@ -31,11 +31,11 @@ class LCA:
     - Query complexity: O(1)
 
     References:
-        .. [1] M. A. Bender, M. Farach-Colton, G. Pemmasani, S. Skiena, P. Sumazin. Lowest common
-               ancestors in trees and directed acyclic graphs. In: Journal of Algorithms. 57, Nr. 2,
-               November 2005, S. 75-94. DOI: 10.1016/j.jalgor.2005.08.001
-        .. [2] https://cp-algorithms.com/data_structures/sparse-table.html
-        .. [3] https://cp-algorithms.com/graph/lca_farachcoltonbender.html
+        1. M. A. Bender, M. Farach-Colton, G. Pemmasani, S. Skiena, P. Sumazin. Lowest common
+           ancestors in trees and directed acyclic graphs. In: Journal of Algorithms. 57, Nr. 2,
+           November 2005, S. 75-94. DOI: 10.1016/j.jalgor.2005.08.001
+        2. https://cp-algorithms.com/data_structures/sparse-table.html
+        3. https://cp-algorithms.com/graph/lca_farachcoltonbender.html
     """
 
     def __init__(self, tree: Tree) -> None:
@@ -46,10 +46,10 @@ class LCA:
                 ancestor queries.
 
         Raises:
-            If 'tree' is not a Tree instance.
+            TypeError: If `tree` is not a Tree instance.
         """
         if not isinstance(tree, Tree):
-            raise TypeError("tree must be of type 'Tree'")
+            raise TypeError("`tree` must be of type `Tree`")
 
         self._tree = tree
 
