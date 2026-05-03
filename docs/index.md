@@ -1,5 +1,7 @@
 # tralda
 
+![Logo](images/logo.png)
+
 tralda is an open-source Python library for **tr**ee **al**gorithms and **da**ta structures.
 It provides efficient implementations of algorithms for tree manipulation and analysis, as well as
 a tree data structure with various methods for tree traversal and manipulation.
