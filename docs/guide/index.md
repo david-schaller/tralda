@@ -13,8 +13,8 @@ flexible rooted-tree representation with support for traversals (preorder, posto
 subtree operations, tree generation, and utilities such as topology comparison and hierarchy
 extraction.
 
-**Lowest common ancestor (LCA)** — An $\mathcal{O}(n)$-time/space preprocessing structure for
-$\mathcal{O}(1)$ LCA queries, based on the algorithm by Bender et al. (2005).
+**Lowest common ancestor (LCA)** — An $O(n)$-time/space preprocessing structure for
+$O(1)$ LCA queries, based on the algorithm by Bender et al. (2005).
 Available as `LCA` in `tralda.datastructures`.
 
 **Supertree computation** — The `tralda.supertree` subpackage implements several algorithms for
@@ -28,13 +28,13 @@ constructing supertrees and consensus trees from a set of (partial) input trees:
   consensus tree for trees with the same leaf set.
 
 **Balanced binary search trees** — `tralda.datastructures.bst` provides AVL trees and red-black
-trees (ordered sets and dictionaries) with $\mathcal{O}(\log n)$ insertion, deletion, and lookup,
-as well as efficient split and join operations.
+trees (ordered sets and dictionaries) with $O(\log n)$ insertion, deletion, and lookup, as well as
+efficient split and join operations.
 
 **Dynamic graph connectivity** — The `HDTGraph` class in `tralda.datastructures.hdtgraph`
 implements the poly-logarithmic dynamic graph structure described by Holm et al. (2001), supporting
-edge insertions and deletions with $\mathcal{O}(\log^2 n)$ amortized cost while answering
-connectivity queries in $\mathcal{O}(\log n / \log \log n)$.
+edge insertions and deletions with $O(\log^2 n)$ amortized cost while answering connectivity
+queries in $O(\log n / \log \log n)$.
 
 **Cograph detection and editing** — `tralda.cograph` offers linear-time cograph recognition
 (Corneil et al. 1985) with cotree construction, as well as a heuristic for cograph editing
