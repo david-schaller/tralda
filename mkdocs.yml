@@ -69,6 +69,7 @@ nav:
     - Overview: guide/index.md
     - Trees: guide/trees.md
     - Last Common Ancestors: guide/lca.md
+    - Supertrees: guide/supertrees.md
   - API Reference:
     - Data Structures:
       - Trees: api/trees.md
