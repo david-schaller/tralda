@@ -70,6 +70,8 @@ nav:
     - Trees: guide/trees.md
     - Last Common Ancestors: guide/lca.md
     - Supertrees: guide/supertrees.md
+    - Dynamic Graph Connectivity: guide/dynamic_connectivity.md
+    - Binary Search Trees: guide/bst.md
   - API Reference:
     - Data Structures:
       - Trees: api/trees.md
