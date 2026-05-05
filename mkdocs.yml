@@ -73,6 +73,8 @@ nav:
     - Cographs: guide/cograph.md
     - Dynamic Graph Connectivity: guide/dynamic_connectivity.md
     - Binary Search Trees: guide/bst.md
+    - Linked Lists: guide/linked_lists.md
+    - Dynamic Partition: guide/dynamic_partition.md
   - API Reference:
     - Data Structures:
       - Trees: api/trees.md
