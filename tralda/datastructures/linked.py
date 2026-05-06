@@ -52,7 +52,7 @@ class LinkedList:
                 for item in arg:
                     self.append(item)
             else:
-                self.append(item)
+                self.append(arg)
 
     def __len__(self) -> int:
         """Number of items in the list.
