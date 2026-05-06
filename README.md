@@ -60,7 +60,7 @@ efficient split and join operations.
 **Dynamic graph connectivity** — The `HDTGraph` class in `tralda.datastructures.hdtgraph`
 implements the poly-logarithmic dynamic graph structure described by Holm et al. (2001), supporting
 edge insertions and deletions with $O(\log^2 n)$ amortized cost while answering connectivity
-queries in $O(\log n / \log \log n)$.
+queries in $O(\log n)$.
 
 **Cograph detection and editing** — `tralda.cograph` offers linear-time cograph recognition
 (Corneil et al. 1985) with cotree construction, as well as a heuristic for cograph editing
