@@ -55,5 +55,4 @@ _minted*/
 
 # others
 examples/results/*
-testfile*
 *.DS_Store
