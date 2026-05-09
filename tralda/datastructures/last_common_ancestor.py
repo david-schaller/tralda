@@ -50,14 +50,24 @@ class LCA:
         """
         if not isinstance(tree, Tree):
             raise TypeError("`tree` must be of type `Tree`")
+        if tree.root is None:
+            raise ValueError("`tree` must be non-empty")
 
         self._tree = tree
 
         self._V = [v for v in self._tree.preorder()]
         self._index = {v: i for i, v in enumerate(self._V)}
 
-        # store labels for queries via label
-        self._label_dict = {v.label: v for v in self._V if hasattr(v, "label")}
+        # store labels for queries via label; duplicate labels are an error
+        self._label_dict: dict = {}
+        for v in self._V:
+            if hasattr(v, "label"):
+                if v.label in self._label_dict:
+                    raise ValueError(
+                        f"Duplicate node label {v.label!r}: label-based queries require unique "
+                        "labels"
+                    )
+                self._label_dict[v.label] = v
 
         self._euler_tour = []
         # levels of the vertices in the Euler tour
@@ -221,13 +231,13 @@ class LCA:
                 yield t
 
     def _precompute_logs(self, x: int) -> list[int]:
-        """Efficiently pre-compute the ceil(log2(x)) values.
+        """Efficiently pre-compute the floor(log2(x)) values.
 
         Args:
-            x: The highest integer for which to pre-compute ceil(log2(x)).
+            x: The highest integer for which to pre-compute floor(log2(x)).
 
         Returns:
-            A list of computed ceil(log2(x)) values.
+            A list of computed floor(log2(x)) values.
         """
         log_2 = [0 for _ in range(x + 1)]
         log_2[0] = -1
