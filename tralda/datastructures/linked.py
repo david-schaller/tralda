@@ -62,7 +62,7 @@ class LinkedList:
         """
         return self._count
 
-    def __nonzero__(self) -> bool:
+    def __bool__(self) -> bool:
         """Returns whether the list is non-empty.
 
         Returns:
@@ -309,7 +309,8 @@ class LinkedList:
         if self._first:
             value = self._first._value
             self._first = self._first._next
-            self._first._next = None
+            if not self._first:
+                self._last = None
             self._count -= 1
             return value
 

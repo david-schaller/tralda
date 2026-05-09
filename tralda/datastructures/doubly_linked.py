@@ -66,7 +66,7 @@ class DLList:
         """
         return self._count
 
-    def __nonzero__(self) -> bool:
+    def __bool__(self) -> bool:
         """Returns whether the list is non-empty.
 
         Returns:
@@ -156,7 +156,7 @@ class DLList:
 
         return node
 
-    def append(self, value: Any) -> DLList:
+    def append(self, value: Any) -> DLListNode:
         """Append an item to the list.
 
         Args:
