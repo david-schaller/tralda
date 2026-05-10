@@ -308,6 +308,9 @@ class MTT:
         else:
             root = self._aho(self.L, self.R)
 
+        if root is None:
+            return None
+
         return root if return_root else Tree(root)
 
     def _trivial_case(self, L: Collection[Any]) -> TreeNode:
