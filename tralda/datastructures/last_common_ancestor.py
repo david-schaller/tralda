@@ -38,12 +38,17 @@ class LCA:
         3. https://cp-algorithms.com/graph/lca_farachcoltonbender.html
     """
 
-    def __init__(self, tree: Tree) -> None:
+    def __init__(self, tree: Tree, strict_labels: bool = True) -> None:
         """Constructor for class LCA.
 
         Args:
             tree: The Tree instance for which this instance will allow efficient last common
                 ancestor queries.
+            strict_labels: If True (default), raise a ``ValueError`` when two nodes share the
+                same label, since label-based queries would be ambiguous.  Set to False to
+                silently keep only the first occurrence in the label map; in that case
+                label-based queries may return unexpected results for duplicate labels, so
+                callers should use ``TreeNode`` objects directly.
 
         Raises:
             TypeError: If `tree` is not a Tree instance.
@@ -61,12 +66,17 @@ class LCA:
         # store labels for queries via label; duplicate labels are an error
         self._label_dict: dict = {}
         for v in self._V:
-            if hasattr(v, "label"):
-                if v.label in self._label_dict:
+            if not hasattr(v, "label"):
+                continue
+
+            if v.label in self._label_dict:
+                if strict_labels:
                     raise ValueError(
-                        f"Duplicate node label {v.label!r}: label-based queries require unique "
-                        "labels"
+                        f"Duplicate node label {v.label!r}: label-based queries require "
+                        "unique labels"
                     )
+                # else: keep the first occurrence; label-based queries are unreliable
+            else:
                 self._label_dict[v.label] = v
 
         self._euler_tour = []

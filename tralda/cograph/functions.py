@@ -100,7 +100,11 @@ def paths_of_length_2(cotree: Tree) -> Iterator[tuple[TreeNode, TreeNode, TreeNo
         ValueError: If the label is not 'series' and 'parallel' for any inner node.
     """
     leaves = cotree.leaf_dict()
-    lca = LCA(cotree)
+
+    # strict_labels=False: inner nodes share the labels "series"/"parallel", which would
+    # otherwise cause LCA to raise. All queries below use TreeNode objects directly, so
+    # label-based lookup is never needed.
+    lca = LCA(cotree, strict_labels=False)
 
     for u in cotree.inner_nodes():
         if u.label == "parallel":
