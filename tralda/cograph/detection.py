@@ -62,7 +62,7 @@ class LinearCographDetector:
             The cotree representation of the graph, or None if it is not a cograph.
         """
         if len(self.V) == 0:
-            raise RuntimeError("empty graph in cograph recognition")
+            return None
         elif len(self.V) == 1:
             self.tree.root = TreeNode(label=self.V[0])
 
