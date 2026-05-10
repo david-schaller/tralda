@@ -105,7 +105,7 @@ class BinarySearchTree(BaseBinarySearchTree):
         """
         self.root = self._recursive_pop_at_index(idx, self.root)
 
-    def _recusive_pop_at_index(self, idx: int, node: BinaryNode) -> BinaryNode | None:
+    def _recursive_pop_at_index(self, idx: int, node: BinaryNode) -> BinaryNode | None:
         """Recursive deletion of a node at the index.
 
         Args:
@@ -128,9 +128,9 @@ class BinarySearchTree(BaseBinarySearchTree):
             self._temp_attributes = node.get_attributes()
             return self._recursive_delete(node.key, node)
         elif idx < node_idx:
-            node.left = self._recusive_pop_at_index(idx, node.left)
+            node.left = self._recursive_pop_at_index(idx, node.left)
         else:
-            node.right = self._recusive_pop_at_index(idx - node_idx - 1, node.right)
+            node.right = self._recursive_pop_at_index(idx - node_idx - 1, node.right)
 
         if node is not None:
             node.update()
