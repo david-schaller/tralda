@@ -45,8 +45,10 @@ class Partition:
         """
         return PartitionIterator(self)
 
-    def __next__(self):
-        pass
+    def __next__(self) -> None:
+        raise TypeError(
+            "'Partition' object is not an iterator; use iter() to obtain a 'PartitionIterator'"
+        )
 
     def in_same_set(self, x: Any, y: Any) -> bool:
         """Check whether two items are in the same set of the partition.
@@ -111,7 +113,8 @@ class Partition:
             KeyError: If 'repr1' or 'repr2' is not an item in the partition.
 
         Returns:
-            The smaller of the original two sets that now have been merged.
+            The smaller of the original two sets that now have been merged. When both sets have
+                equal size, the set containing ``repr1`` is returned.
         """
         try:
             set1 = self._item2set[repr1]
