@@ -35,7 +35,8 @@ class TreeSet(BaseBinarySearchTree):
         Returns:
             Whether all integrity checks have been passed.
         """
-        super().check_integrity(verbose=verbose)
+        if not super().check_integrity(verbose=verbose):
+            return False
 
         for node in self._inorder_traversal():
             if abs(node.balance()) > 1:
