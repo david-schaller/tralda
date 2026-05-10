@@ -70,7 +70,7 @@ class BinaryNode:
         """
         # test both ways as subclasses are not allowed here
         if not (isinstance(other, type(self)) and isinstance(self, type(other))):
-            TypeError(
+            raise TypeError(
                 f"nodes must have the same type (self if {type(self)}, other is {type(other)})"
             )
 
@@ -255,7 +255,10 @@ class BaseBinarySearchTree:
         return self.iterator_class(self)
 
     def __next__(self) -> None:
-        pass
+        raise TypeError(
+            f"'{type(self).__name__}' object is not an iterator; "
+            "use iter() to obtain a tree iterator"
+        )
 
     def __nonzero__(self) -> bool:
         """Return whether the tree is non-empty.
@@ -320,6 +323,9 @@ class BaseBinarySearchTree:
         Raises:
             IndexError: If the index is out of bounds.
         """
+        if not self.root:
+            raise IndexError(f"index {idx} is out of range")
+
         if idx < 0:
             if idx < -self.root.size:
                 raise IndexError(f"index {idx} is out of range")
