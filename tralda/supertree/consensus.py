@@ -184,6 +184,14 @@ def _preprocess(
             setattr(new, key, value)
     tree2 = Tree(orig_to_new[tree2.root])
 
+    # LCA requires unique labels.  Inner nodes that were parsed from a Newick
+    # string without an explicit label receive label="" which causes duplicates.
+    # Strip such empty labels from inner nodes of the working copy so that the
+    # LCA constructor does not raise a false-positive uniqueness error.
+    for _v in tree2.inner_nodes():
+        if getattr(_v, "label", None) == "":
+            del _v.label
+
     # dict storing for each vertex the number edges from the root
     depth = {}
     for v in tree2.preorder():
@@ -337,7 +345,7 @@ def one_way_compatible(
         ):
             # this should never appear
             if not u.parent:
-                raise RuntimeError(f"vertex {u.parent} has no parent")
+                raise RuntimeError(f"vertex {u} has no parent")
 
             bad_edges.append((u.parent, u))
 
