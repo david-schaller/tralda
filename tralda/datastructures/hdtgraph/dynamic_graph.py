@@ -36,7 +36,7 @@ class _Edge:
         level: int = 0,
         is_tree_edge: bool = False,
     ) -> None:
-        """Constructor od the _Edge class.
+        """Constructor of the _Edge class.
 
         Args:
             e: A tuple containing the two endpoints of the edge.
@@ -92,7 +92,7 @@ class _Level:
         """Add a node and add it as a single-node Euler Tour tree to the forest on this level.
 
         Args:
-            u: The element to add as a node on this level.
+            v: The element to add as a node on this level.
         """
         ett_node = self.add_loose_node(v)
 
@@ -105,13 +105,13 @@ class _Level:
 
         self.forest.add(ett)
 
-    def add_loose_node(self, v: Any) -> ETTree:
+    def add_loose_node(self, v: Any) -> ETTreeNode:
         """Add a loose node on this level.
 
         This function does not create a Euler Tour tree that contains the new node.
 
         Args:
-            u: The element to add as a node on this level.
+            v: The element to add as a node on this level.
         """
         ett_node = ETTreeNode(v, active=True)
 
@@ -461,7 +461,7 @@ class HDTGraph:
             for ett in self._levels[level].forest:
                 print([occ.key for occ in ett], ett.num_active_occurrences)
         else:
-            ValueError(f"invalid level: {level} of type {type(level)}")
+            raise ValueError(f"invalid level: {level} of type {type(level)}")
 
     def _replace(self, u: Any, v: Any, level: _Level) -> None:
         """Search for an replacement edge to reconnect u and v on the given level.
