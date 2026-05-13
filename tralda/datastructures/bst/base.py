@@ -260,7 +260,7 @@ class BaseBinarySearchTree:
             "use iter() to obtain a tree iterator"
         )
 
-    def __nonzero__(self) -> bool:
+    def __bool__(self) -> bool:
         """Return whether the tree is non-empty.
 
         Returns:
