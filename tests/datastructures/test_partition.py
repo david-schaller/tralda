@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import random
+
 import pytest
 
 from tralda.datastructures.partition import Partition, PartitionIterator
@@ -397,3 +399,310 @@ class TestWorkflow:
         for x in elements:
             for y in elements:
                 assert p.in_same_set(x, y)
+
+
+# ===========================================================================
+# separated_xy_z — previously uncovered bug path
+# ===========================================================================
+
+
+class TestSeparatedXYZMissingZWhenXYDiffer:
+    """Regression tests for the short-circuit bug fixed in separated_xy_z.
+
+    When x and y are in *different* sets the ``and`` short-circuits, so z was
+    never looked up.  A missing z must always raise KeyError regardless of
+    whether x and y are together or apart.
+    """
+
+    def test_missing_z_raises_when_xy_in_different_sets(self):
+        p = Partition([[1, 2], [3]])
+        # x=1 and y=3 are in DIFFERENT sets — this is the previously buggy path
+        with pytest.raises(KeyError):
+            p.separated_xy_z(1, 3, 99)
+
+    @pytest.mark.parametrize(
+        "sets, x, y, z",
+        [
+            # x and y together
+            ([[1, 2], [3]], 1, 2, 99),
+            # x and y apart — the previously uncovered path
+            ([[1, 2], [3]], 1, 3, 99),
+            ([[1], [2], [3]], 2, 3, 99),
+        ],
+    )
+    def test_missing_z_always_raises_key_error(self, sets, x, y, z):
+        p = Partition(sets)
+        with pytest.raises(KeyError):
+            p.separated_xy_z(x, y, z)
+
+    @pytest.mark.parametrize(
+        "sets, x, y, z",
+        [
+            # x missing, y and z in different sets
+            ([[1, 2], [3]], 99, 1, 3),
+            # y missing, x and z in different sets
+            ([[1, 2], [3]], 1, 99, 3),
+        ],
+    )
+    def test_missing_xy_always_raises_key_error(self, sets, x, y, z):
+        p = Partition(sets)
+        with pytest.raises(KeyError):
+            p.separated_xy_z(x, y, z)
+
+    def test_all_three_missing_raises_key_error(self):
+        p = Partition([[1, 2], [3]])
+        with pytest.raises(KeyError):
+            p.separated_xy_z(97, 98, 99)
+
+
+# ===========================================================================
+# separated_xy_z — all three in the same set
+# ===========================================================================
+
+
+class TestSeparatedXYZAllSameSet:
+    """When x, y, and z are all in the same set the result must be False."""
+
+    @pytest.mark.parametrize(
+        "sets, x, y, z",
+        [
+            ([[1, 2, 3]], 1, 2, 3),
+            ([[1, 2, 3]], 1, 3, 2),
+            ([[1, 2, 3, 4, 5]], 3, 4, 5),
+        ],
+    )
+    def test_all_in_same_set_returns_false(self, sets, x, y, z):
+        p = Partition(sets)
+        assert p.separated_xy_z(x, y, z) is False
+
+    def test_z_joins_xy_set_after_merge_returns_false(self):
+        p = Partition([[1, 2], [3]])
+        assert p.separated_xy_z(1, 2, 3) is True
+        p.merge(1, 3)
+        assert p.separated_xy_z(1, 2, 3) is False
+
+
+# ===========================================================================
+# PartitionIterator — exhaustion and StopIteration
+# ===========================================================================
+
+
+class TestPartitionIteratorExhaustion:
+    def test_iterator_raises_stop_iteration_when_exhausted(self):
+        p = Partition([[1], [2]])
+        it = iter(p)
+        next(it)
+        next(it)
+        with pytest.raises(StopIteration):
+            next(it)
+
+    def test_empty_partition_iterator_raises_immediately(self):
+        p = Partition([])
+        it = iter(p)
+        with pytest.raises(StopIteration):
+            next(it)
+
+    def test_iterator_iter_returns_self(self):
+        p = Partition([[1, 2]])
+        it = iter(p)
+        assert iter(it) is it
+
+    def test_iterator_yields_correct_number_of_sets(self):
+        sets = [[1, 2], [3, 4], [5]]
+        p = Partition(sets)
+        assert sum(1 for _ in iter(p)) == len(sets)
+
+    def test_iterator_still_valid_after_full_traversal(self):
+        """A fresh iterator obtained after a full traversal works correctly."""
+        p = Partition([[1], [2], [3]])
+        _ = list(p)  # exhaust one implicit iterator
+        assert list(p) == list(p)  # two fresh iterators give the same result
+
+
+# ===========================================================================
+# merge — return-value invariants
+# ===========================================================================
+
+
+class TestMergeReturnValueInvariants:
+    @pytest.mark.parametrize(
+        "sets, repr1, repr2, expected_smaller",
+        [
+            # clearly smaller set is the first arg's set
+            ([[1], [2, 3, 4]], 1, 2, {1}),
+            # clearly smaller set is the second arg's set
+            ([[1, 2, 3], [4]], 1, 4, {4}),
+            # equal size — repr1's set is returned
+            ([[1, 2], [3, 4]], 1, 3, {1, 2}),
+            ([[1, 2], [3, 4]], 3, 1, {3, 4}),
+        ],
+    )
+    def test_return_value_is_smaller_set(self, sets, repr1, repr2, expected_smaller):
+        p = Partition(sets)
+        result = p.merge(repr1, repr2)
+        assert result == expected_smaller
+
+    def test_returned_set_union_equals_merged_set(self):
+        """The merged set must contain all elements; the returned set must be a subset of it."""
+        p = Partition([[1, 2], [3, 4, 5]])
+        smaller = p.merge(1, 3)
+        # After merge there is exactly one set in the partition
+        (merged,) = list(p)
+        assert merged == {1, 2, 3, 4, 5}
+        assert smaller.issubset(merged)
+
+    def test_merge_same_set_returns_empty_set_not_none(self):
+        """Idempotent merge must return an empty set, not None or some falsy value."""
+        p = Partition([[1, 2, 3]])
+        result = p.merge(1, 3)
+        assert result == set()
+        assert isinstance(result, set)
+
+
+# ===========================================================================
+# Randomised tests
+# ===========================================================================
+
+
+class TestRandomised:
+    """Property-style tests driven by random seeds to increase structural coverage."""
+
+    @pytest.mark.parametrize("seed", [0, 42, 123, 999, 7])
+    def test_union_find_correctness(self, seed: int) -> None:
+        """A reference union-find (dict-based) must agree with Partition on all queries."""
+        rng = random.Random(seed)
+        n = 40
+        elements = list(range(n))
+
+        # Reference: component id per element (path-compressed manually)
+        comp: dict[int, int] = {e: e for e in elements}
+
+        def find(x: int) -> int:
+            while comp[x] != x:
+                comp[x] = comp[comp[x]]
+                x = comp[x]
+            return x
+
+        p = Partition([[e] for e in elements])
+
+        for _ in range(30):
+            a, b = rng.sample(elements, 2)
+            p.merge(a, b)
+            # Mirror in reference
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                comp[ra] = rb
+
+        # Verify every pair
+        for i in range(n):
+            for j in range(i + 1, n):
+                assert p.in_same_set(i, j) == (find(i) == find(j)), (
+                    f"seed={seed}: in_same_set({i},{j}) disagrees with reference"
+                )
+
+    @pytest.mark.parametrize("seed", [0, 17, 256])
+    def test_len_decrements_exactly_once_per_cross_set_merge(self, seed: int) -> None:
+        """Each merge of two *distinct* sets must decrement len by exactly 1."""
+        rng = random.Random(seed)
+        n = 20
+        p = Partition([[i] for i in range(n)])
+
+        for _ in range(25):
+            a, b = rng.sample(range(n), 2)
+            before = len(p)
+            same = p.in_same_set(a, b)
+            p.merge(a, b)
+            after = len(p)
+            if same:
+                assert after == before
+            else:
+                assert after == before - 1
+
+    @pytest.mark.parametrize("seed", [1, 2, 3])
+    def test_iteration_always_covers_all_elements(self, seed: int) -> None:
+        """After any sequence of merges, iterating the partition yields every element."""
+        rng = random.Random(seed)
+        n = 30
+        elements = set(range(n))
+        p = Partition([[e] for e in elements])
+
+        for _ in range(15):
+            a, b = rng.sample(list(elements), 2)
+            p.merge(a, b)
+
+        iterated = {elem for s in p for elem in s}
+        assert iterated == elements
+
+    @pytest.mark.parametrize("seed", [10, 20, 30])
+    def test_iterated_sets_partition_elements(self, seed: int) -> None:
+        """Sets yielded by the iterator must be pairwise disjoint and cover all elements."""
+        rng = random.Random(seed)
+        n = 25
+        elements = set(range(n))
+        p = Partition([[e] for e in elements])
+
+        for _ in range(10):
+            a, b = rng.sample(list(elements), 2)
+            p.merge(a, b)
+
+        sets = list(p)
+        # pairwise disjoint
+        for i in range(len(sets)):
+            for j in range(i + 1, len(sets)):
+                assert sets[i].isdisjoint(sets[j])
+        # union equals original elements
+        assert set().union(*sets) == elements
+
+    @pytest.mark.parametrize("seed", [5, 50, 500])
+    def test_separated_xy_z_consistent_with_in_same_set(self, seed: int) -> None:
+        """separated_xy_z(x,y,z) must equal in_same_set(x,y) and not in_same_set(x,z)."""
+        rng = random.Random(seed)
+        n = 20
+        elements = list(range(n))
+        p = Partition([[e] for e in elements])
+
+        for _ in range(12):
+            a, b = rng.sample(elements, 2)
+            p.merge(a, b)
+
+        for _ in range(50):
+            x, y, z = rng.sample(elements, 3)
+            expected = p.in_same_set(x, y) and not p.in_same_set(x, z)
+            assert p.separated_xy_z(x, y, z) == expected
+
+    @pytest.mark.parametrize("seed", [11, 22, 33])
+    def test_merge_smaller_set_returned_content(self, seed: int) -> None:
+        """The set returned by merge must equal the smaller of the two pre-merge sets."""
+        rng = random.Random(seed)
+        n = 20
+        elements = list(range(n))
+        p = Partition([[e] for e in elements])
+
+        # Record which elements are in each component using the reference structure
+        comp: dict[int, set[int]] = {e: {e} for e in elements}
+
+        def find_root(x: int) -> int:
+            for root, members in comp.items():
+                if x in members:
+                    return root
+            raise KeyError(x)
+
+        for _ in range(15):
+            a, b = rng.sample(elements, 2)
+            root_a = find_root(a)
+            root_b = find_root(b)
+
+            if root_a == root_b:
+                result = p.merge(a, b)
+                assert result == set()
+                continue
+
+            set_a = comp.pop(root_a)
+            set_b = comp.pop(root_b)
+            expected_smaller = set_a if len(set_a) <= len(set_b) else set_b
+            merged = set_a | set_b
+            new_root = next(iter(merged))
+            comp[new_root] = merged
+
+            result = p.merge(a, b)
+            assert result == expected_smaller
