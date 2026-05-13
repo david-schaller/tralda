@@ -10,6 +10,7 @@ from collections.abc import Iterable
 from typing import Any
 
 from tralda.datastructures.doubly_linked import DLList
+from tralda.datastructures.doubly_linked import DLListNode
 
 
 class Partition:
@@ -22,7 +23,7 @@ class Partition:
             iterable: An iterable of iterables defining the initial partition.
         """
         self._partition = DLList()
-        self._item2set: dict[Any, DLList] = {}
+        self._item2set: dict[Any, DLListNode] = {}
 
         for set_ in iterable:
             dll_node = self._partition.append(set(set_))
@@ -87,17 +88,21 @@ class Partition:
             KeyError: If x, y, or z is not an item in the partition.
         """
         try:
-            return (
-                self._item2set[x] is self._item2set[y]
-                and self._item2set[x] is not self._item2set[z]
-            )
+            sx = self._item2set[x]
         except KeyError:
-            if x not in self._item2set:
-                raise KeyError(f"{x} is not an item in the partition")
-            elif y not in self._item2set:
-                raise KeyError(f"{y} is not an item in the partition")
-            else:
-                raise KeyError(f"{z} is not an item in the partition")
+            raise KeyError(f"{x} is not an item in the partition")
+
+        try:
+            sy = self._item2set[y]
+        except KeyError:
+            raise KeyError(f"{y} is not an item in the partition")
+
+        try:
+            sz = self._item2set[z]
+        except KeyError:
+            raise KeyError(f"{z} is not an item in the partition")
+
+        return sx is sy and sx is not sz
 
     def merge(self, repr1: Any, repr2: Any) -> set[Any]:
         """Merge two sets of the partition based on arbitrary representatives.
