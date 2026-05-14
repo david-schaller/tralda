@@ -9,6 +9,7 @@ import pytest
 from tralda.datastructures import Tree
 from tralda.supertree.build import (
     Build,
+    MTT,
     aho_graph,
     best_pair_merge_first,
     build_supertree,
@@ -282,9 +283,8 @@ class TestBuildSupertree:
         base = Tree.random_tree(30, binary=True)
         partial = make_partial_trees(base)
         result = build_supertree(partial)
-        if result is not None:
-            _, triples = tree_profile_to_triples(partial)
-            assert displays_all_triples(result, triples)
+        _, triples = tree_profile_to_triples(partial)
+        assert displays_all_triples(result, triples)
 
     @pytest.mark.parametrize("seed", SEEDS)
     def test_leaf_set_equals_union(self, seed):
@@ -292,10 +292,9 @@ class TestBuildSupertree:
         base = Tree.random_tree(20, binary=True)
         partial = make_partial_trees(base, n=5)
         result = build_supertree(partial)
-        if result is not None:
-            expected_leaves = {v.label for t in partial for v in t.leaves()}
-            actual_leaves = {v.label for v in result.leaves()}
-            assert actual_leaves == expected_leaves
+        expected_leaves = {v.label for t in partial for v in t.leaves()}
+        actual_leaves = {v.label for v in result.leaves()}
+        assert actual_leaves == expected_leaves
 
     @pytest.mark.parametrize("seed", SEEDS)
     def test_result_is_phylogenetic(self, seed):
@@ -303,8 +302,50 @@ class TestBuildSupertree:
         base = Tree.random_tree(20, binary=True)
         partial = make_partial_trees(base)
         result = build_supertree(partial)
-        if result is not None:
-            assert result.is_phylogenetic()
+        assert result is not None
+        assert result.is_phylogenetic()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MTT
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class TestMTT:
+    # ── No forbidden triples (falls back to Aho) ──────────────────────────────
+
+    def test_no_forbidden_triples_returns_tree(self):
+        T = Tree.parse_newick("((a,b),(c,d));")
+        leaves, triples = tree_profile_to_triples([T])
+        result = MTT(triples, leaves).build_tree()
+        assert result is not None
+        assert result.equal_topology(T)
+
+    # ── Forbidden triples that are avoidable ──────────────────────────────────
+
+    def test_avoidable_forbidden_triple_returns_tree(self):
+        # Required: ab|c.  Forbidden: cd|a.  On 4 leaves the algorithm can
+        # produce ((a,b),c,d) which displays ab|c but not cd|a.
+        leaves = {"a", "b", "c", "d"}
+        required = [("a", "b", "c")]
+        forbidden = [("c", "d", "a")]
+        result = MTT(required, leaves, F=forbidden).build_tree()
+        assert result is not None
+        assert result.is_phylogenetic()
+        assert {v.label for v in result.leaves()} == leaves
+
+    # ── Conflicting required / forbidden triple → regression for None path ────
+
+    @pytest.mark.parametrize("return_root", [False, True])
+    def test_conflicting_required_and_forbidden_returns_none(self, return_root):
+        # Required: ab|c.  Forbidden: ab|c (same triple).
+        # mtt_partition merges all leaves into one component so _mtt returns
+        # None and build_tree must propagate that as None.
+        leaves = {"a", "b", "c"}
+        required = [("a", "b", "c")]
+        forbidden = [("a", "b", "c")]
+        result = MTT(required, leaves, F=forbidden).build_tree(return_root=return_root)
+        assert result is None
 
 
 # ══════════════════════════════════════════════════════════════════════════════

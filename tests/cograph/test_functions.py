@@ -330,8 +330,7 @@ class TestClusterDeletion:
             cluster_deletion(nx.path_graph(4))
 
     def test_empty_graph_raises(self):
-        # Empty graph triggers the RuntimeError from LinearCographDetector
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             cluster_deletion(nx.Graph())
 
 

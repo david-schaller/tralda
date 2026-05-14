@@ -52,6 +52,8 @@ class LCA:
 
         Raises:
             TypeError: If `tree` is not a Tree instance.
+            ValueError: If `tree` is empty or if `strict_labels` is True and duplicate labels are
+                found.
         """
         if not isinstance(tree, Tree):
             raise TypeError("`tree` must be of type `Tree`")

@@ -71,7 +71,7 @@ class BinaryNode:
         # test both ways as subclasses are not allowed here
         if not (isinstance(other, type(self)) and isinstance(self, type(other))):
             raise TypeError(
-                f"nodes must have the same type (self if {type(self)}, other is {type(other)})"
+                f"nodes must have the same type (self is {type(self)}, other is {type(other)})"
             )
 
         other.set_attributes(self.get_attributes())
