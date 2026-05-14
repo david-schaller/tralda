@@ -47,7 +47,7 @@ def sort_edge(u: Any, v: Any) -> tuple[Any, Any]:
 # --------------------------------------------------------------------------------------------------
 
 
-def build_adjacency_matrix(graph: nx.Graph | nx.DiGraph) -> np.ndarray:
+def build_adjacency_matrix(graph: nx.Graph | nx.DiGraph) -> tuple[np.ndarray, dict[Any, int]]:
     """Return an adjacency matrix.
 
     Args:
@@ -55,6 +55,7 @@ def build_adjacency_matrix(graph: nx.Graph | nx.DiGraph) -> np.ndarray:
 
     Returns:
         An adjacency matrix representing the provided graph.
+        A dict mapping each node to its row/column index.
     """
     # maps node --> row/column index
     index = {node: i for i, node in enumerate(graph.nodes())}
@@ -137,7 +138,6 @@ def symmetric_diff(graph1: nx.Graph | nx.DiGraph, graph2: nx.Graph | nx.DiGraph)
 
     if set1 != set2:
         raise RuntimeError("graphs do not have the same vertex set")
-        return
 
     sym_diff_number = 0
 
