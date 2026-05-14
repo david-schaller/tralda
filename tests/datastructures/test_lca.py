@@ -502,10 +502,8 @@ class TestEdgeInterface:
         """Edge (u, v) should be an ancestor-or-equal of any node in the subtree of v."""
         lca = LCA(example_tree)
         for parent, child in example_tree.inner_edges():
-            # child is an inner node; pick any leaf in its subtree
-            leaf = next(example_tree.traverse_subtree(child))
-            if not leaf.is_leaf():
-                continue
+            # child is an inner node; pick an actual leaf in its subtree
+            leaf = next(node for node in example_tree.traverse_subtree(child) if node.is_leaf())
             assert lca.ancestor_or_equal((parent, child), leaf)
 
     def test_node_ancestor_of_edge(self, example_tree):

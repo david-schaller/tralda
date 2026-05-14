@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.0.3] - 2026-05-14
+
+### 🧪 Tests
+
+- Set up comprehensive test suite using `pytest`, covering all main modules:
+  `Tree`, linked lists, supertree algorithms (`BUILD`, `BuildST`, `LinCR`, loose consensus),
+  cograph detection and editing, `Partition`, balanced BSTs (AVL, red-black, simple),
+  `HDTGraph`, and utility functions.
+
+### 🐛 Bug fixes
+
+- `last_common_ancestor`: raise an exception for empty trees and for trees with non-unique labels.
+- `linked`: fix bug in `popleft`; replace `__nonzero__` with `__bool__`.
+- `build`: `build_tree` now correctly returns `None` when the input triples are incompatible.
+- `consensus`: allow empty string as a node label.
+- `cograph.detection`: return `None` for an empty graph instead of raising an error.
+- `cograph.functions`: fix `paths_of_length_2` to use the new `strict_labels` parameter in `LCA`.
+- `partition`: fix silent miss when element `z` is absent; make `__next__` raise
+   `TypeError` instructing callers to use `iter()`.
+- `avl`: do not silently ignore the result of `super().check_integrity()`.
+- `bst.base`: add and fix missing exceptions; replace `__nonzero__` with `__bool__`.
+- `bst.simple`: fix typo in internal method name `_recursive_pop_at_index`.
+- `dynamic_graph`: add missing `raise` statement; fix variable names in docstring.
+- `tree_tools`: apply empty-tree check consistently across all functions.
+- `graph_tools`: fix incorrect type annotation.
+
+### 🔖 Release
+
+- Added a CI workflow using GitHub Actions that automatically runs the `pre-commit` hooks and
+  the full test suite across Python 3.10–3.13 on every push and pull request.
+
 ## [2.0.2] - 2026-05-06
 
 ### 🐛 Bug fixes
