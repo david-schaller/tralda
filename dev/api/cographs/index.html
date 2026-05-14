@@ -2051,7 +2051,7 @@
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">            The cotree representation of the graph, or None if it is not a cograph.</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;empty graph in cograph recognition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>            <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">TreeNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
@@ -2656,7 +2656,7 @@
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        The cotree representation of the graph, or None if it is not a cograph.</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;empty graph in cograph recognition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>        <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">TreeNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
@@ -4824,11 +4824,7 @@ it may be disconnected.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/cograph/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-120">120</a></span>
-<span class="normal"><a href="#__codelineno-0-121">121</a></span>
-<span class="normal"><a href="#__codelineno-0-122">122</a></span>
-<span class="normal"><a href="#__codelineno-0-123">123</a></span>
-<span class="normal"><a href="#__codelineno-0-124">124</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-124">124</a></span>
 <span class="normal"><a href="#__codelineno-0-125">125</a></span>
 <span class="normal"><a href="#__codelineno-0-126">126</a></span>
 <span class="normal"><a href="#__codelineno-0-127">127</a></span>
@@ -4849,32 +4845,36 @@ it may be disconnected.</p>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
 <span class="normal"><a href="#__codelineno-0-144">144</a></span>
-<span class="normal"><a href="#__codelineno-0-145">145</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="k">def</span><span class="w"> </span><span class="nf">random_cotree</span><span class="p">(</span><span class="n">number_of_leaves</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">force_series_root</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tree</span><span class="p">:</span>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a random cotree.</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">        number_of_leaves: The number of leaves in the resulting tree.</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">        force_series_root: If True, the cograph of the resulting cotree will be connected, otherwise</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">            it may be disconnected.</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        A cotree, i.e., a Tree instance with inner vertex labels &#39;series&#39; and &#39;parallel&#39;.</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">cotree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">number_of_leaves</span><span class="p">)</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="c1"># assign labels (&#39;series&#39;, &#39;parallel&#39;)</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cotree</span><span class="o">.</span><span class="n">preorder</span><span class="p">():</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">():</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>            <span class="k">if</span> <span class="n">force_series_root</span><span class="p">:</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>                <span class="n">v</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;series&quot;</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>                <span class="n">v</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;series&quot;</span> <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="s2">&quot;parallel&quot;</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a>            <span class="n">v</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;series&quot;</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;parallel&quot;</span> <span class="k">else</span> <span class="s2">&quot;parallel&quot;</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a>    <span class="k">return</span> <span class="n">cotree</span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
+<span class="normal"><a href="#__codelineno-0-146">146</a></span>
+<span class="normal"><a href="#__codelineno-0-147">147</a></span>
+<span class="normal"><a href="#__codelineno-0-148">148</a></span>
+<span class="normal"><a href="#__codelineno-0-149">149</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">def</span><span class="w"> </span><span class="nf">random_cotree</span><span class="p">(</span><span class="n">number_of_leaves</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">force_series_root</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tree</span><span class="p">:</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a random cotree.</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">        number_of_leaves: The number of leaves in the resulting tree.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        force_series_root: If True, the cograph of the resulting cotree will be connected, otherwise</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            it may be disconnected.</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        A cotree, i.e., a Tree instance with inner vertex labels &#39;series&#39; and &#39;parallel&#39;.</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">cotree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">number_of_leaves</span><span class="p">)</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="c1"># assign labels (&#39;series&#39;, &#39;parallel&#39;)</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cotree</span><span class="o">.</span><span class="n">preorder</span><span class="p">():</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">():</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>            <span class="k">if</span> <span class="n">force_series_root</span><span class="p">:</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>                <span class="n">v</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;series&quot;</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>                <span class="n">v</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;series&quot;</span> <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="s2">&quot;parallel&quot;</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>            <span class="n">v</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;series&quot;</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;parallel&quot;</span> <span class="k">else</span> <span class="s2">&quot;parallel&quot;</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="k">return</span> <span class="n">cotree</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4988,11 +4988,7 @@ problem.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/cograph/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-148">148</a></span>
-<span class="normal"><a href="#__codelineno-0-149">149</a></span>
-<span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-152">152</a></span>
 <span class="normal"><a href="#__codelineno-0-153">153</a></span>
 <span class="normal"><a href="#__codelineno-0-154">154</a></span>
 <span class="normal"><a href="#__codelineno-0-155">155</a></span>
@@ -5040,59 +5036,63 @@ problem.</p>
 <span class="normal"><a href="#__codelineno-0-197">197</a></span>
 <span class="normal"><a href="#__codelineno-0-198">198</a></span>
 <span class="normal"><a href="#__codelineno-0-199">199</a></span>
-<span class="normal"><a href="#__codelineno-0-200">200</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="k">def</span><span class="w"> </span><span class="nf">cluster_deletion</span><span class="p">(</span><span class="n">cograph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">Tree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Cluster deletion for cographs.</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Returns a partition of a cograph into disjoint cliques with a minimal number of edges between</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    the cliques.</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">        cograph: The cograph (as a graph or cotree) for which cluster deletion shall be performed.</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        A partition where each sublist corresponds to a clique in a solution of the cluster deletion</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            problem.</span>
+<span class="normal"><a href="#__codelineno-0-200">200</a></span>
+<span class="normal"><a href="#__codelineno-0-201">201</a></span>
+<span class="normal"><a href="#__codelineno-0-202">202</a></span>
+<span class="normal"><a href="#__codelineno-0-203">203</a></span>
+<span class="normal"><a href="#__codelineno-0-204">204</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="k">def</span><span class="w"> </span><span class="nf">cluster_deletion</span><span class="p">(</span><span class="n">cograph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">Tree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Cluster deletion for cographs.</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Returns a partition of a cograph into disjoint cliques with a minimal number of edges between</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    the cliques.</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        cograph: The cograph (as a graph or cotree) for which cluster deletion shall be performed.</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        ValueError: If the input is not a valid cograph or cotree.</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    References:</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">        1. Gao Y, Hare DR, Nastos J (2013) The cluster deletion problem for cographs. Discrete Math</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">           313(23):2763-2771, DOI: 10.1016/j.disc.2013.08.017.</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        2. Schaller D, Lafond M, Stadler PF, Wieseke N, Hellmuth M (2020) Indirect Identification</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">           of Horizontal Gene Transfer. Journal of Mathematical Biology 83(10),</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">           DOI: 10.1007/s00285-021-01631-0</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">cotree</span> <span class="o">=</span> <span class="n">cograph</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cograph</span><span class="p">,</span> <span class="n">Tree</span><span class="p">)</span> <span class="k">else</span> <span class="n">to_cotree</span><span class="p">(</span><span class="n">cograph</span><span class="p">)</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">cotree</span><span class="p">:</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not a valid cograph/cotree&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="n">partition</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">cotree</span><span class="o">.</span><span class="n">postorder</span><span class="p">():</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">u</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">u</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="k">elif</span> <span class="n">u</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;parallel&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>                <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">partition</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        A partition where each sublist corresponds to a clique in a solution of the cluster deletion</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            problem.</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        ValueError: If the input is not a valid cograph or cotree.</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    References:</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        1. Gao Y, Hare DR, Nastos J (2013) The cluster deletion problem for cographs. Discrete Math</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">           313(23):2763-2771, DOI: 10.1016/j.disc.2013.08.017.</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        2. Schaller D, Lafond M, Stadler PF, Wieseke N, Hellmuth M (2020) Indirect Identification</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">           of Horizontal Gene Transfer. Journal of Mathematical Biology 83(10),</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">           DOI: 10.1007/s00285-021-01631-0</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="n">cotree</span> <span class="o">=</span> <span class="n">cograph</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cograph</span><span class="p">,</span> <span class="n">Tree</span><span class="p">)</span> <span class="k">else</span> <span class="n">to_cotree</span><span class="p">(</span><span class="n">cograph</span><span class="p">)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">cotree</span><span class="p">:</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not a valid cograph/cotree&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>    <span class="n">partition</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">cotree</span><span class="o">.</span><span class="n">postorder</span><span class="p">():</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">u</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>            <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">u</span><span class="o">.</span><span class="n">label</span><span class="p">])</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>            <span class="c1"># naive sorting can be replaced by k-way merge-sort</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>            <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="k">elif</span> <span class="n">u</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;series&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">Q_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">partition</span><span class="p">[</span><span class="n">v</span><span class="p">]):</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]):</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>                        <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>                    <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Q_i</span><span class="p">)</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid cotree&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">return</span> <span class="n">partition</span><span class="p">[</span><span class="n">cotree</span><span class="o">.</span><span class="n">root</span><span class="p">]</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="k">elif</span> <span class="n">u</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;parallel&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>                <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">partition</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>            <span class="c1"># naive sorting can be replaced by k-way merge-sort</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>            <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">elif</span> <span class="n">u</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;series&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">Q_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">partition</span><span class="p">[</span><span class="n">v</span><span class="p">]):</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]):</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>                        <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>                    <span class="n">partition</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Q_i</span><span class="p">)</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid cotree&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="k">return</span> <span class="n">partition</span><span class="p">[</span><span class="n">cotree</span><span class="o">.</span><span class="n">root</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5213,11 +5213,7 @@ graph.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/cograph/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-203">203</a></span>
-<span class="normal"><a href="#__codelineno-0-204">204</a></span>
-<span class="normal"><a href="#__codelineno-0-205">205</a></span>
-<span class="normal"><a href="#__codelineno-0-206">206</a></span>
-<span class="normal"><a href="#__codelineno-0-207">207</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
 <span class="normal"><a href="#__codelineno-0-210">210</a></span>
@@ -5250,44 +5246,48 @@ graph.</p>
 <span class="normal"><a href="#__codelineno-0-237">237</a></span>
 <span class="normal"><a href="#__codelineno-0-238">238</a></span>
 <span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="k">def</span><span class="w"> </span><span class="nf">complete_multipartite_completion</span><span class="p">(</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="n">cograph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">Tree</span><span class="p">,</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="n">supply_graph</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">]:</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete multipartite graph completion for cographs.</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Returns a partition of the vertex set corresponding to the (maximal) independent sets in an</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    optimal edge completion of the cograph to a complete multipartite graph.</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        cograph: The cograph (as a graph or cotree) for which complete multipartite graph completion</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            shall be performed.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        supply_graph: If True, the solution is additionally returned as a NetworkX Graph.</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        A partition where each sublist corresponds to a (maximal) independent set in a solution of</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            the complete multipartite graph completion problem. And, optionally, the solution as a</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            graph.</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        ValueError: If the input is not a valid cograph or cotree.</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">cotree</span> <span class="o">=</span> <span class="n">cograph</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cograph</span><span class="p">,</span> <span class="n">Tree</span><span class="p">)</span> <span class="k">else</span> <span class="n">to_cotree</span><span class="p">(</span><span class="n">cograph</span><span class="p">)</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">cotree</span><span class="p">:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not a valid cograph/cotree&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="c1"># complete multipartite graph completion is equivalent to cluster deletion in the complement</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="c1"># cograph</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="n">compl_cotree</span> <span class="o">=</span> <span class="n">complement_cograph</span><span class="p">(</span><span class="n">cotree</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="k">def</span><span class="w"> </span><span class="nf">complete_multipartite_completion</span><span class="p">(</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="n">cograph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">Tree</span><span class="p">,</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="n">supply_graph</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">]:</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete multipartite graph completion for cographs.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Returns a partition of the vertex set corresponding to the (maximal) independent sets in an</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    optimal edge completion of the cograph to a complete multipartite graph.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        cograph: The cograph (as a graph or cotree) for which complete multipartite graph completion</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            shall be performed.</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        supply_graph: If True, the solution is additionally returned as a NetworkX Graph.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        A partition where each sublist corresponds to a (maximal) independent set in a solution of</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            the complete multipartite graph completion problem. And, optionally, the solution as a</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            graph.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        ValueError: If the input is not a valid cograph or cotree.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="n">cotree</span> <span class="o">=</span> <span class="n">cograph</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cograph</span><span class="p">,</span> <span class="n">Tree</span><span class="p">)</span> <span class="k">else</span> <span class="n">to_cotree</span><span class="p">(</span><span class="n">cograph</span><span class="p">)</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">cotree</span><span class="p">:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not a valid cograph/cotree&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="c1"># clusters are then equivalent to the maximal independent sets</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">independent_sets</span> <span class="o">=</span> <span class="n">cluster_deletion</span><span class="p">(</span><span class="n">compl_cotree</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">supply_graph</span><span class="p">:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="n">independent_sets</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="k">return</span> <span class="p">(</span><span class="n">independent_sets</span><span class="p">,</span> <span class="n">complete_multipartite_graph_from_sets</span><span class="p">(</span><span class="n">independent_sets</span><span class="p">))</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="c1"># complete multipartite graph completion is equivalent to cluster deletion in the complement</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="c1"># cograph</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">compl_cotree</span> <span class="o">=</span> <span class="n">complement_cograph</span><span class="p">(</span><span class="n">cotree</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="c1"># clusters are then equivalent to the maximal independent sets</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="n">independent_sets</span> <span class="o">=</span> <span class="n">cluster_deletion</span><span class="p">(</span><span class="n">compl_cotree</span><span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">supply_graph</span><span class="p">:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="k">return</span> <span class="n">independent_sets</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="p">(</span><span class="n">independent_sets</span><span class="p">,</span> <span class="n">complete_multipartite_graph_from_sets</span><span class="p">(</span><span class="n">independent_sets</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

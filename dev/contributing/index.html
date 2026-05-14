@@ -1343,6 +1343,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Running Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#continuous-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuous Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1588,6 +1605,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Running Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#continuous-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuous Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1782,7 +1816,8 @@ license as <code>tralda</code> (MIT License).</p>
 <p>Before submitting your pull request, make sure that:</p>
 <ul>
 <li>The <code>pre-commit</code> hooks pass (see <a href="#code-style-and-linting">Code style and linting</a>).</li>
-<li>All tests pass (see <a href="#running-tests">Running Tests</a>).</li>
+<li>All tests pass locally (see <a href="#running-tests">Running Tests</a>) and the
+  <a href="https://github.com/david-schaller/tralda/actions/workflows/ci.yml">CI workflow</a> passes.</li>
 <li>The documentation is updated if your changes affect the public API or add new features (see
   <a href="#documentation">Documentation</a>).</li>
 <li>An entry has been added to the changelog (see <a href="#changelog">Changelog</a>).</li>
@@ -1859,16 +1894,21 @@ as a git hook in the <code>tralda</code> repository:</p>
 <p>After this, <code>pre-commit</code> will automatically run the configured hooks (e.g., code formatting and
 linting) before each commit, ensuring that your code adheres to the project's coding standards.</p>
 <h2 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h2>
-<p>To run the tests for <code>tralda</code>, make sure you have set up your development environment with <code>uv</code>
-as described in the previous section.</p>
-<p>Then, you can run the tests using the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>uv<span class="w"> </span>run<span class="w"> </span>tests/all_tests.py
+<p>The test suite uses <a href="https://docs.pytest.org/">pytest</a>.
+Make sure you have set up your development environment with <code>uv</code> as described in the previous
+section.</p>
+<p>Install the test dependencies and run the tests:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span><span class="nb">test</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest
 </code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The project intends to migrate to <code>pytest</code> and introduce a GitHub Actions workflow that
-automatically runs tests on new commits and pull requests.</p>
-</div>
+<p>This will discover and run all tests in the <code>tests/</code> directory.</p>
+<h3 id="continuous-integration">Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permanent link">&para;</a></h3>
+<p>The same test suite runs automatically via the
+<a href="https://github.com/david-schaller/tralda/actions/workflows/ci.yml">CI GitHub Actions workflow</a>
+on every push and pull request, across all supported Python versions.
+The workflow also runs the <code>pre-commit</code> hooks to enforce code style and linting.</p>
+<p>You can check the current status of the CI pipeline via the badge at the top of the
+<a href="https://github.com/david-schaller/tralda#readme">README</a>.</p>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <h3 id="setting-up-mkdocs">Setting up MkDocs<a class="headerlink" href="#setting-up-mkdocs" title="Permanent link">&para;</a></h3>
 <p>The documentation of <code>tralda</code> is maintained in the <code>docs</code> folder of the repository and is built
