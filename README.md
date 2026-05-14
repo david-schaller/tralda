@@ -5,6 +5,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/tralda)](https://pypi.org/project/tralda/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/tralda)](https://pypi.org/project/tralda/)
 [![DOI](https://img.shields.io/badge/DOI-10.1186/s13015--021--00202--8-blue)](https://doi.org/10.1186/s13015-021-00202-8)
+[![CI](https://github.com/david-schaller/tralda/actions/workflows/ci.yml/badge.svg)](https://github.com/david-schaller/tralda/actions/workflows/ci.yml)
 
 A Python library for **tr**ee **al**gorithms and **da**ta structures.
 
