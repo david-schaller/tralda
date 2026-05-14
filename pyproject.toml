@@ -54,6 +54,9 @@ dev = [
     "pandas>=2.3.3",
     "seaborn>=0.13.2",
 ]
+lint = [
+    "pre-commit>=4.6.0",
+]
 docs = [
     "mkdocs-material>=9.7.6",
     "mkdocstrings[python]>=1.0.3",

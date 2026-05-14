@@ -125,7 +125,8 @@ license as `tralda` (MIT License).
 Before submitting your pull request, make sure that:
 
 - The `pre-commit` hooks pass (see [Code style and linting](#code-style-and-linting)).
-- All tests pass (see [Running Tests](#running-tests)).
+- All tests pass locally (see [Running Tests](#running-tests)) and the
+  [CI workflow](https://github.com/david-schaller/tralda/actions/workflows/ci.yml) passes.
 - The documentation is updated if your changes affect the public API or add new features (see
   [Documentation](#documentation)).
 - An entry has been added to the changelog (see [Changelog](#changelog)).
@@ -234,18 +235,28 @@ linting) before each commit, ensuring that your code adheres to the project's co
 
 ## Running Tests
 
-To run the tests for `tralda`, make sure you have set up your development environment with `uv`
-as described in the previous section.
+The test suite uses [pytest](https://docs.pytest.org/).
+Make sure you have set up your development environment with `uv` as described in the previous
+section.
 
-Then, you can run the tests using the following command:
+Install the test dependencies and run the tests:
 
 ```bash
-uv run tests/all_tests.py
+uv sync --group test
+uv run pytest
 ```
 
-!!! note
-    The project intends to migrate to `pytest` and introduce a GitHub Actions workflow that
-    automatically runs tests on new commits and pull requests.
+This will discover and run all tests in the `tests/` directory.
+
+### Continuous Integration
+
+The same test suite runs automatically via the
+[CI GitHub Actions workflow](https://github.com/david-schaller/tralda/actions/workflows/ci.yml)
+on every push and pull request, across all supported Python versions.
+The workflow also runs the `pre-commit` hooks to enforce code style and linting.
+
+You can check the current status of the CI pipeline via the badge at the top of the
+[README](https://github.com/david-schaller/tralda#readme).
 
 ## Documentation
 
