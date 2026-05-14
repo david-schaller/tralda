@@ -39,10 +39,11 @@ def assert_leaf_sets_equal(trees: Collection[Tree]) -> set[Any] | None:
             else:
                 leaves2.add(v.label)
 
-        if not leaves:
+        if len(leaves2) == 0:
+            raise ValueError("empty tree in tree list")
+
+        if leaves is None:
             leaves = leaves2
-            if len(leaves) == 0:
-                raise ValueError("empty tree in tree list")
         elif leaves != leaves2:
             return
 
