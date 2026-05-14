@@ -1115,10 +1115,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tralda.datastructures.linked.LinkedList.__nonzero__" class="md-nav__link">
+  <a href="#tralda.datastructures.linked.LinkedList.__bool__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __nonzero__
+        __bool__
       
     </span>
   </a>
@@ -1397,10 +1397,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tralda.datastructures.doubly_linked.DLList.__nonzero__" class="md-nav__link">
+  <a href="#tralda.datastructures.doubly_linked.DLList.__bool__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __nonzero__
+        __bool__
       
     </span>
   </a>
@@ -2171,10 +2171,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tralda.datastructures.linked.LinkedList.__nonzero__" class="md-nav__link">
+  <a href="#tralda.datastructures.linked.LinkedList.__bool__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __nonzero__
+        __bool__
       
     </span>
   </a>
@@ -2453,10 +2453,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tralda.datastructures.doubly_linked.DLList.__nonzero__" class="md-nav__link">
+  <a href="#tralda.datastructures.doubly_linked.DLList.__bool__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __nonzero__
+        __bool__
       
     </span>
   </a>
@@ -3543,7 +3543,8 @@
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">class</span><span class="w"> </span><span class="nc">LinkedList</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">class</span><span class="w"> </span><span class="nc">LinkedList</span><span class="p">:</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Linked list.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_first&quot;</span><span class="p">,</span> <span class="s2">&quot;_last&quot;</span><span class="p">,</span> <span class="s2">&quot;_count&quot;</span><span class="p">)</span>
@@ -3572,7 +3573,7 @@
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the list is non-empty.</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        Returns:</span>
@@ -3819,34 +3820,35 @@
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="p">:</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="o">.</span><span class="n">_value</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="o">.</span><span class="n">_next</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">-=</span> <span class="mi">1</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="k">return</span> <span class="n">value</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;cannot pop from empty linked list&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear the list.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_first</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_count_actual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Counts the actual number of elements (for debugging purposes).</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Runs in O(n) time.</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            The counted number of items in the list.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">while</span> <span class="n">current</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">_next</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">return</span> <span class="n">counter</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_last</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">-=</span> <span class="mi">1</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="k">return</span> <span class="n">value</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;cannot pop from empty linked list&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear the list.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_first</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_count_actual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Counts the actual number of elements (for debugging purposes).</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Runs in O(n) time.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            The counted number of items in the list.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">while</span> <span class="n">current</span><span class="p">:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">_next</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">return</span> <span class="n">counter</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -4006,10 +4008,10 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="tralda.datastructures.linked.LinkedList.__nonzero__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">__nonzero__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
+<h4 id="tralda.datastructures.linked.LinkedList.__bool__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__bool__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
-<a href="#tralda.datastructures.linked.LinkedList.__nonzero__" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#tralda.datastructures.linked.LinkedList.__bool__" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
@@ -4048,7 +4050,7 @@
 <span class="normal"><a href="#__codelineno-0-68">68</a></span>
 <span class="normal"><a href="#__codelineno-0-69">69</a></span>
 <span class="normal"><a href="#__codelineno-0-70">70</a></span>
-<span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="k">def</span><span class="w"> </span><span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns whether the list is non-empty.</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Returns:</span>
@@ -5430,7 +5432,8 @@ be used.</p>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="k">def</span><span class="w"> </span><span class="nf">popleft</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="k">def</span><span class="w"> </span><span class="nf">popleft</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes the first item of the list and returns its value.</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Returns:</span>
@@ -5442,11 +5445,12 @@ be used.</p>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="p">:</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="o">.</span><span class="n">_value</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="o">.</span><span class="n">_next</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">-=</span> <span class="mi">1</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">return</span> <span class="n">value</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;cannot pop from empty linked list&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">-=</span> <span class="mi">1</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="n">value</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;cannot pop from empty linked list&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5469,15 +5473,15 @@ be used.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/linked.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear the list.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_first</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear the list.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_first</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -6194,7 +6198,7 @@ be used.</p>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the list is non-empty.</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        Returns:</span>
@@ -6284,7 +6288,7 @@ be used.</p>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="k">return</span> <span class="n">node</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DLList</span><span class="p">:</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DLListNode</span><span class="p">:</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Append an item to the list.</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        Args:</span>
@@ -6701,10 +6705,10 @@ be used.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="tralda.datastructures.doubly_linked.DLList.__nonzero__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">__nonzero__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
+<h4 id="tralda.datastructures.doubly_linked.DLList.__bool__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__bool__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
-<a href="#tralda.datastructures.doubly_linked.DLList.__nonzero__" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#tralda.datastructures.doubly_linked.DLList.__bool__" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
@@ -6743,7 +6747,7 @@ be used.</p>
 <span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
 <span class="normal"><a href="#__codelineno-0-74">74</a></span>
-<span class="normal"><a href="#__codelineno-0-75">75</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">def</span><span class="w"> </span><span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-75">75</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns whether the list is non-empty.</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    Returns:</span>
@@ -7205,7 +7209,7 @@ Python lists).</p>
 
 
 <h4 id="tralda.datastructures.doubly_linked.DLList.append" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DLList</span></code>
+            <code class="highlight language-python"><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DLListNode</span></code>
 
 <a href="#tralda.datastructures.doubly_linked.DLList.append" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -7257,7 +7261,7 @@ Python lists).</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="DLList (tralda.datastructures.doubly_linked.DLList)" href="#tralda.datastructures.doubly_linked.DLList">DLList</a></code>
+                  <code><a class="autorefs autorefs-internal" title="DLListNode (tralda.datastructures.doubly_linked.DLListNode)" href="#tralda.datastructures.doubly_linked.DLListNode">DLListNode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7290,7 +7294,7 @@ Python lists).</p>
 <span class="normal"><a href="#__codelineno-0-175">175</a></span>
 <span class="normal"><a href="#__codelineno-0-176">176</a></span>
 <span class="normal"><a href="#__codelineno-0-177">177</a></span>
-<span class="normal"><a href="#__codelineno-0-178">178</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DLList</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-178">178</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DLListNode</span><span class="p">:</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Append an item to the list.</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    Args:</span>
@@ -8591,8 +8595,7 @@ index + length is out of bounds, the list gets truncated.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-15"> 15</a></span>
-<span class="normal"><a href="#__codelineno-0-16"> 16</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-16"> 16</a></span>
 <span class="normal"><a href="#__codelineno-0-17"> 17</a></span>
 <span class="normal"><a href="#__codelineno-0-18"> 18</a></span>
 <span class="normal"><a href="#__codelineno-0-19"> 19</a></span>
@@ -8717,133 +8720,148 @@ index + length is out of bounds, the list gets truncated.</p>
 <span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
-<span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="k">class</span><span class="w"> </span><span class="nc">Partition</span><span class="p">:</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dynamic partition implementation.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17"></a>
-<a id="__codelineno-0-18" name="__codelineno-0-18"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the partition.</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">            iterable: An iterable of iterables defining the initial partition.</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span> <span class="o">=</span> <span class="n">DLList</span><span class="p">()</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DLList</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="k">for</span> <span class="n">set_</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="n">dll_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">set_</span><span class="p">))</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set_</span><span class="p">:</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">dll_node</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Current number of sets in the partition.</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">            The current number of sets in the partition.</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="p">)</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartitionIterator</span><span class="p">:</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;An iterator for the dynamic partition.</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">            An iterator for this partition.</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="k">return</span> <span class="n">PartitionIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>        <span class="k">pass</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">in_same_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set of the partition.</span>
+<span class="normal"><a href="#__codelineno-0-141">141</a></span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span>
+<span class="normal"><a href="#__codelineno-0-143">143</a></span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
+<span class="normal"><a href="#__codelineno-0-146">146</a></span>
+<span class="normal"><a href="#__codelineno-0-147">147</a></span>
+<span class="normal"><a href="#__codelineno-0-148">148</a></span>
+<span class="normal"><a href="#__codelineno-0-149">149</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="k">class</span><span class="w"> </span><span class="nc">Partition</span><span class="p">:</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dynamic partition implementation.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18"></a>
+<a id="__codelineno-0-19" name="__codelineno-0-19"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the partition.</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">            iterable: An iterable of iterables defining the initial partition.</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span> <span class="o">=</span> <span class="n">DLList</span><span class="p">()</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DLListNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>        <span class="k">for</span> <span class="n">set_</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="n">dll_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">set_</span><span class="p">))</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set_</span><span class="p">:</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">dll_node</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Current number of sets in the partition.</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">            The current number of sets in the partition.</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="p">)</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartitionIterator</span><span class="p">:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;An iterator for the dynamic partition.</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">            An iterator for this partition.</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>        <span class="k">return</span> <span class="n">PartitionIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a>            <span class="s2">&quot;&#39;Partition&#39; object is not an iterator; use iter() to obtain a &#39;PartitionIterator&#39;&quot;</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>        <span class="p">)</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">            x: Item 1.</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">            y: Item 2.</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">            True if x and y are in the same set of the partition, False otherwise.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">in_same_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set of the partition.</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">            x: Item 1.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">            y: Item 2.</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">            KeyError: If x or y is not an item in the partition.</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">separated_xy_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set but in a different set than the third.</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">            True if x and y are in the same set of the partition, False otherwise.</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            KeyError: If x or y is not an item in the partition.</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">            x: Item 1.</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">            y: Item 2.</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">            z: Item 3.</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">            True if x and y are in the same set of the partition and z is in a different one, False</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">                otherwise.</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            KeyError: If x, y, or z is not an item in the partition.</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>            <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">z</span><span class="p">]</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>            <span class="p">)</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">separated_xy_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set but in a different set than the third.</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">            x: Item 1.</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">            y: Item 2.</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">            z: Item 3.</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            True if x and y are in the same set of the partition and z is in a different one, False</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">                otherwise.</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            KeyError: If x, y, or z is not an item in the partition.</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>            <span class="n">sx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>            <span class="k">elif</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>            <span class="n">sy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repr1</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">repr2</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge two sets of the partition based on arbitrary representatives.</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">        The merging is done efficiently by adding the elements of the smaller set to the bigger set.</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">        That way, each element is moved at most log(n) times into a new set.</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            repr1: Arbitrary representative of the first set.</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            repr2: Arbitrary representative of the second set.</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>            <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">z</span><span class="p">]</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="k">return</span> <span class="n">sx</span> <span class="ow">is</span> <span class="n">sy</span> <span class="ow">and</span> <span class="n">sx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">sz</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repr1</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">repr2</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge two sets of the partition based on arbitrary representatives.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            KeyError: If &#39;repr1&#39; or &#39;repr2&#39; is not an item in the partition.</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        The merging is done efficiently by adding the elements of the smaller set to the bigger set.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        That way, each element is moved at most log(n) times into a new set.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            The smaller of the original two sets that now have been merged.</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a>            <span class="n">set1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr1</span><span class="p">]</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr1</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>            <span class="n">set2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr2</span><span class="p">]</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr2</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>        <span class="k">if</span> <span class="n">set1</span> <span class="ow">is</span> <span class="n">set2</span><span class="p">:</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>            <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            repr1: Arbitrary representative of the first set.</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">            repr2: Arbitrary representative of the second set.</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            KeyError: If &#39;repr1&#39; or &#39;repr2&#39; is not an item in the partition.</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            The smaller of the original two sets that now have been merged. When both sets have</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">                equal size, the set containing ``repr1`` is returned.</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>            <span class="n">set1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr1</span><span class="p">]</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr1</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>        <span class="c1"># ensure that set1 is smaller</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">set2</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">):</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>            <span class="n">set1</span><span class="p">,</span> <span class="n">set2</span> <span class="o">=</span> <span class="n">set2</span><span class="p">,</span> <span class="n">set1</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">set2</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="c1"># the bigger set gets extended</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="n">set2</span><span class="o">.</span><span class="n">_value</span> <span class="o">|=</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">set1</span><span class="p">)</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>            <span class="n">set2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr2</span><span class="p">]</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr2</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>        <span class="k">if</span> <span class="n">set1</span> <span class="ow">is</span> <span class="n">set2</span><span class="p">:</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>            <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="c1"># ensure that set1 is smaller</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">set2</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">):</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>            <span class="n">set1</span><span class="p">,</span> <span class="n">set2</span> <span class="o">=</span> <span class="n">set2</span><span class="p">,</span> <span class="n">set1</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">set2</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a>        <span class="c1"># the bigger set gets extended</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>        <span class="n">set2</span><span class="o">.</span><span class="n">_value</span> <span class="o">|=</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">set1</span><span class="p">)</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="k">return</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -8907,8 +8925,7 @@ index + length is out of bounds, the list gets truncated.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-18">18</a></span>
-<span class="normal"><a href="#__codelineno-0-19">19</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-19">19</a></span>
 <span class="normal"><a href="#__codelineno-0-20">20</a></span>
 <span class="normal"><a href="#__codelineno-0-21">21</a></span>
 <span class="normal"><a href="#__codelineno-0-22">22</a></span>
@@ -8919,19 +8936,20 @@ index + length is out of bounds, the list gets truncated.</p>
 <span class="normal"><a href="#__codelineno-0-27">27</a></span>
 <span class="normal"><a href="#__codelineno-0-28">28</a></span>
 <span class="normal"><a href="#__codelineno-0-29">29</a></span>
-<span class="normal"><a href="#__codelineno-0-30">30</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Constructor of the partition.</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">        iterable: An iterable of iterables defining the initial partition.</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span> <span class="o">=</span> <span class="n">DLList</span><span class="p">()</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DLList</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="k">for</span> <span class="n">set_</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>        <span class="n">dll_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">set_</span><span class="p">))</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set_</span><span class="p">:</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">dll_node</span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Constructor of the partition.</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">        iterable: An iterable of iterables defining the initial partition.</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span> <span class="o">=</span> <span class="n">DLList</span><span class="p">()</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DLListNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">for</span> <span class="n">set_</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="n">dll_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">set_</span><span class="p">))</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set_</span><span class="p">:</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">dll_node</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8977,19 +8995,19 @@ index + length is out of bounds, the list gets truncated.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-33">33</a></span>
 <span class="normal"><a href="#__codelineno-0-34">34</a></span>
 <span class="normal"><a href="#__codelineno-0-35">35</a></span>
 <span class="normal"><a href="#__codelineno-0-36">36</a></span>
 <span class="normal"><a href="#__codelineno-0-37">37</a></span>
-<span class="normal"><a href="#__codelineno-0-38">38</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Current number of sets in the partition.</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">        The current number of sets in the partition.</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Current number of sets in the partition.</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">        The current number of sets in the partition.</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9035,19 +9053,19 @@ index + length is out of bounds, the list gets truncated.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-40">40</a></span>
-<span class="normal"><a href="#__codelineno-0-41">41</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-41">41</a></span>
 <span class="normal"><a href="#__codelineno-0-42">42</a></span>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartitionIterator</span><span class="p">:</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;An iterator for the dynamic partition.</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        An iterator for this partition.</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="k">return</span> <span class="n">PartitionIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartitionIterator</span><span class="p">:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;An iterator for the dynamic partition.</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        An iterator for this partition.</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="k">return</span> <span class="n">PartitionIterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9163,10 +9181,7 @@ index + length is out of bounds, the list gets truncated.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
-<span class="normal"><a href="#__codelineno-0-52">52</a></span>
-<span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
@@ -9182,26 +9197,29 @@ index + length is out of bounds, the list gets truncated.</p>
 <span class="normal"><a href="#__codelineno-0-67">67</a></span>
 <span class="normal"><a href="#__codelineno-0-68">68</a></span>
 <span class="normal"><a href="#__codelineno-0-69">69</a></span>
-<span class="normal"><a href="#__codelineno-0-70">70</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="k">def</span><span class="w"> </span><span class="nf">in_same_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set of the partition.</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">        x: Item 1.</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">        y: Item 2.</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">        True if x and y are in the same set of the partition, False otherwise.</span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span>
+<span class="normal"><a href="#__codelineno-0-72">72</a></span>
+<span class="normal"><a href="#__codelineno-0-73">73</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">def</span><span class="w"> </span><span class="nf">in_same_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set of the partition.</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">        x: Item 1.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">        y: Item 2.</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        KeyError: If x or y is not an item in the partition.</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        True if x and y are in the same set of the partition, False otherwise.</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">        KeyError: If x or y is not an item in the partition.</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>        <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9334,59 +9352,67 @@ otherwise.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-72">72</a></span>
-<span class="normal"><a href="#__codelineno-0-73">73</a></span>
-<span class="normal"><a href="#__codelineno-0-74">74</a></span>
-<span class="normal"><a href="#__codelineno-0-75">75</a></span>
-<span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span>
-<span class="normal"><a href="#__codelineno-0-78">78</a></span>
-<span class="normal"><a href="#__codelineno-0-79">79</a></span>
-<span class="normal"><a href="#__codelineno-0-80">80</a></span>
-<span class="normal"><a href="#__codelineno-0-81">81</a></span>
-<span class="normal"><a href="#__codelineno-0-82">82</a></span>
-<span class="normal"><a href="#__codelineno-0-83">83</a></span>
-<span class="normal"><a href="#__codelineno-0-84">84</a></span>
-<span class="normal"><a href="#__codelineno-0-85">85</a></span>
-<span class="normal"><a href="#__codelineno-0-86">86</a></span>
-<span class="normal"><a href="#__codelineno-0-87">87</a></span>
-<span class="normal"><a href="#__codelineno-0-88">88</a></span>
-<span class="normal"><a href="#__codelineno-0-89">89</a></span>
-<span class="normal"><a href="#__codelineno-0-90">90</a></span>
-<span class="normal"><a href="#__codelineno-0-91">91</a></span>
-<span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span>
-<span class="normal"><a href="#__codelineno-0-94">94</a></span>
-<span class="normal"><a href="#__codelineno-0-95">95</a></span>
-<span class="normal"><a href="#__codelineno-0-96">96</a></span>
-<span class="normal"><a href="#__codelineno-0-97">97</a></span>
-<span class="normal"><a href="#__codelineno-0-98">98</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">def</span><span class="w"> </span><span class="nf">separated_xy_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set but in a different set than the third.</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        x: Item 1.</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">        y: Item 2.</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">        z: Item 3.</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        True if x and y are in the same set of the partition and z is in a different one, False</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            otherwise.</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">        KeyError: If x, y, or z is not an item in the partition.</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>        <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">z</span><span class="p">]</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-75"> 75</a></span>
+<span class="normal"><a href="#__codelineno-0-76"> 76</a></span>
+<span class="normal"><a href="#__codelineno-0-77"> 77</a></span>
+<span class="normal"><a href="#__codelineno-0-78"> 78</a></span>
+<span class="normal"><a href="#__codelineno-0-79"> 79</a></span>
+<span class="normal"><a href="#__codelineno-0-80"> 80</a></span>
+<span class="normal"><a href="#__codelineno-0-81"> 81</a></span>
+<span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
+<span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
+<span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
+<span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
+<span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
+<span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
+<span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
+<span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
+<span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
+<span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
+<span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
+<span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
+<span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
+<span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#__codelineno-0-101">101</a></span>
+<span class="normal"><a href="#__codelineno-0-102">102</a></span>
+<span class="normal"><a href="#__codelineno-0-103">103</a></span>
+<span class="normal"><a href="#__codelineno-0-104">104</a></span>
+<span class="normal"><a href="#__codelineno-0-105">105</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="k">def</span><span class="w"> </span><span class="nf">separated_xy_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether two items are in the same set but in a different set than the third.</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">        x: Item 1.</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">        y: Item 2.</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        z: Item 3.</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        True if x and y are in the same set of the partition and z is in a different one, False</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            otherwise.</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">        KeyError: If x, y, or z is not an item in the partition.</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="n">sx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>        <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="k">elif</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">:</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="n">sy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>        <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">z</span><span class="p">]</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="k">return</span> <span class="n">sx</span> <span class="ow">is</span> <span class="n">sy</span> <span class="ow">and</span> <span class="n">sx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">sz</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9494,7 +9520,8 @@ That way, each element is moved at most log(n) times into a new set.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The smaller of the original two sets that now have been merged.</p>
+                <p>The smaller of the original two sets that now have been merged. When both sets have
+equal size, the set containing <code>repr1</code> is returned.</p>
               </div>
             </td>
           </tr>
@@ -9504,14 +9531,7 @@ That way, each element is moved at most log(n) times into a new set.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tralda/datastructures/partition.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-100">100</a></span>
-<span class="normal"><a href="#__codelineno-0-101">101</a></span>
-<span class="normal"><a href="#__codelineno-0-102">102</a></span>
-<span class="normal"><a href="#__codelineno-0-103">103</a></span>
-<span class="normal"><a href="#__codelineno-0-104">104</a></span>
-<span class="normal"><a href="#__codelineno-0-105">105</a></span>
-<span class="normal"><a href="#__codelineno-0-106">106</a></span>
-<span class="normal"><a href="#__codelineno-0-107">107</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-107">107</a></span>
 <span class="normal"><a href="#__codelineno-0-108">108</a></span>
 <span class="normal"><a href="#__codelineno-0-109">109</a></span>
 <span class="normal"><a href="#__codelineno-0-110">110</a></span>
@@ -9545,48 +9565,57 @@ That way, each element is moved at most log(n) times into a new set.</p>
 <span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
-<span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repr1</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">repr2</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge two sets of the partition based on arbitrary representatives.</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    The merging is done efficiently by adding the elements of the smaller set to the bigger set.</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    That way, each element is moved at most log(n) times into a new set.</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        repr1: Arbitrary representative of the first set.</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        repr2: Arbitrary representative of the second set.</span>
+<span class="normal"><a href="#__codelineno-0-141">141</a></span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span>
+<span class="normal"><a href="#__codelineno-0-143">143</a></span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
+<span class="normal"><a href="#__codelineno-0-146">146</a></span>
+<span class="normal"><a href="#__codelineno-0-147">147</a></span>
+<span class="normal"><a href="#__codelineno-0-148">148</a></span>
+<span class="normal"><a href="#__codelineno-0-149">149</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repr1</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">repr2</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge two sets of the partition based on arbitrary representatives.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        KeyError: If &#39;repr1&#39; or &#39;repr2&#39; is not an item in the partition.</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    The merging is done efficiently by adding the elements of the smaller set to the bigger set.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    That way, each element is moved at most log(n) times into a new set.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        The smaller of the original two sets that now have been merged.</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a>        <span class="n">set1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr1</span><span class="p">]</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr1</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>        <span class="n">set2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr2</span><span class="p">]</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr2</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="k">if</span> <span class="n">set1</span> <span class="ow">is</span> <span class="n">set2</span><span class="p">:</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        repr1: Arbitrary representative of the first set.</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">        repr2: Arbitrary representative of the second set.</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">        KeyError: If &#39;repr1&#39; or &#39;repr2&#39; is not an item in the partition.</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">        The smaller of the original two sets that now have been merged. When both sets have</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            equal size, the set containing ``repr1`` is returned.</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>        <span class="n">set1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr1</span><span class="p">]</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr1</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="c1"># ensure that set1 is smaller</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">set2</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">):</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="n">set1</span><span class="p">,</span> <span class="n">set2</span> <span class="o">=</span> <span class="n">set2</span><span class="p">,</span> <span class="n">set1</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">set2</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="c1"># the bigger set gets extended</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">set2</span><span class="o">.</span><span class="n">_value</span> <span class="o">|=</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">set1</span><span class="p">)</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="n">set2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">repr2</span><span class="p">]</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repr2</span><span class="si">}</span><span class="s2"> is not an item in the partition&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="k">if</span> <span class="n">set1</span> <span class="ow">is</span> <span class="n">set2</span><span class="p">:</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="c1"># ensure that set1 is smaller</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">set2</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">):</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>        <span class="n">set1</span><span class="p">,</span> <span class="n">set2</span> <span class="o">=</span> <span class="n">set2</span><span class="p">,</span> <span class="n">set1</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">return</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_item2set</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">set2</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a>    <span class="c1"># the bigger set gets extended</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>    <span class="n">set2</span><span class="o">.</span><span class="n">_value</span> <span class="o">|=</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">set1</span><span class="p">)</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="k">return</span> <span class="n">set1</span><span class="o">.</span><span class="n">_value</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -10238,7 +10267,7 @@ That way, each element is moved at most log(n) times into a new set.</p>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="k">for</span> <span class="n">ett</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_levels</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">forest</span><span class="p">:</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>                <span class="nb">print</span><span class="p">([</span><span class="n">occ</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">occ</span> <span class="ow">in</span> <span class="n">ett</span><span class="p">],</span> <span class="n">ett</span><span class="o">.</span><span class="n">num_active_occurrences</span><span class="p">)</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid level: </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">level</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid level: </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">level</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="n">_Level</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search for an replacement edge to reconnect u and v on the given level.</span>
@@ -11726,7 +11755,7 @@ case all levels are printed.</p>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="k">for</span> <span class="n">ett</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_levels</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">forest</span><span class="p">:</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="nb">print</span><span class="p">([</span><span class="n">occ</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">occ</span> <span class="ow">in</span> <span class="n">ett</span><span class="p">],</span> <span class="n">ett</span><span class="o">.</span><span class="n">num_active_occurrences</span><span class="p">)</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid level: </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">level</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid level: </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">level</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
