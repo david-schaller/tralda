@@ -122,7 +122,7 @@ class NodeStyle:
 #: Every field is fully resolved (no ``None`` values).  Use this as a reference when constructing
 #: a partial :class:`NodeStyle` to pass as *default*.
 DEFAULT_NODE_STYLE = NodeStyle(
-    symbol=None,  # resolved per-node via TreeStyle.root_symbol / leaf_symbol / internal_symbol
+    symbol=None,  # resolved per-node via TreeStyle.node_symbol / root_symbol / etc.
     symbol_size=9.0,
     symbol_color="white",
     symbol_edge_color="black",
@@ -156,12 +156,14 @@ class TreeStyle:
             be overlaid onto :data:`DEFAULT_NODE_STYLE` in ``__post_init__``, so omitted fields
             keep their standard values.  After construction, ``default`` is always fully resolved
             (no ``None`` fields).
+        node_symbol: Symbol name used for all nodes when the style function and node-override dict
+            do not specify one.  Default ``"none"`` (i.e. no symbol).
         root_symbol: Symbol name used for the root node when the style function and node-override
-            dict do not specify one.  Default ``"circle_with_inner_ring"``.
+            dict do not specify one.  Default ``None`` (falls back to *node_symbol*).
         leaf_symbol: Symbol name used for leaf nodes when not otherwise specified.
-            Default ``"circle_with_dot"``.
+            Default ``None`` (falls back to *node_symbol*).
         internal_symbol: Symbol name used for internal (non-root) nodes when not otherwise
-            specified.  Default ``"dot"``.
+            specified.  Default ``None`` (falls back to *node_symbol*).
         ghost_color: Color of ghost (leaf-extension) segments.  Default ``"grey"``.
         ghost_lw: Line width of ghost segments.  Default ``0.6``.
         ghost_ls: Line style of ghost segments.  Default ``"--"``.
@@ -175,9 +177,10 @@ class TreeStyle:
     default: NodeStyle = field(default=None)  # type: ignore[assignment]  resolved in __post_init__
 
     # ── structural symbol fallbacks ────────────────────────────────────────────────────────────
-    root_symbol: str = "none"
-    leaf_symbol: str = "none"
-    internal_symbol: str = "none"
+    node_symbol: str = "none"  # default for all nodes when no other symbol is specified
+    root_symbol: str | None = None
+    leaf_symbol: str | None = None
+    internal_symbol: str | None = None
 
     # ── ghost segment styling ──────────────────────────────────────────────────────────────────
     ghost_color: str = "grey"
@@ -232,6 +235,11 @@ class TreeStyle:
                 sym = self.leaf_symbol
             else:
                 sym = self.internal_symbol
+
+            # If the fallback is also None, fall back to node_symbol (which defaults to "none").
+            if sym is None:
+                sym = self.node_symbol
+
             style = style.overlay(NodeStyle(symbol=sym))
 
         return style
