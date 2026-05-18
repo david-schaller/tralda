@@ -51,11 +51,15 @@ class NodeRankMode(Enum):
         MEAN: The node is placed at the mean rank of its first and last child (default).
         FIRST: The node is placed at the rank of its first (leftmost) child.
         LAST: The node is placed at the rank of its last (rightmost) child.
+        NODE: Every node (leaf or internal) receives its own unique rank in preorder.  This
+            guarantees that no two nodes share the same perpendicular position, which eliminates
+            label overlap when labels are drawn for all nodes.
     """
 
     MEAN = "mean"
     FIRST = "first"
     LAST = "last"
+    NODE = "node"
 
 
 class LayoutMode(Enum):
@@ -92,11 +96,14 @@ class TreeLayout:
             according to :attr:`node_rank_mode`.
         max_depth (float): Maximum depth value (depth at which the outermost leaves sit).
         leaf_count (int): Total number of leaves.
+        rank_span (int): Number of distinct perpendicular rank slots occupied by nodes.  Equals
+            *leaf_count* for all :class:`NodeRankMode` values except ``NODE``, where every node
+            (leaf and internal) occupies its own slot, so *rank_span* equals the total node count.
         positions (dict[TreeNode, tuple[float, float]]): Final ``(x, y)`` screen-space coordinates.
-        label_angle (dict[TreeNode, float]): Suggested text rotation in degrees for each leaf.
+        label_angle (dict[TreeNode, float]): Suggested text rotation in degrees for each node.
             0 = horizontal text; positive values rotate counter-clockwise.
-        label_ha (dict[TreeNode, str]): Suggested ``horizontalalignment`` for each leaf label.
-        label_va (dict[TreeNode, str]): Suggested ``verticalalignment`` for each leaf label.
+        label_ha (dict[TreeNode, str]): Suggested ``horizontalalignment`` for each node label.
+        label_va (dict[TreeNode, str]): Suggested ``verticalalignment`` for each node label.
     """
 
     def __init__(
@@ -144,6 +151,7 @@ class TreeLayout:
         self.leaf_ranks: dict[TreeNode, float] = {}
         self.max_depth: float = 0.0
         self.leaf_count: int = 0
+        self.rank_span: int = 0
 
         self.positions: dict[TreeNode, tuple[float, float]] = {}
         self.label_angle: dict[TreeNode, float] = {}
@@ -374,8 +382,17 @@ class TreeLayout:
         """Assign perpendicular ranks to every node.
 
         Leaves receive consecutive integer ranks in left-to-right order. The rank of an internal
-        node is determined by :attr:`node_rank_mode`.
+        node is determined by :attr:`node_rank_mode`.  In ``NODE`` mode every node (leaf and
+        internal) receives its own unique rank in preorder, so all nodes are spaced equally along
+        the perpendicular axis with no two nodes sharing a position.
         """
+        if self.node_rank_mode is NodeRankMode.NODE:
+            for index, v in enumerate(self.tree.preorder()):
+                self.leaf_ranks[v] = float(index)
+            self.leaf_count = sum(1 for _ in self.tree.leaves())
+            self.rank_span = sum(1 for _ in self.tree.preorder())
+            return
+
         leaf_index = 0
         for v in self.tree.postorder():
             if not v.children:
@@ -392,13 +409,12 @@ class TreeLayout:
                     self.leaf_ranks[v] = self.leaf_ranks[last]
 
         self.leaf_count = leaf_index
+        self.rank_span = leaf_index
 
     def _positions_horizontal(self) -> None:
         """Set positions for horizontal layout (root left, leaves right)."""
         for v in self.tree.preorder():
             self.positions[v] = (self.depths[v], self.leaf_ranks[v])
-
-        for v in self.tree.leaves():
             self.label_angle[v] = 0.0
             self.label_ha[v] = "left"
             self.label_va[v] = "center"
@@ -407,8 +423,6 @@ class TreeLayout:
         """Set positions for vertical layout (root top, leaves bottom)."""
         for v in self.tree.preorder():
             self.positions[v] = (self.leaf_ranks[v], self.depths[v])
-
-        for v in self.tree.leaves():
             self.label_angle[v] = -90.0
             self.label_ha[v] = "left"
             self.label_va[v] = "center"
@@ -419,9 +433,6 @@ class TreeLayout:
             r = self.depths[v]
             theta = self._theta(self.leaf_ranks[v])
             self.positions[v] = (r * math.cos(theta), r * math.sin(theta))
-
-        for v in self.tree.leaves():
-            theta = self._theta(self.leaf_ranks[v])
             angle_deg = math.degrees(theta)
             # Normalise to (-180, 180].
             angle_deg = (angle_deg + 180.0) % 360.0 - 180.0
@@ -436,7 +447,7 @@ class TreeLayout:
     def _theta(self, rank: float) -> float:
         """Convert a leaf rank to an angle in radians for circular layout.
 
-        Angles run from 0 to just below 2π, distributed evenly across leaf ranks.
+        Angles run from 0 to just below 2π, distributed evenly across rank slots.
 
         Args:
             rank: The leaf rank to convert.
@@ -444,7 +455,7 @@ class TreeLayout:
         Returns:
             The corresponding angle in radians.
         """
-        if self.leaf_count <= 1:
+        if self.rank_span <= 1:
             return 0.0
 
-        return 2.0 * math.pi * rank / self.leaf_count
+        return 2.0 * math.pi * rank / self.rank_span

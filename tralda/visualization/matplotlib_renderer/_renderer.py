@@ -33,6 +33,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from tralda.datastructures.tree import TreeNode
+from tralda.visualization.layout import NodeRankMode
 from tralda.visualization.layout import LayoutMode
 from tralda.visualization.layout import TreeLayout
 from tralda.visualization.style import NodeStyle
@@ -81,6 +82,7 @@ class MatplotlibRenderer:
         rescale_depth: bool = True,
         label_pad: float = 4.0,
         show_labels: bool = True,
+        show_internal_labels: bool = False,
         show_ghost_segments: bool = True,
         figsize: tuple[float, float] | None = None,
     ) -> None:
@@ -97,6 +99,8 @@ class MatplotlibRenderer:
             label_pad: Gap between the symbol edge and the start of the label text, in points.
                 Default ``4``.
             show_labels: Draw leaf labels.  Default ``True``.
+            show_internal_labels: Also draw labels for internal nodes (including the root).  Only
+                nodes that have a ``label`` attribute are labelled.  Default ``False``.
             show_ghost_segments: Extend short leaves to the maximum depth with a dashed line.  Only
                 visible when leaves sit at different depths (``ATTR`` / ``UNIFORM`` edge-length
                 modes).  Default ``True``.
@@ -110,6 +114,7 @@ class MatplotlibRenderer:
         self.rescale_depth = rescale_depth
         self.label_pad = label_pad
         self.show_labels = show_labels
+        self.show_internal_labels = show_internal_labels
         self.show_ghost_segments = show_ghost_segments
         self.figsize = figsize
 
@@ -146,7 +151,7 @@ class MatplotlibRenderer:
 
         self._draw_edges(ax, positions, node_styles)
         self._draw_nodes(ax, positions, node_styles, mode)
-        if self.show_labels:
+        if self.show_labels or self.show_internal_labels:
             self._draw_labels(ax, positions, node_styles)
         self._style_axes(ax)
 
@@ -245,7 +250,10 @@ class MatplotlibRenderer:
             # ── child connector ────────────────────────────────────────────────────────────────
             if v.children:
                 children = list(v.children)
-                first_pos = positions[children[0]]
+                if layout.node_rank_mode == NodeRankMode.NODE:
+                    first_pos = positions[v]
+                else:
+                    first_pos = positions[children[0]]
                 last_pos = positions[children[-1]]
                 consensus_style = ts.consensus_style(children, mode)
 
@@ -308,6 +316,14 @@ class MatplotlibRenderer:
 
         The arc spans from the angular projection of *first_pos* to that of *last_pos*, sweeping
         the shorter way around.
+
+        Args:
+            ax: The axes to draw on.
+            px: X-coordinate of the node center, used to compute the arc radius.
+            py: Y-coordinate of the node center, used to compute the arc radius.
+            first_pos: (x, y) coordinates of the first child, used to determine the start angle.
+            last_pos: (x, y) coordinates of the last child, used to determine the end angle.
+            ns: The NodeStyle object containing styling information for the arc.
         """
         r = math.hypot(px, py)
         if r < 1e-12:
@@ -348,7 +364,14 @@ class MatplotlibRenderer:
         node_styles: dict[TreeNode, NodeStyle],
         mode: LayoutMode,
     ) -> None:
-        """Draw a symbol at every node."""
+        """Draw a symbol at every node.
+
+        Args:
+            ax: The axes to draw on.
+            positions: Mapping from tree nodes to (x, y) positions in data coordinates.
+            node_styles: Mapping from tree nodes to resolved NodeStyle objects.
+            mode: The layout mode, used to determine symbol rotation.
+        """
         for v in self.layout.tree.preorder():
             ns = node_styles[v]
             drawer = SYMBOL_REGISTRY[ns.symbol]
@@ -373,11 +396,24 @@ class MatplotlibRenderer:
         positions: dict[TreeNode, tuple[float, float]],
         node_styles: dict[TreeNode, NodeStyle],
     ) -> None:
-        """Draw a label next to every leaf that has a ``label`` attribute."""
+        """Draw a label next to every leaf (and optionally every internal node).
+
+        Only nodes that have a ``label`` attribute will be annotated.
+
+        Args:
+            ax: The axes to draw on.
+            positions: Mapping from tree nodes to (x, y) positions in data coordinates.
+            node_styles: Mapping from tree nodes to resolved NodeStyle objects.
+        """
         layout = self.layout
         mode = layout.layout_mode
 
-        for v in layout.tree.leaves():
+        for v in layout.tree.preorder():
+            if v.is_leaf() and not self.show_labels:
+                continue
+            if not v.is_leaf() and not self.show_internal_labels:
+                continue
+
             label = getattr(v, "label", None)
             if label is None:
                 continue
@@ -388,7 +424,8 @@ class MatplotlibRenderer:
 
             # If a ghost segment extends this leaf to max_depth, anchor the label at the far end
             # so all leaf labels are visually aligned regardless of actual branch length.
-            seg = layout.ghost_segment(v)
+            # Internal nodes never have ghost segments, so this branch is skipped for them.
+            seg = layout.ghost_segment(v) if v.is_leaf() else None
             if seg is not None:
                 (_, _), (x1_raw, y1_raw) = seg
                 scale = (
@@ -442,9 +479,13 @@ class MatplotlibRenderer:
     # ----------------------------------------------------------------------------------------------
 
     def _style_axes(self, ax: Axes) -> None:
-        """Remove decorations and orient the axes for the chosen layout mode."""
+        """Remove decorations and orient the axes for the chosen layout mode.
+
+        Returns:
+            The styled Axes object.
+        """
         mode = self.layout.layout_mode
-        n = self.layout.leaf_count
+        n = self.layout.rank_span
 
         ax.set_xticks([])
         ax.set_yticks([])
@@ -470,11 +511,15 @@ class MatplotlibRenderer:
     # ----------------------------------------------------------------------------------------------
 
     def _auto_figsize(self) -> tuple[float, float]:
-        """Compute a sensible default figure size from the leaf count."""
+        """Compute a sensible default figure size from the leaf count.
+
+        Returns:
+            A tuple (width, height) representing the figure size in inches.
+        """
         if self.figsize is not None:
             return self.figsize
 
-        n = max(1, self.layout.leaf_count)
+        n = max(1, self.layout.rank_span)
         mode = self.layout.layout_mode
         default_symbol_size = self.tree_style.default.symbol_size
 
