@@ -3,42 +3,22 @@
 All built-in symbols are sized in *points* so they scale consistently across DPI settings and axis
 extents.  Custom symbols can be added globally with :func:`register_symbol`.
 
-Built-in symbol names:
-
-+------------------------------+----------------------------------------------------------------+
-| Name                         | Appearance                                                     |
-+==============================+================================================================+
-| ``"none"``                   | Nothing drawn                                                  |
-+------------------------------+----------------------------------------------------------------+
-| ``"dot"``                    | Small solid circle; color and width follow the incoming edge   |
-+------------------------------+----------------------------------------------------------------+
-| ``"cap"``                    | Bar perpendicular to the edge; color and width follow edge     |
-+------------------------------+----------------------------------------------------------------+
-| ``"circle"``                 | Circle                                                         |
-+------------------------------+----------------------------------------------------------------+
-| ``"circle_with_dot"``        | Circle with centre dot                                         |
-+------------------------------+----------------------------------------------------------------+
-| ``"circle_with_inner_ring"`` | Circle with inner ring                                         |
-+------------------------------+----------------------------------------------------------------+
-| ``"square"``                 | Square, rotated in circular mode                               |
-+------------------------------+----------------------------------------------------------------+
-| ``"triangle"``               | Upward-pointing triangle, rotated in circular mode             |
-+------------------------------+----------------------------------------------------------------+
-| ``"triangle_down"``          | Downward-pointing triangle, rotated in circular mode           |
-+------------------------------+----------------------------------------------------------------+
-| ``"star"``                   | Star, rotated in circular mode                                 |
-+------------------------------+----------------------------------------------------------------+
+The canonical list of built-in symbol names and their cross-renderer properties is maintained in
+:mod:`~tralda.visualization._symbol_defs`.  Simple symbols (``SymbolKind.SIMPLE``) are drawn by
+auto-generated drawers produced by :func:`_make_simple_drawer`; no per-symbol boilerplate is
+needed.  Composite and edge-style symbols have explicit drawers defined below.
 """
 
 from __future__ import annotations
 
-from typing import Any, Callable
 import warnings
+from typing import Any, Callable
 
 from matplotlib.axes import Axes
 from matplotlib.markers import MarkerStyle
 from matplotlib.transforms import Affine2D
 
+from tralda.visualization._symbol_defs import SYMBOL_DEFS, SymbolDef, SymbolKind, resolve_symbol
 from tralda.visualization.layout import LayoutMode
 from tralda.visualization.style import NodeStyle
 
@@ -61,22 +41,16 @@ SymbolDrawer = Callable[..., None]
 
 
 # --------------------------------------------------------------------------------------------------
-# Built-in symbol drawers
+# Edge-style and composite drawers (explicit per-renderer logic)
 # --------------------------------------------------------------------------------------------------
 # Signature: (ax, x, y, ns, *, angle, layout_mode, **kwargs) -> None
-
-# --------------------------------------------------------------------------------------------------
-# Structural fallbacks
-# --------------------------------------------------------------------------------------------------
 
 
 def _draw_none(ax: Axes, x: float, y: float, ns: NodeStyle, **_: Any) -> None:
     """Draw nothing."""
 
 
-# --------------------------------------------------------------------------------------------------
-# Edge-style symbols (color and size follow the incoming edge, not the symbol style)
-# --------------------------------------------------------------------------------------------------
+# Edge-style symbols: color and size follow the incoming edge, not the symbol_* fields.
 
 
 def _draw_dot(
@@ -126,36 +100,10 @@ def _draw_cap(
     )
 
 
-# --------------------------------------------------------------------------------------------------
-# Circles
-# --------------------------------------------------------------------------------------------------
+# Composite symbols: two ax.plot calls to achieve the full visual.
 
 
-def _draw_circle(
-    ax: Axes,
-    x: float,
-    y: float,
-    ns: NodeStyle,
-    *,
-    angle: float = 0.0,
-    layout_mode: LayoutMode | None = None,
-    **_: Any,
-) -> None:
-    """Solid filled circle."""
-    ax.plot(
-        x,
-        y,
-        "o",
-        ms=ns.symbol_size,
-        mfc=ns.symbol_color,
-        mec=ns.symbol_edge_color,
-        mew=ns.symbol_lw,
-        ls="none",
-        zorder=ns.symbol_zorder,
-    )
-
-
-def _draw_circle_with_dot(
+def _draw_circle_dot(
     ax: Axes,
     x: float,
     y: float,
@@ -189,7 +137,7 @@ def _draw_circle_with_dot(
     )
 
 
-def _draw_circle_with_inner_ring(
+def _draw_circle_inner_ring(
     ax: Axes,
     x: float,
     y: float,
@@ -225,122 +173,70 @@ def _draw_circle_with_inner_ring(
 
 
 # --------------------------------------------------------------------------------------------------
-# Squares
+# Explicit drawers for INVISIBLE / EDGE_STYLE / COMPOSITE symbols
 # --------------------------------------------------------------------------------------------------
 
-
-def _draw_square(
-    ax: Axes,
-    x: float,
-    y: float,
-    ns: NodeStyle,
-    *,
-    angle: float = 0.0,
-    layout_mode: LayoutMode | None = None,
-    **_: Any,
-) -> None:
-    """Empty square with a border, rotated to align with the edge direction."""
-    marker = MarkerStyle("s", transform=Affine2D().rotate_deg(angle))
-    ax.plot(
-        x,
-        y,
-        marker=marker,
-        ms=ns.symbol_size,
-        mfc=ns.symbol_color,
-        mec=ns.symbol_edge_color,
-        mew=ns.symbol_lw,
-        ls="none",
-        zorder=ns.symbol_zorder,
-    )
+_SPECIAL_DRAWERS: dict[str, SymbolDrawer] = {
+    "none": _draw_none,
+    "dot": _draw_dot,
+    "cap": _draw_cap,
+    "circle-dot": _draw_circle_dot,
+    "circle-inner-ring": _draw_circle_inner_ring,
+}
 
 
 # --------------------------------------------------------------------------------------------------
-# Other shapes
+# Factory for SIMPLE symbols
 # --------------------------------------------------------------------------------------------------
 
 
-def _draw_triangle(
-    ax: Axes,
-    x: float,
-    y: float,
-    ns: NodeStyle,
-    *,
-    angle: float = 0.0,
-    layout_mode: LayoutMode | None = None,
-    **_: Any,
-) -> None:
-    """Upward-pointing triangle, rotated to align with the edge direction in circular mode."""
-    if layout_mode is LayoutMode.CIRCULAR:
-        marker = MarkerStyle("<", transform=Affine2D().rotate_deg(angle))
-    else:
-        marker = "^"
-    ax.plot(
-        x,
-        y,
-        marker=marker,
-        ms=ns.symbol_size,
-        mfc=ns.symbol_color,
-        mec=ns.symbol_edge_color,
-        mew=ns.symbol_lw,
-        ls="none",
-        zorder=ns.symbol_zorder,
-    )
+def _make_simple_drawer(defn: SymbolDef) -> SymbolDrawer:
+    """Return a :data:`SymbolDrawer` for a ``SIMPLE`` symbol definition.
 
+    The generated drawer uses a single ``ax.plot`` call.  In CIRCULAR mode the marker is wrapped
+    in a :class:`~matplotlib.markers.MarkerStyle` transform to rotate it toward the radial
+    direction; *mpl_circ_marker* and *mpl_circ_angle_offset* from the definition are applied.
 
-def _draw_triangle_down(
-    ax: Axes,
-    x: float,
-    y: float,
-    ns: NodeStyle,
-    *,
-    angle: float = 0.0,
-    layout_mode: LayoutMode | None = None,
-    **_: Any,
-) -> None:
-    """Downward-pointing triangle, rotated to align with the edge direction in circular mode."""
-    if layout_mode is LayoutMode.CIRCULAR:
-        marker = MarkerStyle(">", transform=Affine2D().rotate_deg(angle))
-    else:
-        marker = "v"
-    ax.plot(
-        x,
-        y,
-        marker=marker,
-        ms=ns.symbol_size,
-        mfc=ns.symbol_color,
-        mec=ns.symbol_edge_color,
-        mew=ns.symbol_lw,
-        ls="none",
-        zorder=ns.symbol_zorder,
-    )
+    Args:
+        defn: A :class:`~tralda.visualization._symbol_defs.SymbolDef` with
+            ``kind == SymbolKind.SIMPLE``.
 
+    Returns:
+        A callable matching the :data:`SymbolDrawer` protocol.
+    """
 
-def _draw_star(
-    ax: Axes,
-    x: float,
-    y: float,
-    ns: NodeStyle,
-    *,
-    angle: float = 0.0,
-    layout_mode: LayoutMode | None = None,
-    **_: Any,
-) -> None:
-    """Star, rotated to align with the edge direction in circular mode."""
-    if layout_mode is LayoutMode.CIRCULAR:
-        marker = MarkerStyle("*", transform=Affine2D().rotate_deg(angle + 90.0))
-    else:
-        marker = "*"
-    ax.plot(
-        x,
-        y,
-        marker=marker,
-        ms=ns.symbol_size * 1.3,
-        mfc=ns.symbol_color,
-        mec=ns.symbol_edge_color,
-        mew=ns.symbol_lw,
-        ls="none",
-        zorder=ns.symbol_zorder,
-    )
+    def draw(
+        ax: Axes,
+        x: float,
+        y: float,
+        ns: NodeStyle,
+        *,
+        angle: float = 0.0,
+        layout_mode: LayoutMode | None = None,
+        **_: Any,
+    ) -> None:
+        size = ns.symbol_size * defn.size_factor
+        if defn.directional and layout_mode is LayoutMode.CIRCULAR:
+            # An extra 90° rotates the marker's natural upward orientation to face
+            # radially inward, which is the correct convention for all directional symbols.
+            marker: Any = MarkerStyle(
+                defn.mpl_marker, transform=Affine2D().rotate_deg(angle + 90.0)
+            )
+        else:
+            marker = defn.mpl_marker
+        ax.plot(
+            x,
+            y,
+            marker=marker,
+            ms=size,
+            mfc=ns.symbol_color,
+            mec=ns.symbol_edge_color,
+            mew=ns.symbol_lw,
+            ls="none",
+            zorder=ns.symbol_zorder,
+        )
+
+    return draw
 
 
 # --------------------------------------------------------------------------------------------------
@@ -356,29 +252,22 @@ class _SymbolRegistry(dict[str, SymbolDrawer]):
     """
 
     def __init__(self) -> None:
-        """Initialize the registry with built-in symbols."""
+        """Initialize the registry with built-in symbols derived from :data:`SYMBOL_DEFS`."""
         super().__init__()
-
-        # add built-in symbols to the registry
-        self.update(
-            {
-                "none": _draw_none,
-                "dot": _draw_dot,
-                "cap": _draw_cap,
-                "circle": _draw_circle,
-                "circle_with_dot": _draw_circle_with_dot,
-                "circle_with_inner_ring": _draw_circle_with_inner_ring,
-                "square": _draw_square,
-                "triangle": _draw_triangle,
-                "triangle_down": _draw_triangle_down,
-                "star": _draw_star,
-            }
-        )
+        for defn in SYMBOL_DEFS:
+            if defn.kind is SymbolKind.SIMPLE:
+                self[defn.name] = _make_simple_drawer(defn)
+            elif defn.name in _SPECIAL_DRAWERS:
+                self[defn.name] = _SPECIAL_DRAWERS[defn.name]
 
     def __getitem__(self, key: str) -> SymbolDrawer:
         """Look up a symbol drawer by name, with a warning for missing symbols.
 
-        If the requested symbol name is not found in the registry, a warning is issued and the
+        Accepts tralda names, matplotlib marker strings (e.g. ``"^"``), and Plotly marker
+        names (e.g. ``"line-ns"``); all are resolved to the tralda canonical name first via
+        :func:`~tralda.visualization._symbol_defs.resolve_symbol`.
+
+        If the resolved name is not found in the registry, a warning is issued and the
         'none' drawer is returned, which results in no symbol being drawn.
 
         Args:
@@ -387,6 +276,7 @@ class _SymbolRegistry(dict[str, SymbolDrawer]):
         Returns:
             The corresponding symbol drawer if found; otherwise, the 'none' drawer.
         """
+        key = resolve_symbol(key)
         if key not in self:
             warnings.warn(f"Symbol '{key}' is not registered; using 'none' instead", stacklevel=2)
             return self["none"]
