@@ -25,6 +25,7 @@ See :mod:`~tralda.visualization.style` for the full styling API.
 
 from __future__ import annotations
 
+import functools
 import math
 
 import numpy as np
@@ -33,12 +34,17 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from tralda.datastructures.tree import TreeNode
-from tralda.visualization.layout import NodeRankMode
+from tralda.visualization._base_renderer import BaseRenderer
+from tralda.visualization._base_renderer import arc_theta_range
 from tralda.visualization.layout import LayoutMode
 from tralda.visualization.layout import TreeLayout
 from tralda.visualization.style import NodeStyle
 from tralda.visualization.style import TreeStyle
+from tralda.visualization._symbol_defs import resolve_linestyle
 from tralda.visualization.matplotlib_renderer._symbols import SYMBOL_REGISTRY
+
+# Bind the matplotlib target so all callsites in this module use the mpl shorthand directly.
+resolve_linestyle = functools.partial(resolve_linestyle, target="mpl")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -46,7 +52,7 @@ from tralda.visualization.matplotlib_renderer._symbols import SYMBOL_REGISTRY
 # --------------------------------------------------------------------------------------------------
 
 
-class MatplotlibRenderer:
+class MatplotlibRenderer(BaseRenderer):
     """Render a :class:`~tralda.visualization.layout.TreeLayout` with matplotlib.
 
     All node symbols are drawn at a size specified in *points*, so they remain visually consistent
@@ -66,7 +72,7 @@ class MatplotlibRenderer:
 
         layout = TreeLayout(tree, edge_length_mode="attr")
         style = TreeStyle.from_maps(
-            symbol_map={"S": "circle", "D": "square", "H": "triangle"},
+            symbol_map={"S": "circle", "D": "square", "H": "triangle-up"},
             color_map={"a": "steelblue", "b": "tomato"},
         )
         renderer = MatplotlibRenderer(layout, tree_style=style)
@@ -80,10 +86,10 @@ class MatplotlibRenderer:
         *,
         tree_style: TreeStyle | None = None,
         rescale_depth: bool = True,
-        label_pad: float = 4.0,
         show_labels: bool = True,
         show_internal_labels: bool = False,
         show_ghost_segments: bool = True,
+        label_pad: float = 4.0,
         figsize: tuple[float, float] | None = None,
     ) -> None:
         """Construct a renderer.
@@ -96,26 +102,27 @@ class MatplotlibRenderer:
                 default :class:`~tralda.visualization.style.TreeStyle` is used.
             rescale_depth: Normalise the depth axis to ``[0, 1]`` before rendering.  Recommended
                 when edge lengths are in absolute units (e.g. millions of years).  Default ``True``.
-            label_pad: Gap between the symbol edge and the start of the label text, in points.
-                Default ``4``.
             show_labels: Draw leaf labels.  Default ``True``.
             show_internal_labels: Also draw labels for internal nodes (including the root).  Only
                 nodes that have a ``label`` attribute are labelled.  Default ``False``.
             show_ghost_segments: Extend short leaves to the maximum depth with a dashed line.  Only
                 visible when leaves sit at different depths (``ATTR`` / ``UNIFORM`` edge-length
                 modes).  Default ``True``.
+            label_pad: Gap between the symbol edge and the start of the label text, in points.
+                Default ``4``.
             figsize: Figure size ``(width, height)`` in inches.  When ``None`` the size is derived
                 automatically from the leaf count and layout mode.
         """
-        self.layout = layout
+        super().__init__(
+            layout,
+            tree_style=tree_style,
+            rescale_depth=rescale_depth,
+            show_labels=show_labels,
+            show_internal_labels=show_internal_labels,
+            show_ghost_segments=show_ghost_segments,
+        )
         self._user_ax = ax
-
-        self.tree_style: TreeStyle = tree_style if tree_style is not None else TreeStyle()
-        self.rescale_depth = rescale_depth
         self.label_pad = label_pad
-        self.show_labels = show_labels
-        self.show_internal_labels = show_internal_labels
-        self.show_ghost_segments = show_ghost_segments
         self.figsize = figsize
 
     # ----------------------------------------------------------------------------------------------
@@ -161,32 +168,6 @@ class MatplotlibRenderer:
         return fig, ax
 
     # ----------------------------------------------------------------------------------------------
-    # Coordinate preparation
-    # ----------------------------------------------------------------------------------------------
-
-    def _build_positions(self) -> dict[TreeNode, tuple[float, float]]:
-        """Return layout positions, optionally normalising the depth axis to [0, 1].
-
-        Returns:
-            Mapping from tree nodes to (x, y) positions in data coordinates.
-        """
-        positions = dict(self.layout.positions)
-
-        if not self.rescale_depth or self.layout.max_depth == 0.0:
-            return positions
-
-        scale = 1.0 / self.layout.max_depth
-        mode = self.layout.layout_mode
-
-        if mode is LayoutMode.HORIZONTAL:
-            return {v: (x * scale, y) for v, (x, y) in positions.items()}
-        elif mode is LayoutMode.VERTICAL:
-            return {v: (x, y * scale) for v, (x, y) in positions.items()}
-        else:
-            # CIRCULAR: depth is encoded in the radius — scale uniformly.
-            return {v: (x * scale, y * scale) for v, (x, y) in positions.items()}
-
-    # ----------------------------------------------------------------------------------------------
     # Edge drawing
     # ----------------------------------------------------------------------------------------------
 
@@ -208,53 +189,19 @@ class MatplotlibRenderer:
             # ── parent edge ────────────────────────────────────────────────────────────────────
             if v.parent is not None:
                 px, py = positions[v.parent]
-
-                if mode is LayoutMode.HORIZONTAL:
-                    # Horizontal run from parent x to child x at the child's y.
-                    ax.plot(
-                        [px, vx],
-                        [vy, vy],
-                        color=ns.edge_color,
-                        lw=ns.edge_lw,
-                        ls=ns.edge_ls,
-                        solid_capstyle="round",
-                    )
-                elif mode is LayoutMode.VERTICAL:
-                    # Vertical run from parent y to child y at the child's x.
-                    ax.plot(
-                        [vx, vx],
-                        [py, vy],
-                        color=ns.edge_color,
-                        lw=ns.edge_lw,
-                        ls=ns.edge_ls,
-                        solid_capstyle="round",
-                    )
-                else:
-                    # CIRCULAR: radial segment at the child's angle.
-                    r_parent = math.hypot(px, py)
-                    if r_parent > 1e-12:
-                        theta_v = math.atan2(vy, vx)
-                        start_x = r_parent * math.cos(theta_v)
-                        start_y = r_parent * math.sin(theta_v)
-                    else:
-                        start_x, start_y = px, py
-                    ax.plot(
-                        [start_x, vx],
-                        [start_y, vy],
-                        color=ns.edge_color,
-                        lw=ns.edge_lw,
-                        ls=ns.edge_ls,
-                        solid_capstyle="round",
-                    )
+                x0, y0, x1, y1 = self._parent_edge_segment(vx, vy, px, py, mode)
+                ax.plot(
+                    [x0, x1],
+                    [y0, y1],
+                    color=ns.edge_color,
+                    lw=ns.edge_lw,
+                    ls=resolve_linestyle(ns.edge_ls),
+                    solid_capstyle="round",
+                )
 
             # ── child connector ────────────────────────────────────────────────────────────────
             if v.children:
-                children = list(v.children)
-                if layout.node_rank_mode == NodeRankMode.NODE:
-                    first_pos = positions[v]
-                else:
-                    first_pos = positions[children[0]]
-                last_pos = positions[children[-1]]
+                children, first_pos, last_pos = self._child_connector_range(v, positions)
                 consensus_style = ts.consensus_style(children, mode)
 
                 if mode is LayoutMode.HORIZONTAL:
@@ -263,7 +210,7 @@ class MatplotlibRenderer:
                         [first_pos[1], last_pos[1]],
                         color=consensus_style.edge_color,
                         lw=consensus_style.edge_lw,
-                        ls=consensus_style.edge_ls,
+                        ls=resolve_linestyle(consensus_style.edge_ls),
                         solid_capstyle="round",
                     )
                 elif mode is LayoutMode.VERTICAL:
@@ -272,7 +219,7 @@ class MatplotlibRenderer:
                         [vy, vy],
                         color=consensus_style.edge_color,
                         lw=consensus_style.edge_lw,
-                        ls=consensus_style.edge_ls,
+                        ls=resolve_linestyle(consensus_style.edge_ls),
                         solid_capstyle="round",
                     )
                 else:
@@ -286,21 +233,13 @@ class MatplotlibRenderer:
                 if seg is None:
                     continue
                 (x0, y0), (x1, y1) = seg
-                if self.rescale_depth and layout.max_depth > 0:
-                    scale = 1.0 / layout.max_depth
-                    if mode is LayoutMode.HORIZONTAL:
-                        x0, x1 = x0 * scale, x1 * scale
-                    elif mode is LayoutMode.VERTICAL:
-                        y0, y1 = y0 * scale, y1 * scale
-                    else:
-                        x0, y0 = x0 * scale, y0 * scale
-                        x1, y1 = x1 * scale, y1 * scale
+                x0, y0, x1, y1 = self._rescale_seg(x0, y0, x1, y1, mode)
                 ax.plot(
                     [x0, x1],
                     [y0, y1],
                     color=ts.ghost_color,
                     lw=ts.ghost_lw,
-                    ls=ts.ghost_ls,
+                    ls=resolve_linestyle(ts.ghost_ls),
                 )
 
     def _draw_arc(
@@ -325,31 +264,18 @@ class MatplotlibRenderer:
             last_pos: (x, y) coordinates of the last child, used to determine the end angle.
             ns: The NodeStyle object containing styling information for the arc.
         """
-        r = math.hypot(px, py)
-        if r < 1e-12:
+        result = arc_theta_range(px, py, first_pos, last_pos)
+        if result is None:
             return
 
-        # atan2 returns values in (-π, π].  Restore to [0, 2π) so that the angles match the
-        # layout's counterclockwise assignment (rank 0 → 0, rank n-1 → just below 2π).
-        # Because the first child always has a smaller rank than the last, theta1 ≤ theta2
-        # after this normalisation, and linspace sweeps the correct arc without any heuristic.
-        theta1 = math.atan2(first_pos[1], first_pos[0])
-        theta2 = math.atan2(last_pos[1], last_pos[0])
-        if theta1 < 0.0:
-            theta1 += 2.0 * math.pi
-        if theta2 < 0.0:
-            theta2 += 2.0 * math.pi
-        if theta2 < theta1:
-            theta2 += 2.0 * math.pi
-
-        n_pts = max(3, int((theta2 - theta1) * 30) + 2)
+        theta1, theta2, r, n_pts = result
         thetas = np.linspace(theta1, theta2, n_pts)
         ax.plot(
             r * np.cos(thetas),
             r * np.sin(thetas),
             color=ns.edge_color,
             lw=ns.edge_lw,
-            ls=ns.edge_ls,
+            ls=resolve_linestyle(ns.edge_ls),
             solid_capstyle="round",
         )
 
@@ -422,24 +348,7 @@ class MatplotlibRenderer:
             offset_pts = ns.symbol_size / 2.0 + self.label_pad
             x, y = positions[v]
 
-            # If a ghost segment extends this leaf to max_depth, anchor the label at the far end
-            # so all leaf labels are visually aligned regardless of actual branch length.
-            # Internal nodes never have ghost segments, so this branch is skipped for them.
-            seg = layout.ghost_segment(v) if v.is_leaf() else None
-            if seg is not None:
-                (_, _), (x1_raw, y1_raw) = seg
-                scale = (
-                    (1.0 / layout.max_depth)
-                    if (self.rescale_depth and layout.max_depth > 0)
-                    else 1.0
-                )
-                if mode is LayoutMode.HORIZONTAL:
-                    x = x1_raw * scale
-                elif mode is LayoutMode.VERTICAL:
-                    y = y1_raw * scale
-                else:  # CIRCULAR
-                    x = x1_raw * scale
-                    y = y1_raw * scale
+            x, y = self._ghost_label_anchor(v, x, y, mode)
 
             ha = layout.label_ha.get(v, "left")
             va = layout.label_va.get(v, "center")
