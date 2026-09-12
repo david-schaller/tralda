@@ -2949,14 +2949,25 @@ dependencies = [
     { name = "numpy", version = "2.3.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
 
+[package.optional-dependencies]
+matplotlib = [
+    { name = "matplotlib" },
+]
+plotly = [
+    { name = "plotly" },
+]
+viz = [
+    { name = "matplotlib" },
+    { name = "plotly" },
+]
+
 [package.dev-dependencies]
 dev = [
-    { name = "matplotlib" },
     { name = "notebook" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pandas", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "plotly" },
     { name = "seaborn" },
+    { name = "tralda", extra = ["viz"] },
 ]
 docs = [
     { name = "mkdocs-material" },
@@ -2971,17 +2982,20 @@ test = [
 
 [package.metadata]
 requires-dist = [
+    { name = "matplotlib", marker = "extra == 'matplotlib'", specifier = ">=3.10.8" },
     { name = "networkx", specifier = ">=3.4.2" },
     { name = "numpy", specifier = ">=2.2.6" },
+    { name = "plotly", marker = "extra == 'plotly'", specifier = ">=6.7.0" },
+    { name = "tralda", extras = ["matplotlib", "plotly"], marker = "extra == 'viz'" },
 ]
+provides-extras = ["matplotlib", "plotly", "viz"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "notebook", specifier = ">=7.5.6" },
     { name = "pandas", specifier = ">=2.3.3" },
-    { name = "plotly", specifier = ">=6.7.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "tralda", extras = ["viz"] },
 ]
 docs = [
     { name = "mkdocs-material", specifier = ">=9.7.6" },
