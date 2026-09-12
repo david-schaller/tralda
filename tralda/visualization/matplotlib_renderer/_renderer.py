@@ -73,7 +73,7 @@ class MatplotlibRenderer(BaseRenderer):
         layout = TreeLayout(tree, edge_length_mode="attr")
         style = TreeStyle.from_maps(
             symbol_map={"S": "circle", "D": "square", "H": "triangle-up"},
-            color_map={"a": "steelblue", "b": "tomato"},
+            node_color_map={"a": "steelblue", "b": "tomato"},
         )
         renderer = MatplotlibRenderer(layout, tree_style=style)
         fig, ax = renderer.render()
@@ -405,12 +405,15 @@ class MatplotlibRenderer(BaseRenderer):
             # Leaf rank 0 at the top, increasing downward.  Setting ylim explicitly avoids
             # matplotlib's default 5 % margin, which wastes significant vertical space for
             # large trees.  Half a rank unit of padding keeps the outermost symbols unclipped.
-            ax.set_ylim(n - 0.5, -0.5)
+            # Skipped for an empty tree (n == 0), where low == high would be degenerate.
+            if n > 0:
+                ax.set_ylim(n - 0.5, -0.5)
         elif mode is LayoutMode.VERTICAL:
             # Depth 0 (root) at the top, increasing downward.
             ax.invert_yaxis()
             # Tighten the leaf-rank (x) axis for the same reason as the horizontal case.
-            ax.set_xlim(-0.5, n - 0.5)
+            if n > 0:
+                ax.set_xlim(-0.5, n - 0.5)
         else:
             # CIRCULAR: equal aspect ratio so the tree is not distorted.
             ax.set_aspect("equal")

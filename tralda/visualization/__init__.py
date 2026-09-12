@@ -12,6 +12,7 @@ from __future__ import annotations
 import importlib
 from typing import TYPE_CHECKING, Any
 
+from tralda.visualization._convenience import plot_tree as plot_tree
 from tralda.visualization.layout import EdgeLengthMode as EdgeLengthMode
 from tralda.visualization.layout import LayoutMode as LayoutMode
 from tralda.visualization.layout import NodeRankMode as NodeRankMode

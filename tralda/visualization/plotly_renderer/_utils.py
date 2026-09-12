@@ -19,6 +19,21 @@ _MPL_SHORT_COLORS: dict[str, str] = {
     "w": "white",
 }
 
+#: Matplotlib named font sizes mapped to points, using matplotlib's default font-scaling factors
+#: (``matplotlib.font_manager.font_scalings``) applied to its default base size of 10pt.  Plotly's
+#: font size must be numeric, unlike matplotlib which accepts these names directly.
+_NAMED_FONT_SIZES: dict[str, float] = {
+    "xx-small": 5.79,
+    "x-small": 6.94,
+    "smaller": 8.33,
+    "small": 8.33,
+    "medium": 10.0,
+    "large": 12.0,
+    "larger": 12.0,
+    "x-large": 14.4,
+    "xx-large": 17.28,
+}
+
 
 # ---------------------------------------------------------------------------------------------------
 # Utility functions
@@ -51,4 +66,24 @@ def to_plotly_color(color: Any) -> str:
             return f"rgba({r},{g},{b},{a})"
     except (TypeError, ValueError):
         pass
+
     return str(color)
+
+
+def to_plotly_font_size(size: float | str) -> float:
+    """Convert a font size to a Plotly-compatible number.
+
+    ``NodeStyle.label_fontsize`` also accepts matplotlib named sizes (e.g. ``"small"``), but
+    Plotly's ``font.size`` property must be numeric. Named sizes are resolved via
+    :data:`_NAMED_FONT_SIZES`; unrecognised names fall back to the ``"medium"`` size (10pt).
+
+    Args:
+        size: A font size in points, or a matplotlib named size string.
+
+    Returns:
+        A numeric font size in points.
+    """
+    if isinstance(size, str):
+        return _NAMED_FONT_SIZES.get(size, _NAMED_FONT_SIZES["medium"])
+
+    return float(size)

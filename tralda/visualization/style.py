@@ -22,8 +22,8 @@ Resolution order (later wins, ``None`` fields are skipped):
 
     default  →  style_fn(node)  →  node_overrides[node]
 
-Convenience class methods on :class:`TreeStyle` accept ``symbol_map`` / ``color_map`` dicts and
-translate them into a style function.
+Convenience class methods on :class:`TreeStyle` accept ``symbol_map`` / ``node_color_map`` dicts
+and translate them into a style function.
 """
 
 from __future__ import annotations

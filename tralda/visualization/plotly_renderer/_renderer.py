@@ -56,6 +56,7 @@ from tralda.visualization.layout import LayoutMode
 from tralda.visualization.layout import TreeLayout
 from tralda.visualization.plotly_renderer._symbols import get_node_traces
 from tralda.visualization.plotly_renderer._utils import to_plotly_color
+from tralda.visualization.plotly_renderer._utils import to_plotly_font_size
 from tralda.visualization.style import NodeStyle
 from tralda.visualization.style import TreeStyle
 
@@ -91,6 +92,9 @@ class PlotlyRenderer(BaseRenderer):
         fig = renderer.render()
         fig.show()                      # interactive browser / Jupyter
         fig.write_html("tree.html")     # self-contained HTML file
+        fig.write_image("tree.png")     # static image, requires the 'kaleido' package
+                                        # (included in the 'plotly' extra:
+                                        # pip install tralda[plotly])
     """
 
     def __init__(
@@ -345,6 +349,7 @@ class PlotlyRenderer(BaseRenderer):
             offset = ns.symbol_size / 2.0 + _PAD
             angle = layout.label_angle.get(v, 0.0)
             ha = layout.label_ha.get(v, "left")
+            font_size = to_plotly_font_size(ns.label_fontsize)
 
             if mode is LayoutMode.HORIZONTAL:
                 # Leaves are at the rightmost position; push label further right.
@@ -378,7 +383,7 @@ class PlotlyRenderer(BaseRenderer):
                 orig_rad = math.radians(angle)
                 xshift = math.cos(orig_rad) * offset
                 yshift = math.sin(orig_rad) * offset
-                correction_factor = ns.label_fontsize * 0.75
+                correction_factor = font_size * 0.75
                 if 0.0 <= angle <= 90.0 or -180.0 <= angle < -90.0:
                     xshift -= correction_factor * math.sin(orig_rad)
                     yshift -= correction_factor * math.cos(orig_rad)
@@ -402,7 +407,7 @@ class PlotlyRenderer(BaseRenderer):
                     showarrow=False,
                     font=dict(
                         color=to_plotly_color(ns.label_color),
-                        size=ns.label_fontsize,
+                        size=font_size,
                     ),
                     xanchor=xanchor,
                     yanchor=yanchor,

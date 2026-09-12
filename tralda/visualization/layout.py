@@ -114,7 +114,7 @@ class TreeLayout:
         edge_length_attr: str = "dist",
         layout_mode: LayoutMode
         | Literal["horizontal", "vertical", "circular"] = LayoutMode.HORIZONTAL,
-        node_rank_mode: NodeRankMode | Literal["mean", "first", "last"] = NodeRankMode.MEAN,
+        node_rank_mode: NodeRankMode | Literal["mean", "first", "last", "node"] = NodeRankMode.MEAN,
     ) -> None:
         """Construct a layout for the given tree.
 
@@ -129,7 +129,7 @@ class TreeLayout:
                 or its string value (``"horizontal"``, ``"vertical"``, ``"circular"``).
             node_rank_mode: How the perpendicular rank of internal nodes is derived from their
                 children. Accepts a :class:`NodeRankMode` member or its string value
-                (``"mean"``, ``"first"``, ``"last"``).
+                (``"mean"``, ``"first"``, ``"last"``, ``"node"``).
         """
         self.tree = tree
         self.edge_length_mode: EdgeLengthMode = (
