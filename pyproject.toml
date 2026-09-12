@@ -41,7 +41,8 @@ keywords = [
 
 [project.optional-dependencies]
 matplotlib = ["matplotlib>=3.10.8"]
-plotly = ["plotly>=6.7.0"]
+# kaleido enables static image export (Figure.write_image) alongside interactive HTML output.
+plotly = ["plotly>=6.7.0", "kaleido>=1.0.0"]
 viz = ["tralda[matplotlib,plotly]"]
 
 [project.urls]

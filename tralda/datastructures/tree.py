@@ -1145,6 +1145,33 @@ class Tree:
         for line in self._lines_for_print_tree(child_indentation):
             print(line)
 
+    def plot(
+        self,
+        *,
+        backend: str = "matplotlib",
+        path: str | os.PathLike | None = None,
+        show: bool = False,
+        **kwargs: Any,
+    ) -> Any:
+        """Render this tree; see :func:`tralda.visualization.plot_tree` for all parameters.
+
+        Requires the optional visualization dependencies, e.g. ``pip install tralda[matplotlib]``,
+        ``tralda[plotly]``, or ``tralda[viz]`` for both backends.
+
+        Args:
+            backend: ``"matplotlib"`` (default) or ``"plotly"``.
+            path: If given, save the resulting figure to this path.
+            show: If ``True``, display the figure after rendering.
+            **kwargs: Additional keyword arguments forwarded to
+                :func:`~tralda.visualization.plot_tree` (layout mode, tree style, etc.).
+
+        Returns:
+            ``(fig, ax)`` for the matplotlib backend, or a Plotly ``Figure`` for the plotly backend.
+        """
+        from tralda.visualization import plot_tree
+
+        return plot_tree(self, backend=backend, path=path, show=show, **kwargs)
+
     # --------------------------------------------------------------------------
     #                             RANDOM TREE
     # --------------------------------------------------------------------------
