@@ -76,6 +76,10 @@ nav:
     - Linked Lists: guide/linked_lists.md
     - Dynamic Partition: guide/dynamic_partition.md
     - Utils: guide/utils.md
+    - Visualization:
+      - Quick Start: guide/visualization.md
+      - Layout & Styling: guide/visualization_styling.md
+      - Examples: guide/visualization_examples.md
   - API Reference:
     - Data Structures:
       - Trees: api/trees.md
@@ -84,5 +88,6 @@ nav:
     - Supertrees: api/supertrees.md
     - Cographs: api/cographs.md
     - Utils: api/utils.md
+    - Visualization: api/visualization.md
   - Citation: citation.md
   - Contributing: contributing.md
