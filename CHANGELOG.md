@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased]
+
+### 🌟 Features
+
+- New `tralda.visualization` subpackage for rendering `Tree` objects as static (matplotlib) or
+  interactive (Plotly) figures. Provides `TreeLayout` (horizontal, vertical, and circular layout
+  modes with several edge-length and node-rank strategies), `TreeStyle`/`NodeStyle` for flexible
+  per-node styling (symbols, colors, labels), `MatplotlibRenderer` and `PlotlyRenderer`, and the
+  one-call convenience function `plot_tree`. Optional extras: `pip install tralda[matplotlib]`,
+  `tralda[plotly]`, or `tralda[viz]` for both.
+
+### 📚 Documentation
+
+- Added a user guide for `tralda.visualization` (quick start, layout & styling reference, and
+  worked examples using a real mammal phylogeny and a simulated dataset from AsymmeTree), along
+  with the corresponding API reference page.
+- Added a short "Visualization" section with a runnable example to `README.md`.
+
 ## [2.0.3] - 2026-05-14
 
 ### 🧪 Tests

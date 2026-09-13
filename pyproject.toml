@@ -92,4 +92,4 @@ target-version = "py310"
 testpaths = ["tests"]
 
 [tool.codespell]
-ignore-words-list = "stoer"
+ignore-words-list = "stoer,te"

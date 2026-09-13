@@ -68,6 +68,43 @@ queries in $O(\log n)$.
 (Crespelle 2021) that modifies a graph with a near-minimum number of edge insertions/deletions to
 make it a cograph.
 
+## Visualization
+
+`tralda.visualization` renders `Tree` objects as static (matplotlib) or interactive (Plotly)
+figures, with horizontal, vertical, and circular layouts and a flexible per-node styling API.
+Optional extra: `pip install tralda[viz]`.
+
+<details>
+<summary>Click to expand the code example</summary>
+
+```python
+from tralda.datastructures import LCA, Tree
+from tralda.visualization import plot_tree
+from tralda.visualization.style import NodeStyle, TreeStyle
+
+T = Tree.parse_newick(
+    "((((Human:6,Chimpanzee:6)HC:2,Gorilla:8)HCG:9,Orangutan:17)Hominidae:3,"
+    "(Gibbon:17,Siamang:17)Hylobatidae:3)Hominoidea;"
+)
+
+# Compute and highlight the last common ancestor of Human and Gorilla.
+lca = LCA(T)
+lca_node = lca("Human", "Gorilla")
+
+tree_style = TreeStyle(
+    leaf_symbol="circle",
+    node_overrides={lca_node: NodeStyle(symbol="star", symbol_size=13, symbol_color="gold")},
+)
+
+fig, ax = plot_tree(T, tree_style=tree_style)
+```
+</details>
+
+![Ape phylogeny with leaf symbols and a highlighted LCA](docs/guide/images/viz-readme-example.png)
+
+See the [visualization user guide](https://david-schaller.github.io/tralda/guide/visualization/)
+for the full styling API and more examples.
+
 ## Citation and references
 
 If you use `tralda` in your project or code from it, please consider citing:

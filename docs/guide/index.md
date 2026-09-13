@@ -52,3 +52,7 @@ $O(n \log n)$ total cost over all merge operations.
 
 **[Utils](utils.md)** — Helper functions for working with trees and graphs, collected in
 `tralda.utils`.
+
+**[Visualization](visualization.md)** — `tralda.visualization` renders trees as static
+(matplotlib) or interactive (Plotly) figures, with horizontal, vertical, and circular layouts and
+a flexible per-node styling API. Optional extra: `pip install tralda[viz]`.
