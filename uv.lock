@@ -3165,6 +3165,7 @@ lint = [
 ]
 test = [
     { name = "pytest" },
+    { name = "tralda", extra = ["viz"] },
 ]
 
 [package.metadata]
@@ -3190,7 +3191,10 @@ docs = [
     { name = "mkdocstrings", extras = ["python"], specifier = ">=1.0.3" },
 ]
 lint = [{ name = "pre-commit", specifier = ">=4.6.0" }]
-test = [{ name = "pytest", specifier = ">=9.0.3" }]
+test = [
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "tralda", extras = ["viz"] },
+]
 
 [[package]]
 name = "typing-extensions"
