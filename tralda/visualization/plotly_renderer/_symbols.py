@@ -10,6 +10,7 @@ names are mapped to Plotly marker symbols via
 
 from __future__ import annotations
 
+import html
 import math
 import plotly.graph_objects as go
 
@@ -66,16 +67,16 @@ def get_node_traces(
         plotly_sym, eff_color, eff_size, eff_edge_color, eff_edge_width = _resolve_marker(ns)
         angle = _marker_angle(ns.symbol, x, y, mode)
 
-        # Build hover text.
+        # Build hover text; escape user-controlled values, keep the intentional <b> wrapper.
         label = getattr(v, "label", None)
         parts: list[str] = []
         if label is not None:
-            parts.append(f"<b>{label}</b>")
+            parts.append(f"<b>{html.escape(str(label))}</b>")
         parts.append(f"depth: {layout.depths[v]:.4g}")
         for attr in hover_attrs:
             val = getattr(v, attr, None)
             if val is not None:
-                parts.append(f"{attr}: {val}")
+                parts.append(f"{html.escape(str(attr))}: {html.escape(str(val))}")
 
         node_x.append(x)
         node_y.append(y)
