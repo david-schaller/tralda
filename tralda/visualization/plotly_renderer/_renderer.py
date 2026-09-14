@@ -43,6 +43,7 @@ left-half readability flip) and rotated to align with the radial direction.
 
 from __future__ import annotations
 
+import html
 import math
 from typing import Any
 
@@ -392,7 +393,7 @@ class PlotlyRenderer(BaseRenderer):
                     yshift += correction_factor * math.cos(orig_rad)
 
             # Apply font weight and style via HTML tags.
-            text = str(label)
+            text = html.escape(str(label))
             if ns.label_fontstyle == "italic":
                 text = f"<i>{text}</i>"
             if ns.label_fontweight == "bold":
